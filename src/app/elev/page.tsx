@@ -50,7 +50,17 @@ export default function ZonaElev() {
           ))}
         </div>
 
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <Link href={`/elev/antrenament?clasa=${clasa}`}
+          className="mt-8 flex flex-wrap items-center gap-5 rounded-3xl bg-mov p-6 text-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl">
+          <span className="text-6xl" aria-hidden>🎒</span>
+          <span className="flex-1">
+            <span className="block text-2xl font-bold">Antrenament pe noțiuni</span>
+            <span className="block text-white/90">Alege una sau mai multe noțiuni din programă și exersează 10, 20, 50 sau 100 de exerciții, cu ajutor pas cu pas.</span>
+          </span>
+          <span className="rounded-2xl bg-galben px-5 py-3 text-lg font-bold text-mov-inchis">Începe ▶</span>
+        </Link>
+
+        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {JOCURI.map((j) => {
             const disponibil = j.clase.includes(clasa);
             const stele = pr?.stele[`${j.id}-${clasa}`] ?? 0;

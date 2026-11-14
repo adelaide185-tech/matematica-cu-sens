@@ -70,7 +70,14 @@ Gata (etapa 2):
 - import CSV al elevilor
 - progres salvat în PostgreSQL
 
+Gata (etapa 3, fazele A + B din `docs/03_PLAN_JOCURI.md`):
+- **antrenament pe noțiuni** (`/elev/antrenament`): 28 de subiecte de numerație, operații și probleme (clasele I–IV)
+- sesiuni de 10/20/50/100 exerciții unice; mod mixt cu mai multe subiecte amestecate
+- indicii pas cu pas, pauză și reluare, ecran final cu verdict pe noțiune
+- link direct pentru profesori: `/elev/antrenament?clasa=2&subiecte=op.tabla,op.impartire&nivel=mediu&n=50`
+
 Urmează:
+- fazele C–E: fracții, măsurări, timp, bani; geometrie și date; clasa a V-a
 - teme cu cod pentru clasă și rapoarte de progres pentru profesor
 - generatoare de geometrie și date
 - clasa a V-a

@@ -50,6 +50,7 @@ model Utilizator {
   incercari     Incercare[]
   stapaniri     Stapanire[]
   recompense    RecompensaObtinuta[]
+  sesiuniJoc    SesiuneJoc[]
   puncteLogica  Int       @default(0)
   puncteViteza  Int       @default(0)
 
@@ -209,4 +210,22 @@ model RecompensaObtinuta {
   recompensa   Recompensa @relation(fields: [recompensaId], references: [id])
   obtinutLa    DateTime   @default(now())
   @@id([elevId, recompensaId])
+}
+
+// Sesiuni de antrenament (10–100 exerciții, unul sau mai multe subiecte), cu pauză și reluare
+model SesiuneJoc {
+  id         String     @id @default(cuid())
+  elevId     String
+  elev       Utilizator @relation(fields: [elevId], references: [id], onDelete: Cascade)
+  /// { clasa, nivel, subiecte, n, seed } — exercițiile se regenerează identic din seed
+  config     Json
+  pozitie    Int        @default(0)
+  /// rezultatele pe exercițiu: { subiectId, incercari, cuAjutor, timpMs }[]
+  rezultate  Json
+  /// „in_curs” | „pauza” | „terminata”
+  stare      String     @default("in_curs")
+  creatLa    DateTime   @default(now())
+  actualizat DateTime   @updatedAt
+
+  @@index([elevId, stare])
 }

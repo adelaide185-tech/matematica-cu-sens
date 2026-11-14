@@ -1,4 +1,9 @@
-# Plan: jocuri educaționale pentru fiecare noțiune (propunere, în așteptarea confirmării)
+# Plan: jocuri educaționale pentru fiecare noțiune
+
+> **Stadiu:**
+> - Fazele A (motorul) și B (numerație, operații, probleme: 28 de subiecte) sunt implementate și testate.
+> - Fazele C–E urmează.
+> - Capacitatea măsurată a fiecărui subiect apare în testul `src/antrenament/antrenament.test.ts`.
 
 ## 1. Auditul codului actual
 
