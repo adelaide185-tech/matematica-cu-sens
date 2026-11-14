@@ -16,7 +16,9 @@ export async function BaraCont() {
       <nav className="flex items-center gap-3">
         {s.rol === "ADMIN_SCOALA" && <Link href="/admin" className="font-semibold text-mov hover:underline">Administrare</Link>}
         {s.rol !== "ELEV" && <Link href="/profesor" className="font-semibold text-mov hover:underline">Fișe</Link>}
+        {s.rol !== "ELEV" && <Link href="/profesor/lectii" className="font-semibold text-mov hover:underline">Lecții</Link>}
         <Link href="/elev" className="font-semibold text-mov hover:underline">Jocuri</Link>
+        <Link href="/elev/atelier" className="font-semibold text-mov hover:underline">Atelier</Link>
         <span className="hidden text-gray-600 md:inline">{s.nume} · {ROL_NUME[s.rol]}</span>
         <Link href="/schimba-parola" className="text-gray-600 hover:underline">Parola</Link>
         <form action={deconectare}><button className="rounded-lg bg-mov-deschis px-3 py-1 font-semibold text-mov">Ieși</button></form>

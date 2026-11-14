@@ -44,7 +44,10 @@ export default function PanouProfesor() {
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[400px_1fr]">
       <aside className="bg-white p-5 shadow-md lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
-        <Link href="/" className="text-sm font-semibold text-mov">← Acasă</Link>
+        <div className="flex items-center justify-between gap-2">
+          <Link href="/" className="text-sm font-semibold text-mov">← Acasă</Link>
+          <Link href="/profesor/lectii" className="rounded-lg bg-mov-deschis px-2.5 py-1 text-sm font-bold text-mov hover:bg-mov/20">🧱 Lecții cu materiale</Link>
+        </div>
         <h1 className="mt-2 text-2xl font-bold text-mov">Generator de fișe</h1>
 
         <Sectiune titlu="1. Clasa">

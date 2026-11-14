@@ -50,7 +50,24 @@ export default function ZonaElev() {
           ))}
         </div>
 
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid gap-5 sm:grid-cols-2">
+          <Link href="/elev/lectii" className="flex items-center gap-4 rounded-3xl bg-mov p-6 text-white shadow-md transition hover:-translate-y-1 hover:shadow-xl">
+            <span className="text-6xl" aria-hidden>🧱</span>
+            <span>
+              <span className="block text-2xl font-bold">Lecții cu materiale</span>
+              <span className="block text-white/85">Blocuri, axa numerelor, modelul în bară și altele, pas cu pas.</span>
+            </span>
+          </Link>
+          <Link href="/elev/atelier" className="flex items-center gap-4 rounded-3xl bg-white p-6 shadow-md ring-2 ring-mov/20 transition hover:-translate-y-1 hover:shadow-xl">
+            <span className="text-6xl" aria-hidden>🧰</span>
+            <span>
+              <span className="block text-2xl font-bold text-mov">Atelierul</span>
+              <span className="block text-gray-600">Lucrează liber cu materialele: construiește, mută, descoperă.</span>
+            </span>
+          </Link>
+        </div>
+
+        <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {JOCURI.map((j) => {
             const disponibil = j.clase.includes(clasa);
             const stele = pr?.stele[`${j.id}-${clasa}`] ?? 0;

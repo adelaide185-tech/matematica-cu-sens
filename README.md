@@ -16,6 +16,9 @@ Aplicația pornește la http://localhost:3000.
 
 - `/profesor`: generatorul de fișe
 - `/elev`: jocurile (Scara, Numărătoarea magică, Pizza fracțiilor)
+- `/elev/atelier`: Atelierul cu materiale (blocuri baza 10, rekenrek, cadrul de 10, axa numerelor, tabla sutelor, modelul în bară), cu link de partajare
+- `/elev/lectii`: lecții ghidate pe materiale (clasa a II-a)
+- `/profesor/lectii`: lecțiile cu notele pentru profesor și modul „Proiectează la clasă”
 - `/fisa?...`: pagina A4 de printare
 - `/api/pdf?...`: descărcare PDF (are nevoie de Playwright + Chromium pe server)
 
@@ -52,6 +55,8 @@ Testele verifică fiecare generator, pentru fiecare clasă și fiecare nivel, pe
 | `src/curriculum/` | mapa curriculară: lecțiile Eduten (cl. I, III, IV), curriculumul „Matematică cu Sens” (cl. II), programa (cl. V) |
 | `src/componente/svg/` | desenele SVG comune fișelor și jocurilor: numărătoare, fracții, ceas, axa numerelor |
 | `src/componente/FisaPrint.tsx` | fișa A4 (antet, itemi, spațiu de lucru, rezolvări, barem) |
+| `src/manipulative/` | materialele virtuale: logica pură (`logica.ts`, testată), componentele interactive, starea + linkul de partajare (`stare.ts`) |
+| `src/lectii/` | lecțiile ghidate (pași, verificări, indicii, rezolvări) și notele pentru profesor |
 | `src/jocuri/` | progres, dificultate adaptivă, recompense, componente comune jocurilor |
 | `src/app/` | paginile Next.js |
 | `prisma/schema.prisma` | schema bazei de date (conturi, școli, licențe, teme, progres); încă neconectată |
@@ -64,6 +69,7 @@ Gata și testat:
 - fișe pe 4 niveluri cu barem și descriptori
 - PDF
 - 3 jocuri cu stele, trofee și dificultate adaptivă
+- Atelierul cu 6 materiale virtuale și 9 lecții ghidate pentru clasa a II-a (inspirate de Brainingcamp)
 
 Gata (etapa 2):
 - conturi cu roluri (administrator, profesor, elev)

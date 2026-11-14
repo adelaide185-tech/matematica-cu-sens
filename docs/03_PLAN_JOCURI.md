@@ -234,3 +234,26 @@ Asta dă peste 100. Spațierea faptului (§3.2, punctul 2) previne repetarea mec
 | **C. Fracții, măsurări, timp, bani** | M13–M16; ~15 subiecte | — |
 | **D. Geometrie și date** | grilă, simetrie, unghiuri, grafice; ~15 subiecte; completează și lecțiile „în curând” de pe fișe | — |
 | **E. Clasa a V-a** | după programa OM 3393/2017 | — |
+
+## 6. Materiale virtuale și lecții ghidate (implementat, după modelul Brainingcamp)
+
+Brainingcamp oferă 18 materiale virtuale („manipulative”), lecții gata făcute pe ele („Tasks”, cu note pentru profesor) și coduri de partajare. Am preluat ideea, nu grafica: materialele sunt desenate de noi, în culorile aplicației.
+
+| Brainingcamp | La noi | Stadiu |
+|---|---|---|
+| Base Ten Blocks, Place Value Disks | **Blocuri baza 10** (M1): sute, zeci, unități; schimb 10 → 1 și 1 → 10 | gata |
+| Rekenreks | **Rekenrek** 1 sau 2 rânduri, 5 roșii + 5 albe | gata |
+| Two-Color Counters (în cadru) | **Cadrul de 10** simplu/dublu, jetoane în două culori (M5) | gata |
+| Number Lines | **Axa numerelor** (M3): puncte, salturi, numere ascunse pentru estimare | gata |
+| Hundred Board | **Tabla sutelor** 1–1000 (pe sute), colorare + numere acoperite | gata |
+| Bar Models | **Modelul în bară** (M12): parte–întreg, comparație, editor liber | gata |
+| Clock, Money, Fraction Tiles/Circles, Geoboard, Pattern Blocks, Color Tiles, Linking Cubes, Cuisenaire, XY Board | M13, M15, M14, M16 + geometrie | următoarele faze |
+| LIVE (profesorul vede ecranele elevilor) | rapoarte din `/api/progres`; vizualizare live mai târziu | de discutat |
+
+**Atelierul** (`/elev/atelier`): lucru liber cu fiecare material. Profesorul pregătește o situație și apasă „Copiază linkul pentru elevi”: starea e codificată în link (echivalentul codurilor de partajare, fără bază de date).
+
+**Lecțiile ghidate** (`/elev/lectii`, clasa a II-a): 9 lecții, 3–5 pași fiecare, concret → pictorial → abstract. Fiecare pas are verificare automată cu mesaj specific, două indicii și rezolvarea arătată după ultimul indiciu (pasul se notează „cu ajutor”, nu „greșit”). Stelele: ≥ 90% din prima → 3, ≥ 60% → 2.
+
+**Notele pentru profesor** (`/profesor/lectii`): obiectiv, materialul fizic echivalent, desfășurare, întrebări pentru clasă, greșeli frecvente. „Proiectează la clasă” deschide lecția cu notele alături.
+
+Testele (`src/lectii/lectii.test.ts`) verifică, pentru fiecare pas: rezolvarea arătată copilului e acceptată, starea de pornire nu e acceptată, un răspuns greșit primește mesaj, există indicii.
