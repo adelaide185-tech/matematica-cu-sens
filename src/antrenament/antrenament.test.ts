@@ -9,7 +9,7 @@ const NIV: NivelJoc[] = NIVELURI_JOC.map((n) => n.id);
 const MAX: Record<number, number> = { 1: 100, 2: 1000, 3: 10000, 4: 1000000 };
 
 /** Verifică faptele matematice care se pot citi din mecanică și limitele clasei. */
-function verificaMatematic(e: Omit<Exercitiu, "subiectId">, clasa: Clasa) {
+function verificaMatematic(e: Omit<Exercitiu, "subiectId"> & { subiectId?: string }, clasa: Clasa) {
   const m = e.mecanica;
   const r = e.raspuns;
   const val = r.tip === "numar" || r.tip === "construit" ? r.valoare : null;
@@ -33,10 +33,67 @@ function verificaMatematic(e: Omit<Exercitiu, "subiectId">, clasa: Clasa) {
     expect(r.valori[0] * m.farfurii + r.valori[1]).toBe(m.total);
     expect(r.valori[1]).toBeLessThan(m.farfurii);
   }
-  if (m.tip === "balanta" && r.tip === "optiune") {
+  if (m.tip === "balanta" && r.tip === "optiune" && r.optiuni.includes("<")) {
     expect(r.valoare).toBe(m.valStanga < m.valDreapta ? "<" : m.valStanga > m.valDreapta ? ">" : "=");
   }
   if (m.tip === "ordonare" && r.tip === "ordine") expect([...m.numere].sort((a, b) => a - b)).toEqual([...r.valori].sort((a, b) => a - b));
+  // ── faza C ──
+  if (m.tip === "fractie" && m.interactiv) {
+    expect(val).toBe(m.colorate);
+    expect(m.colorate).toBeLessThanOrEqual(m.parti);
+  }
+  if (m.tip === "fractie" && r.tip === "optiune") expect(r.valoare).toBe(`${m.colorate}/${m.parti}`);
+  if (m.tip === "benzi" && r.tip === "optiune") {
+    const [[a, p], [b, q]] = m.fractii;
+    expect(r.valoare).toBe(Math.abs(a / p - b / q) < 1e-9 ? "=" : a / p < b / q ? "<" : ">");
+  }
+  if (m.tip === "grila100") {
+    expect(m.colorate).toBeGreaterThan(0);
+    expect(m.colorate).toBeLessThan(100);
+  }
+  if (m.tip === "ceas" && m.interactiv) {
+    const t = e.enunt.match(/(\d{1,2}):(\d{2})/);
+    if (t) expect(val).toBe((Number(t[1]) % 12) * 60 + Number(t[2]));
+    expect(val!).toBeLessThan(720);
+  }
+  if (m.tip === "ceas" && !m.interactiv) {
+    expect(m.ore).toBeGreaterThanOrEqual(1);
+    expect(m.ore).toBeLessThanOrEqual(12);
+    if (clasa === 1) expect(m.minute).toBe(0);
+    if (r.tip === "optiune") expect(r.valoare).toBe(`${m.ore}:${String(m.minute).padStart(2, "0")}`);
+    if (r.tip === "campuri") expect(r.valori).toEqual([m.ore, m.minute]);
+  }
+  if (m.tip === "rigla") {
+    expect(val).toBe(m.unitate === "mm" ? Math.round(m.lungime * 10) : m.lungime);
+    expect(m.start + m.lungime).toBeLessThanOrEqual(clasa === 1 ? 10 : 14);
+  }
+  if ((m.tip === "cantar" || m.tip === "recipient") && r.tip === "numar" && !e.enunt.includes("mai trebuie")) {
+    expect(val).toBe(m.valoare);
+    expect(m.valoare).toBeLessThan(m.max);
+    expect(m.valoare % m.pas).toBe(0);
+  }
+  if (m.tip === "bani" && e.subiectId !== "bani.rest" && !e.enunt.includes("rest")) {
+    const s = m.piese.reduce((a, b) => a + b, 0);
+    if (r.tip === "numar") expect(val! * 100).toBe(s);
+    if (r.tip === "campuri") expect(r.valori[0] * 100 + r.valori[1]).toBe(s);
+  }
+  if (m.tip === "magazin") {
+    expect(val).toBe(m.pret);
+    // prețul se poate plăti exact cu piesele disponibile (greedy funcționează pentru sistemul leu/ban)
+    let rest = m.pret;
+    for (const p of [...m.disponibile].sort((a, b) => b - a)) rest -= Math.floor(rest / p) * p;
+    expect(rest).toBe(0);
+  }
+  if (m.tip === "linieTimp" && r.tip === "campuri") {
+    const fin = m.start + m.durata;
+    expect(r.valori).toEqual([Math.floor(fin / 60), fin % 60]);
+    expect(fin).toBeLessThan(24 * 60);
+  }
+  if (m.tip === "linieTimp" && r.tip === "numar") expect(val).toBe(m.durata);
+  // comparări cu răspuns „obiect”: obiectul ales are valoarea mai mare
+  if (m.tip === "balanta" && r.tip === "optiune" && !r.optiuni.includes("<")) {
+    expect(r.valoare).toBe(m.valStanga > m.valDreapta ? r.optiuni[0] : r.optiuni[1]);
+  }
   if (r.tip === "campuri") r.valori.forEach((v) => expect(v).toBeGreaterThanOrEqual(0));
   if (r.tip === "optiune") expect(r.optiuni).toContain(r.valoare);
   expect(e.indicii.length).toBeGreaterThanOrEqual(3);

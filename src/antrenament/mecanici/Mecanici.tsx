@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { Mecanica } from "../tipuri";
 import { AxaNumerelor, Numaratoare } from "@/componente/svg/Vizual";
+import { Bani, Benzi, CeasAfisat, CeasInteractiv, Cantar, Fasie, FractieAfisata, FractieInteractiva, Grila100, LinieTimp, Magazin, Recipient, Rigla } from "./MecaniciC";
 
 /**
  * Vizualul fiecărui exercițiu. `indiciu` (0–3) aprinde treptat ajutoarele vizuale.
@@ -39,12 +40,39 @@ export function VizualExercitiu({ m, indiciu, onValoare, rezolvat }: { m: Mecani
       return <Ordonare numere={m.numere} onValoare={onValoare} />;
     case "expresie":
       return m.text ? <div className="text-center text-4xl font-bold text-mov-inchis sm:text-5xl">{m.text}</div> : null;
+    case "fractie":
+      return m.interactiv ? <FractieInteractiva forma={m.forma} parti={m.parti} onValoare={onValoare} indiciu={indiciu} /> : <FractieAfisata forma={m.forma} parti={m.parti} colorate={m.colorate} intregi={m.intregi} />;
+    case "benzi":
+      return <Benzi fractii={m.fractii} />;
+    case "grila100":
+      return <Grila100 colorate={m.colorate} />;
+    case "ceas":
+      return m.interactiv ? <CeasInteractiv pas={m.pasMinute ?? 5} onValoare={onValoare} indiciu={indiciu} /> : <CeasAfisat ore={m.ore} minute={m.minute} />;
+    case "rigla":
+      return <Rigla start={m.start} lungime={m.lungime} unitate={m.unitate} obiect={m.obiect} indiciu={indiciu} />;
+    case "cantar":
+      return <Cantar valoare={m.valoare} max={m.max} pas={m.pas} unitate={m.unitate} obiect={m.obiect} />;
+    case "recipient":
+      return <Recipient valoare={m.valoare} max={m.max} pas={m.pas} unitate={m.unitate} />;
+    case "bani":
+      return <Bani piese={m.piese} />;
+    case "magazin":
+      return <Magazin disponibile={m.disponibile} onValoare={onValoare} />;
+    case "calendar":
+      return <Fasie elemente={m.elemente} evidentiat={m.evidentiat} />;
+    case "linieTimp":
+      return <LinieTimp start={m.start} durata={m.durata} indiciu={indiciu} />;
   }
 }
 
 /** Mecanicile la care copilul construiește răspunsul direct pe obiect (fără tastatură). */
 export function areIntrareProprie(m: Mecanica): boolean {
-  return m.tip === "blocuri" || (m.tip === "numaratoare" && Boolean(m.construieste)) || m.tip === "ordonare";
+  return (
+    m.tip === "blocuri" || m.tip === "ordonare" || m.tip === "magazin" ||
+    (m.tip === "numaratoare" && Boolean(m.construieste)) ||
+    (m.tip === "fractie" && Boolean(m.interactiv)) ||
+    (m.tip === "ceas" && Boolean(m.interactiv))
+  );
 }
 
 // ───────── blocuri baza 10 ─────────

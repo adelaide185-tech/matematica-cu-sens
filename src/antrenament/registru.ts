@@ -3,8 +3,10 @@ import type { Subiect } from "./tipuri";
 import { SUBIECTE_NUMERATIE } from "./subiecte/numeratie";
 import { SUBIECTE_OPERATII } from "./subiecte/operatii";
 import { SUBIECTE_PROBLEME } from "./subiecte/probleme";
+import { SUBIECTE_FRACTII } from "./subiecte/fractii";
+import { SUBIECTE_MASURARI } from "./subiecte/masurari";
 
-export const SUBIECTE: Subiect[] = [...SUBIECTE_NUMERATIE, ...SUBIECTE_OPERATII, ...SUBIECTE_PROBLEME];
+export const SUBIECTE: Subiect[] = [...SUBIECTE_NUMERATIE, ...SUBIECTE_OPERATII, ...SUBIECTE_PROBLEME, ...SUBIECTE_FRACTII, ...SUBIECTE_MASURARI];
 
 export function subiect(id: string): Subiect | undefined {
   return SUBIECTE.find((s) => s.id === id);

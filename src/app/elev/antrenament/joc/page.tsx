@@ -1,12 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { SUBIECTE, subiect } from "@/antrenament/registru";
 import { construiesteSesiune, stele, verdicte, VERDICTE, capacitateSelectie, type RezultatExercitiu } from "@/antrenament/sesiune";
-import { raspunsText, verificaRaspuns, type Exercitiu } from "@/antrenament/tipuri";
+import { raspunsPentruCopil, verificaRaspuns, type Exercitiu } from "@/antrenament/tipuri";
 import { salveaza, sesiuneDeschisa, seteazaSunet, sunetActiv, sunetBland, type StareSesiune } from "@/antrenament/stare-client";
 import { VizualExercitiu, areIntrareProprie } from "@/antrenament/mecanici/Mecanici";
 import { seedNou } from "@/motor/rng";
@@ -54,8 +54,9 @@ function Sesiune({ stareInitiala, exercitii }: { stareInitiala: StareSesiune; ex
   const inceput = useRef(Date.now());
 
   useEffect(() => setSunet(sunetActiv()), []);
-  // exercițiu nou → resetăm tot
-  useEffect(() => {
+  // exercițiu nou → resetăm tot. useLayoutEffect rulează ÎNAINTE de efectele componentelor-copil,
+  // astfel valoarea inițială raportată de mecanică (ex. ceasul la 12:00) nu e ștearsă după.
+  useLayoutEffect(() => {
     setIncercari(0);
     setIndiciu(0);
     setMesaj(null);
@@ -92,7 +93,7 @@ function Sesiune({ stareInitiala, exercitii }: { stareInitiala: StareSesiune; ex
     setIncercari(nIncercari);
     const k = Math.min(3, nIncercari);
     setIndiciu(k);
-    setMesaj({ tip: "ajutor", text: k >= 3 ? `${ex.indicii[2]} (Răspunsul: ${raspunsText(ex.raspuns)}.) Acum scrie tu răspunsul, ca să mergem mai departe.` : `${INCURAJARI[(nIncercari - 1) % INCURAJARI.length]} ${ex.indicii[k - 1]}` });
+    setMesaj({ tip: "ajutor", text: k >= 3 ? `${ex.indicii[2]} (Răspunsul: ${raspunsPentruCopil(ex)}.) ${areIntrareProprie(ex.mecanica) ? "Acum fă tu asta pe desen" : "Acum scrie tu răspunsul"}, ca să mergem mai departe.` : `${INCURAJARI[(nIncercari - 1) % INCURAJARI.length]} ${ex.indicii[k - 1]}` });
     setText("");
     if (ex.raspuns.tip === "campuri") {
       // păstrăm câmpurile corecte, golim doar ce e greșit
