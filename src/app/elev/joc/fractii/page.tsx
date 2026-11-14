@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { AntetJoc, Feedback, Final } from "@/jocuri/componente";
-import { Adaptiv, inregistreaza, steleDinGreseli } from "@/jocuri/progres";
+import { Adaptiv, inregistreaza, seteazaRezultat, steleDinGreseli } from "@/jocuri/progres";
 import { Fractie } from "@/componente/svg/Vizual";
 import { Rng, seedNou } from "@/motor/rng";
 import type { Clasa } from "@/motor/tipuri";
@@ -75,6 +75,7 @@ export default function JocFractii() {
       }
       if (nr + 1 >= RUNDE) {
         const stele = steleDinGreseli(greseli);
+        seteazaRezultat(RUNDE, RUNDE + greseli);
         const trofee = inregistreaza("fractii", clasa, stele, { logica: RUNDE }, stele === 3 ? ["fractii-3"] : []);
         setFinal({ stele, trofee });
       } else {

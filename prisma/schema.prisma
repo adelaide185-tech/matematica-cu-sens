@@ -1,13 +1,16 @@
-// Matematică cu Sens — schema bazei de date (Pasul 2, propunere)
-// PostgreSQL (Neon) atât local (ramură de dezvoltare), cât și în producție.
+// Matematică cu Sens — schema bazei de date
+// PostgreSQL: Neon în producție (Vercel), Postgres local la dezvoltare.
+// DATABASE_URL = conexiunea „pooled” (aplicația); DATABASE_URL_UNPOOLED = conexiunea directă (migrări).
+// scripts/db-env.mjs completează variabilele dacă integrarea Vercel le-a dat alte nume.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 // ───────────── Școli, conturi, licențe ─────────────

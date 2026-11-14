@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { citesteProgres, salveazaProgres, TROFEE, type Progres } from "@/jocuri/progres";
+import { citesteProgres, salveazaProgres, sincronizeazaProgres, TROFEE, type Progres } from "@/jocuri/progres";
 
 const JOCURI = [
   { id: "scara", nume: "Scara", icon: "🪜", descriere: "Urcă treaptă cu treaptă rezolvând calcule.", clase: [1, 2, 3, 4], culoare: "#2f6fd1" },
@@ -18,6 +18,7 @@ export default function ZonaElev() {
     const q = Number(new URLSearchParams(location.search).get("clasa"));
     if ([1, 2, 3, 4, 5].includes(q)) p.clasa = q;
     setPr(p);
+    sincronizeazaProgres().then((x) => setPr({ ...x, clasa: p.clasa }));
   }, []);
   const clasa = pr?.clasa ?? 2;
   const alegeClasa = (c: number) => {

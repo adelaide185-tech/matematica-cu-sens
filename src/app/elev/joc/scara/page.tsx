@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { AntetJoc, Feedback, Final, Tastatura } from "@/jocuri/componente";
-import { Adaptiv, inregistreaza, steleDinGreseli } from "@/jocuri/progres";
+import { Adaptiv, inregistreaza, seteazaRezultat, steleDinGreseli } from "@/jocuri/progres";
 import { generator } from "@/motor/registru";
 import { Rng, seedNou } from "@/motor/rng";
 import type { Cerinta, Clasa, Nivel } from "@/motor/tipuri";
@@ -75,6 +75,7 @@ export default function Scara() {
       if (nouaTreapta >= TREPTE) {
         const g = greseli + (ok ? 0 : 1);
         const stele = steleDinGreseli(g);
+        seteazaRezultat(corecte + 1, corecte + 1 + greseli + (ok ? 0 : 1));
         const trofee = inregistreaza("scara", clasa, stele, { viteza: corecte + 1 }, g === 0 ? ["scara-perfecta"] : []);
         setFinal({ stele, trofee });
       } else {

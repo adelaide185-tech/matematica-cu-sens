@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { AntetJoc, Feedback, Final } from "@/jocuri/componente";
-import { Adaptiv, inregistreaza, steleDinGreseli } from "@/jocuri/progres";
+import { Adaptiv, inregistreaza, seteazaRezultat, steleDinGreseli } from "@/jocuri/progres";
 import { Numaratoare } from "@/componente/svg/Vizual";
 import { numarInLitere } from "@/motor/limba";
 import { Rng, seedNou } from "@/motor/rng";
@@ -81,6 +81,7 @@ export default function JocNumaratoare() {
       setBile(ZERO);
       if (runda + 1 >= RUNDE) {
         const stele = steleDinGreseli(greseli);
+        seteazaRezultat(RUNDE, RUNDE + greseli);
         const trofee = inregistreaza("numaratoare", clasa, stele, { logica: RUNDE }, stele === 3 ? ["numaratoare-3"] : []);
         setFinal({ stele, trofee });
       } else {

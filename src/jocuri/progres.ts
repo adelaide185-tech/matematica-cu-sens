@@ -49,7 +49,42 @@ export function inregistreaza(joc: string, clasa: number, stele: number, puncte:
   const noi = candidate.filter((t) => !p.trofee.includes(t));
   p.trofee.push(...noi);
   salveazaProgres(p);
+  // cu cont de elev: salvăm și în baza de date (fără să blocăm jocul dacă nu reușește)
+  fetch("/api/progres", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ joc, clasa, stele, logica: puncte.logica ?? 0, viteza: puncte.viteza ?? 0, trofee: candidate, ...rezultat }),
+    keepalive: true,
+  }).catch(() => {});
   return noi;
+}
+
+let rezultat: { corecte?: number; total?: number } = {};
+/** Răspunsurile corecte / totale ale jocului în curs (trimise odată cu rezultatul). */
+export function seteazaRezultat(corecte: number, total: number) {
+  rezultat = { corecte, total };
+}
+
+/** Combină progresul din browser cu cel din cont (cel mai bun scor câștigă). */
+export async function sincronizeazaProgres(): Promise<Progres> {
+  const local = citesteProgres();
+  try {
+    const r = await fetch("/api/progres", { cache: "no-store" }).then((x) => x.json());
+    if (!r.conectat) return local;
+    const stele = { ...local.stele };
+    for (const [k, v] of Object.entries(r.stele as Record<string, number>)) stele[k] = Math.max(stele[k] ?? 0, v);
+    const p: Progres = {
+      ...local,
+      stele,
+      puncteLogica: Math.max(local.puncteLogica, r.puncteLogica),
+      puncteViteza: Math.max(local.puncteViteza, r.puncteViteza),
+      trofee: [...new Set([...local.trofee, ...r.trofee])],
+    };
+    salveazaProgres(p);
+    return p;
+  } catch {
+    return local;
+  }
 }
 
 /** Dificultate adaptivă simplă: 3 corecte la rând → urcă; 2 greșeli la rând → coboară. */

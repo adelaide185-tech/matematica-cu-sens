@@ -19,6 +19,23 @@ Aplicația pornește la http://localhost:3000.
 - `/fisa?...`: pagina A4 de printare
 - `/api/pdf?...`: descărcare PDF (are nevoie de Playwright + Chromium pe server)
 
+## Conturi și baza de date
+
+- Cu o bază de date configurată (Vercel + Neon setează automat `DATABASE_URL`), aplicația cere autentificare.
+- Fără bază de date rulează în **mod demonstrativ**: fișe și jocuri, fără conturi.
+- **Variabile în Vercel → Settings → Environment Variables:**
+  - `ADMIN_EMAILS`: emailurile administratorilor, separate prin virgulă. Obligatorie pentru prima configurare.
+  - `AUTH_SECRET`: recomandată; un șir aleator lung.
+- **Prima configurare:** pe `/configurare`, un email din `ADMIN_EMAILS` își alege parola.
+- **Administratorul** (`/admin`):
+  - creează clase și conturi de profesori;
+  - importă elevi din CSV (`nume, prenume, email`);
+  - primește parolele temporare ca CSV sau ca bilețele de printat;
+  - poate reseta parolele.
+- La prima intrare, fiecare utilizator își schimbă parola temporară.
+- Progresul din jocuri se salvează în cont (`/api/progres`).
+- Migrările Prisma rulează automat la fiecare build (`scripts/migreaza.mjs`).
+
 ## Teste
 
 ```bash
@@ -48,8 +65,12 @@ Gata și testat:
 - PDF
 - 3 jocuri cu stele, trofee și dificultate adaptivă
 
+Gata (etapa 2):
+- conturi cu roluri (administrator, profesor, elev)
+- import CSV al elevilor
+- progres salvat în PostgreSQL
+
 Urmează:
-- conturi (autentificare email + parolă, import CSV elevi) și baza de date PostgreSQL
-- teme cu cod pentru clasă
+- teme cu cod pentru clasă și rapoarte de progres pentru profesor
 - generatoare de geometrie și date
 - clasa a V-a
