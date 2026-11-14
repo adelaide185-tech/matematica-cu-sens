@@ -10,7 +10,23 @@
   --color-albastru: #2f6fd1;
   --color-portocaliu: #e07a1f;
   --font-sans: var(--font-quicksand), ui-sans-serif, system-ui, sans-serif;
+
+  /* ── Zona elev (jocuri): tabletă și tablă interactivă ── */
+  --color-crem: #fbf4e6;         /* fundal cald, mat, anti-oboseală (fără alb pur pe suprafețe mari) */
+  --color-crem-inchis: #f3e6cc;
+  --color-hartie: #fffaf1;       /* cardurile de joc */
+  --color-cerneala: #2b2540;     /* text principal, contrast ~13:1 pe crem */
+  --spacing-tinta: 4rem;         /* ținta minimă de atingere: 64px */
 }
+
+/* Animațiile explicative se opresc pentru cine a cerut mișcare redusă. */
+@media (prefers-reduced-motion: reduce) {
+  .zona-elev *, .zona-elev *::before, .zona-elev *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}
+.zona-elev button, .zona-elev a { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 
 html {
   color-scheme: light;

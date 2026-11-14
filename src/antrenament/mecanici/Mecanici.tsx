@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { Mecanica } from "../tipuri";
 import { AxaNumerelor, Numaratoare } from "@/componente/svg/Vizual";
+import { pas, tranzitie } from "@/jocuri/miscare";
 import { Bani, Benzi, CeasAfisat, CeasInteractiv, Cantar, Fasie, FractieAfisata, FractieInteractiva, Grila100, LinieTimp, Magazin, Recipient, Rigla } from "./MecaniciC";
 
 /**
@@ -93,22 +94,24 @@ function Blocuri({ tinta, text, indiciu, onValoare }: { tinta: number; text: str
   return (
     <div className="w-full">
       <div className="mx-auto mb-3 w-fit max-w-full rounded-2xl bg-galben-deschis px-5 py-2 text-center text-3xl font-bold text-mov-inchis">{text}</div>
-      <div className="flex min-h-[150px] flex-wrap items-end justify-center gap-4 rounded-2xl bg-white/70 p-3">
+      <div className="flex min-h-[150px] flex-wrap items-end justify-center gap-4 rounded-2xl bg-hartie/70 p-3">
         {ordine.map((o) => (
           <div key={o.k} className="flex flex-wrap items-end gap-1" aria-label={`${c[o.k]} ${o.nume}`}>
-            {Array.from({ length: c[o.k] }, (_, i) => <Bloc key={i} tip={o.k} culoare={o.culoare} />)}
+            {Array.from({ length: c[o.k] }, (_, i) => (
+              <motion.div key={i} initial={{ y: -24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={tranzitie("scurt")}><Bloc tip={o.k} culoare={o.culoare} /></motion.div>
+            ))}
           </div>
         ))}
         {total === 0 && <span className="self-center text-gray-400">Adaugă blocuri cu butoanele de mai jos</span>}
       </div>
       <div className="mt-3 grid gap-2" style={{ gridTemplateColumns: `repeat(${ordine.length}, minmax(0, 1fr))` }}>
         {ordine.map((o) => (
-          <div key={o.k} className={`rounded-2xl bg-white p-2 text-center shadow ${indiciu >= 2 ? "ring-2 ring-galben" : ""}`}>
+          <div key={o.k} className={`rounded-2xl bg-hartie p-2 text-center shadow ${indiciu >= 2 ? "ring-2 ring-galben" : ""}`}>
             <div className="text-sm font-bold" style={{ color: o.culoare }}>{o.nume}</div>
             <div className="text-2xl font-bold">{c[o.k]}</div>
             <div className="mt-1 flex justify-center gap-1">
-              <button type="button" aria-label={`scoate o ${o.nume}`} onClick={() => schimba(o.k, -1)} className="h-14 w-14 rounded-xl bg-mov-deschis text-2xl font-bold text-mov">−</button>
-              <button type="button" aria-label={`adaugă o ${o.nume}`} onClick={() => schimba(o.k, 1)} className="h-14 w-14 rounded-xl text-2xl font-bold text-white" style={{ background: o.culoare }}>+</button>
+              <button type="button" aria-label={`scoate o ${o.nume}`} onClick={() => schimba(o.k, -1)} className="h-tinta w-tinta rounded-xl bg-mov-deschis text-2xl font-bold text-mov">−</button>
+              <button type="button" aria-label={`adaugă o ${o.nume}`} onClick={() => schimba(o.k, 1)} className="h-tinta w-tinta rounded-xl text-2xl font-bold text-white" style={{ background: o.culoare }}>+</button>
             </div>
           </div>
         ))}
@@ -175,6 +178,7 @@ function Balanta({ stanga, dreapta, a, b, rezolvat }: { stanga: string; dreapta:
 // ───────── cadrul de 10 ─────────
 
 function Cadru10({ a, b, op, lipsa, indiciu }: { a: number; b: number; op: "+" | "−"; lipsa?: boolean; indiciu: number }) {
+  const redus = useReducedMotion();
   const total = op === "+" ? a + b : a;
   const cadre = total > 10 || (op === "+" && a + b > 10) ? 2 : 1;
   const culoare = (i: number) => {
@@ -199,8 +203,12 @@ function Cadru10({ a, b, op, lipsa, indiciu }: { a: number; b: number; op: "+" |
             return (
               <g key={j}>
                 <rect x={x} y={y} width="48" height="48" fill="#fff" stroke="#6a59a7" strokeWidth="2" />
-                <circle cx={x + 24} cy={y + 24} r="17" fill={culoare(i)} stroke={culoare(i) === "transparent" ? "none" : "#0003"} />
-                {taiat && <line x1={x + 8} y1={y + 40} x2={x + 40} y2={y + 8} stroke="#555" strokeWidth="4" />}
+                {/* bulinele intră una câte una: primul termen, apoi al doilea care „umple zecea” */}
+                <motion.circle cx={x + 24} cy={y + 24} stroke={culoare(i) === "transparent" ? "none" : "#0003"}
+                  initial={redus ? false : { r: 0 }} animate={{ r: 17, fill: culoare(i) }}
+                  transition={redus ? { duration: 0 } : { r: tranzitie("scurt", pas(i, cadre * 10)), fill: tranzitie("mediu") }} />
+                {taiat && <motion.line x1={x + 8} y1={y + 40} x2={x + 40} y2={y + 8} stroke="#555" strokeWidth="4"
+                  initial={redus ? false : { pathLength: 0 }} animate={{ pathLength: 1 }} transition={tranzitie("scurt", pas(i - (a - b), b))} />}
               </g>
             );
           })}
@@ -213,12 +221,14 @@ function Cadru10({ a, b, op, lipsa, indiciu }: { a: number; b: number; op: "+" |
 // ───────── matrice, grupe, farfurii, perechi ─────────
 
 function Matrice({ r, c, indiciu, total }: { r: number; c: number; indiciu: number; total?: boolean }) {
+  const redus = useReducedMotion();
   const d = Math.min(30, 300 / Math.max(r, c));
   return (
     <div className="flex items-center justify-center gap-3">
       <svg viewBox={`0 0 ${c * d + 4} ${r * d + 4}`} width={c * d + 4} height={r * d + 4} className="max-w-full" role="img" aria-label={`${r} rânduri a câte ${c}`}>
         {Array.from({ length: r * c }, (_, i) => (
-          <circle key={i} cx={2 + (i % c) * d + d / 2} cy={2 + Math.floor(i / c) * d + d / 2} r={d * 0.36} fill={Math.floor(i / c) % 2 ? "#2f6fd1" : "#6a59a7"} />
+          <motion.circle key={i} cx={2 + (i % c) * d + d / 2} cy={2 + Math.floor(i / c) * d + d / 2} fill={Math.floor(i / c) % 2 ? "#2f6fd1" : "#6a59a7"}
+            initial={redus ? false : { r: 0 }} animate={{ r: d * 0.36 }} transition={tranzitie("scurt", pas(Math.floor(i / c), r))} />
         ))}
       </svg>
       {indiciu >= 1 && (
@@ -232,13 +242,17 @@ function Matrice({ r, c, indiciu, total }: { r: number; c: number; indiciu: numb
 }
 
 function Grupe({ grupe, cate, simbol, indiciu }: { grupe: number; cate: number; simbol: string; indiciu: number }) {
+  const redus = useReducedMotion();
   return (
     <div className="flex flex-wrap justify-center gap-3">
+      {/* fiecare grupă „se strânge” în cercul ei: vezi că sunt grupe egale, nu obiecte la grămadă */}
       {Array.from({ length: grupe }, (_, g) => (
-        <div key={g} className="relative rounded-full border-4 border-dashed border-mov/50 bg-white px-3 py-2 text-2xl leading-tight" style={{ maxWidth: 170 }}>
+        <motion.div key={g} initial={redus ? false : { scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={tranzitie("mediu", pas(g, grupe))}
+          className="relative rounded-full border-4 border-dashed border-mov/50 bg-hartie px-3 py-2 text-2xl leading-tight" style={{ maxWidth: 170 }}>
           {simbol.repeat(cate)}
-          {indiciu >= 1 && <span className="absolute -right-2 -top-3 rounded-full bg-galben px-2 text-sm font-bold">{cate * (g + 1)}</span>}
-        </div>
+          {indiciu >= 1 && <motion.span initial={redus ? false : { scale: 0 }} animate={{ scale: 1 }} transition={tranzitie("scurt", pas(g, grupe))}
+            className="absolute -right-2 -top-3 rounded-full bg-galben px-2 text-base font-bold">{cate * (g + 1)}</motion.span>}
+        </motion.div>
       ))}
     </div>
   );
@@ -253,13 +267,13 @@ function Farfurii({ total, n, simbol }: { total: number; n: number; simbol: stri
       <div className="mx-auto mb-3 min-h-10 max-w-md text-2xl leading-tight" aria-label={`${ramase} rămase`}>{simbol.repeat(ramase)}</div>
       <div className="flex flex-wrap justify-center gap-3">
         {Array.from({ length: n }, (_, i) => (
-          <div key={i} className="flex h-24 w-24 flex-wrap content-center items-center justify-center rounded-full border-4 border-gray-300 bg-white p-2 text-xl leading-none shadow-inner">
+          <div key={i} className="flex h-24 w-24 flex-wrap content-center items-center justify-center rounded-full border-4 border-gray-300 bg-hartie p-2 text-xl leading-none shadow-inner">
             {simbol.repeat(impartite)}
           </div>
         ))}
       </div>
       <button type="button" disabled={impartite >= runde} onClick={() => setImpartite((x) => x + 1)}
-        className="mt-3 rounded-2xl bg-galben px-5 py-3 text-lg font-bold text-mov-inchis disabled:opacity-40">
+        className="mt-3 min-h-tinta rounded-2xl bg-galben px-6 py-3 text-xl font-bold text-mov-inchis disabled:opacity-40">
         {impartite >= runde ? (ramase > 0 ? `Nu mai ajunge pentru toți: rămân ${ramase}` : "Gata, s-au împărțit toate!") : "Împarte câte unul în fiecare farfurie"}
       </button>
     </div>
@@ -290,7 +304,7 @@ function Sir({ elemente }: { elemente: (number | null)[] }) {
   return (
     <div className="flex flex-wrap items-center justify-center gap-2">
       {elemente.map((e, i) => (
-        <div key={i} className={`flex h-16 min-w-16 items-center justify-center rounded-2xl px-3 text-2xl font-bold ${e === null ? "border-4 border-dashed border-mov bg-white text-mov" : "bg-mov-deschis text-mov-inchis"}`}>
+        <div key={i} className={`flex h-16 min-w-16 items-center justify-center rounded-2xl px-3 text-2xl font-bold ${e === null ? "border-4 border-dashed border-mov bg-hartie text-mov" : "bg-mov-deschis text-mov-inchis"}`}>
           {e === null ? `${++k}.` : e}
         </div>
       ))}
@@ -376,7 +390,7 @@ function Ordonare({ numere, onValoare }: { numere: number[]; onValoare?: (v: num
           const poz = alese.indexOf(n);
           return (
             <button key={n} type="button" onClick={() => setAlese((a) => (a.includes(n) ? a.filter((x) => x !== n) : [...a, n]))}
-              className={`relative h-20 min-w-24 rounded-2xl px-4 text-3xl font-bold shadow transition ${poz >= 0 ? "bg-mov text-white" : "bg-white text-mov-inchis ring-2 ring-mov/20"}`}>
+              className={`relative h-20 min-w-24 rounded-2xl px-4 text-3xl font-bold shadow transition ${poz >= 0 ? "bg-mov text-white" : "bg-hartie text-mov-inchis ring-2 ring-mov/20"}`}>
               {n}
               {poz >= 0 && <span className="absolute -right-2 -top-2 h-7 w-7 rounded-full bg-galben text-base leading-7 text-mov-inchis">{poz + 1}</span>}
             </button>

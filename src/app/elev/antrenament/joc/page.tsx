@@ -11,6 +11,7 @@ import { salveaza, sesiuneDeschisa, seteazaSunet, sunetActiv, sunetBland, type S
 import { VizualExercitiu, areIntrareProprie } from "@/antrenament/mecanici/Mecanici";
 import { seedNou } from "@/motor/rng";
 import { Tastatura } from "@/jocuri/componente";
+import { tranzitie, useCelebrare } from "@/jocuri/miscare";
 
 const LAUDE = ["Bravo!", "Foarte bine!", "Super!", "Ai reușit!", "Excelent!", "Așa da!"];
 const INCURAJARI = ["Hai să ne uităm împreună.", "Aproape! Uite un ajutor:", "Nicio problemă, încercăm pas cu pas."];
@@ -141,25 +142,25 @@ function Sesiune({ stareInitiala, exercitii }: { stareInitiala: StareSesiune; ex
   const progres = (poz / total) * 100;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-galben-deschis via-white to-mov-deschis pb-10">
+    <main className="min-h-screen pb-10">
       <header className="mx-auto flex max-w-4xl items-center gap-3 px-4 pt-4">
-        <button onClick={pauza} className="h-12 rounded-xl bg-white px-4 font-bold text-mov shadow">⏸ Pauză</button>
+        <button onClick={pauza} className="h-tinta rounded-2xl bg-hartie px-5 text-lg font-bold text-mov shadow-sm">⏸ Pauză</button>
         <div className="flex-1">
           <div className="mb-1 flex justify-between text-sm font-semibold text-gray-600">
             <span>{s?.icon} {s?.titlu}</span>
             <span>{poz + 1} din {total}</span>
           </div>
-          <div className="h-4 overflow-hidden rounded-full bg-white shadow-inner" role="progressbar" aria-valuenow={poz} aria-valuemin={0} aria-valuemax={total} aria-label="Progres">
-            <motion.div className="h-full rounded-full bg-gradient-to-r from-verde to-galben" initial={false} animate={{ width: `${progres}%` }} style={{ width: `${progres}%` }} />
+          <div className="h-4 overflow-hidden rounded-full bg-crem-inchis shadow-inner" role="progressbar" aria-valuenow={poz} aria-valuemin={0} aria-valuemax={total} aria-label="Progres">
+            <motion.div className="h-full rounded-full bg-gradient-to-r from-verde to-galben" initial={false} animate={{ width: `${progres}%` }} transition={tranzitie("lung")} style={{ width: `${progres}%` }} />
           </div>
         </div>
-        <button onClick={() => { seteazaSunet(!sunet); setSunet(!sunet); }} aria-label={sunet ? "Oprește sunetul" : "Pornește sunetul blând"} className="h-12 w-12 rounded-xl bg-white text-xl shadow">{sunet ? "🔔" : "🔕"}</button>
+        <button onClick={() => { seteazaSunet(!sunet); setSunet(!sunet); }} aria-label={sunet ? "Oprește sunetul" : "Pornește sunetul blând"} className="h-tinta w-tinta rounded-2xl bg-hartie text-2xl shadow-sm">{sunet ? "🔔" : "🔕"}</button>
       </header>
 
       <AnimatePresence mode="wait">
-        <motion.section key={poz} initial={redus ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={redus ? undefined : { opacity: 0, y: -12 }}
+        <motion.section key={poz} initial={redus ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={redus ? undefined : { opacity: 0, y: -12 }} transition={tranzitie("scurt")}
           className="mx-auto mt-5 max-w-4xl px-4">
-          <div className="rounded-3xl bg-white p-5 shadow-lg sm:p-7">
+          <div className="rounded-3xl bg-hartie p-5 shadow-lg sm:p-7">
             <h1 className="mb-4 text-center text-2xl font-bold leading-snug text-mov-inchis sm:text-3xl">{ex.enunt}</h1>
             {!(ex.mecanica.tip === "expresie" && ex.enunt.replace(/\s/g, "").includes(ex.mecanica.text.replace(/\s/g, ""))) && (
               <VizualExercitiu m={ex.mecanica} indiciu={indiciu} onValoare={onValoare} rezolvat={blocat} />
@@ -168,7 +169,7 @@ function Sesiune({ stareInitiala, exercitii }: { stareInitiala: StareSesiune; ex
 
           <div aria-live="polite" className="min-h-[3.5rem]">
             {mesaj && (
-              <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+              <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={tranzitie("scurt")}
                 className={`mx-auto mt-4 max-w-2xl rounded-2xl p-4 text-lg ${mesaj.tip === "bravo" ? "bg-verde text-center text-2xl font-bold text-white" : "bg-galben-deschis text-gray-800 ring-2 ring-galben"}`}>
                 {mesaj.tip === "ajutor" && <span className="mr-2" aria-hidden>💡</span>}{mesaj.text}
               </motion.div>
@@ -195,7 +196,7 @@ function Intrare({ ex, text, campuri, campActiv, setCampActiv, indiciu, scrie, t
       <div className={`mx-auto grid max-w-2xl gap-3 ${r.optiuni.length <= 3 && r.optiuni.every((o) => o.length <= 6) ? "grid-cols-3" : "sm:grid-cols-2"}`}>
         {r.optiuni.map((o) => (
           <button key={o} disabled={blocat} onClick={() => trimite(o)}
-            className={`min-h-16 rounded-2xl bg-white px-4 py-3 text-xl font-bold text-mov-inchis shadow ring-2 transition active:scale-95 ${indiciu >= 3 && o === r.valoare ? "ring-4 ring-verde" : "ring-mov/20"} ${o.length <= 3 ? "text-4xl" : ""}`}>
+            className={`min-h-16 rounded-2xl bg-hartie px-4 py-3 text-xl font-bold text-mov-inchis shadow ring-2 transition active:scale-95 ${indiciu >= 3 && o === r.valoare ? "ring-4 ring-verde" : "ring-mov/20"} ${o.length <= 3 ? "text-4xl" : ""}`}>
             {o}
           </button>
         ))}
@@ -206,7 +207,7 @@ function Intrare({ ex, text, campuri, campActiv, setCampActiv, indiciu, scrie, t
     return (
       <div className="text-center">
         <button onClick={verifica} disabled={blocat || valoare === null || (Array.isArray(valoare) && valoare.length === 0)}
-          className="h-16 w-full max-w-xs rounded-2xl bg-mov text-2xl font-bold text-white shadow disabled:opacity-40">Verifică ✓</button>
+          className="h-tinta w-full max-w-xs rounded-2xl bg-mov text-2xl font-bold text-white shadow disabled:opacity-40">Verifică ✓</button>
       </div>
     );
   }
@@ -216,13 +217,13 @@ function Intrare({ ex, text, campuri, campActiv, setCampActiv, indiciu, scrie, t
         {r.tip === "campuri" ? (
           r.etichete.map((e, i) => (
             <button key={i} onClick={() => setCampActiv(i)} aria-label={`${e}: ${campuri[i] || "gol"}`}
-              className={`flex min-w-28 flex-col items-center rounded-2xl bg-white px-3 py-2 shadow ${campActiv === i ? "ring-4 ring-mov" : "ring-2 ring-mov/20"}`}>
+              className={`flex min-w-28 flex-col items-center rounded-2xl bg-hartie px-3 py-2 shadow ${campActiv === i ? "ring-4 ring-mov" : "ring-2 ring-mov/20"}`}>
               <span className="text-sm font-semibold text-gray-600">{e}</span>
               <span className="min-h-10 text-4xl font-bold text-mov-inchis">{campuri[i] || "?"}</span>
             </button>
           ))
         ) : (
-          <div className="min-w-40 rounded-2xl border-4 border-dashed border-mov bg-white px-6 py-2 text-center text-5xl font-bold text-mov-inchis" aria-label="răspunsul tău">{text || "?"}</div>
+          <div className="min-w-40 rounded-2xl border-4 border-dashed border-mov bg-hartie px-6 py-2 text-center text-5xl font-bold text-mov-inchis" aria-label="răspunsul tău">{text || "?"}</div>
         )}
       </div>
       <Tastatura valoare={r.tip === "campuri" ? campuri[campActiv] ?? "" : text} onChange={(v) => scrie(() => v)} onTrimite={verifica} />
@@ -236,6 +237,7 @@ function Final({ stare, exercitii }: { stare: StareSesiune; exercitii: Exercitiu
   const st = stele(stare.rezultate);
   const deExersat = v.filter((x) => x.verdict !== "stapanit").map((x) => x.subiectId);
   const dinPrima = stare.rezultate.filter((r) => r.incercari === 1).length;
+  useCelebrare(true, st >= 2 ? "mare" : "mica");
 
   const reia = async (subiecte: string[]) => {
     const sub = subiecte.map(subiect).filter(Boolean) as typeof SUBIECTE;
@@ -246,8 +248,8 @@ function Final({ stare, exercitii }: { stare: StareSesiune; exercitii: Exercitiu
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-galben-deschis to-mov-deschis px-4 py-8">
-      <div className="mx-auto max-w-3xl rounded-3xl bg-white p-6 text-center shadow-lg sm:p-8">
+    <main className="min-h-screen px-4 py-8">
+      <div className="mx-auto max-w-3xl rounded-3xl bg-hartie p-6 text-center shadow-lg sm:p-8">
         <div className="text-6xl">{[1, 2, 3].map((i) => <span key={i} className={i <= st ? "" : "opacity-20 grayscale"}>⭐</span>)}</div>
         <h1 className="mt-3 text-3xl font-bold text-mov">Ai terminat {exercitii.length} exerciții!</h1>
         <p className="mt-1 text-lg text-gray-600">{dinPrima} din prima încercare. Fiecare greșeală te-a ajutat să înveți ceva nou. 💜</p>
@@ -271,10 +273,10 @@ function Final({ stare, exercitii }: { stare: StareSesiune; exercitii: Exercitiu
 
         <div className="mt-7 flex flex-wrap justify-center gap-3">
           {deExersat.length > 0 && (
-            <button onClick={() => reia(deExersat)} className="h-14 rounded-2xl bg-galben px-6 text-lg font-bold text-mov-inchis shadow">🔁 Exersează ce a fost greu</button>
+            <button onClick={() => reia(deExersat)} className="h-tinta rounded-2xl bg-galben px-6 text-lg font-bold text-mov-inchis shadow">🔁 Exersează ce a fost greu</button>
           )}
-          <button onClick={() => reia(stare.config.subiecte)} className="h-14 rounded-2xl bg-mov px-6 text-lg font-bold text-white shadow">Încă o sesiune</button>
-          <Link href="/elev/antrenament" className="flex h-14 items-center rounded-2xl bg-white px-6 text-lg font-bold text-mov shadow ring-2 ring-mov/20">Alte subiecte</Link>
+          <button onClick={() => reia(stare.config.subiecte)} className="h-tinta rounded-2xl bg-mov px-6 text-lg font-bold text-white shadow">Încă o sesiune</button>
+          <Link href="/elev/antrenament" className="flex h-tinta items-center rounded-2xl bg-hartie px-6 text-lg font-bold text-mov shadow ring-2 ring-mov/20">Alte subiecte</Link>
         </div>
       </div>
     </main>

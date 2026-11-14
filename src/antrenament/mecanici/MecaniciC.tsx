@@ -68,7 +68,7 @@ export function CeasInteractiv({ pas, onValoare, indiciu }: { pas: number; onVal
   const ora = (d: number) => setT((x) => (x + d * 60 + 720) % 720);
   const minut = (d: number) => setT((x) => (x + d + 720) % 720);
   const Btn = ({ onClick, children, label }: { onClick: () => void; children: React.ReactNode; label: string }) => (
-    <button type="button" onClick={onClick} aria-label={label} className="h-14 min-w-14 rounded-2xl bg-mov px-3 text-xl font-bold text-white shadow active:scale-95">{children}</button>
+    <button type="button" onClick={onClick} aria-label={label} className="h-tinta min-w-tinta rounded-2xl bg-mov px-3 text-xl font-bold text-white shadow active:scale-95">{children}</button>
   );
   return (
     <div className="flex flex-wrap items-center justify-center gap-6">
@@ -174,7 +174,7 @@ export function Piesa({ b, onClick }: { b: number; onClick?: () => void }) {
     <svg width="104" height="54" viewBox="0 0 104 54" aria-hidden><rect x="2" y="2" width="100" height="50" rx="6" fill={CULORI_BANCNOTE[b] ?? "#8ab"} stroke="#0005" strokeWidth="2" /><circle cx="26" cy="27" r="14" fill="#fff6" /><text x="70" y="32" textAnchor="middle" fontSize="20" fontWeight="800" fill="#1f1b2e">{b / 100}</text><text x="70" y="45" textAnchor="middle" fontSize="10" fill="#1f1b2e">{b === 100 ? "leu" : "lei"}</text></svg>
   );
   const eticheta = b < 100 ? `${b} bani` : `${b / 100} ${b === 100 ? "leu" : "lei"}`;
-  return onClick ? <button type="button" onClick={onClick} aria-label={`adaugă ${eticheta}`} className="rounded-xl p-1 transition hover:bg-mov-deschis active:scale-95">{corp}</button> : <span role="img" aria-label={eticheta}>{corp}</span>;
+  return onClick ? <button type="button" onClick={onClick} aria-label={`adaugă ${eticheta}`} className="flex min-h-tinta min-w-tinta items-center justify-center rounded-xl p-1 transition hover:bg-mov-deschis active:scale-95">{corp}</button> : <span role="img" aria-label={eticheta}>{corp}</span>;
 }
 
 export function Bani({ piese }: { piese: number[] }) {
@@ -188,10 +188,10 @@ export function Magazin({ disponibile, onValoare }: { disponibile: number[]; onV
   const text = (b: number) => (b % 100 === 0 ? `${b / 100} ${b === 100 ? "leu" : "lei"}` : b < 100 ? `${b} bani` : `${Math.floor(b / 100)} lei și ${b % 100} bani`);
   return (
     <div className="text-center">
-      <div className="min-h-20 rounded-2xl border-4 border-dashed border-mov/40 bg-white p-2">
+      <div className="min-h-20 rounded-2xl border-4 border-dashed border-mov/40 bg-hartie p-2">
         <div className="mb-1 text-sm font-semibold text-gray-600">Pe tejghea (atinge ca să iei înapoi):</div>
         <div className="flex flex-wrap justify-center gap-1">
-          {plata.map((b, i) => <button key={i} type="button" onClick={() => setPlata((p) => p.filter((_, j) => j !== i))} aria-label="ia înapoi"><Piesa b={b} /></button>)}
+          {plata.map((b, i) => <button key={i} type="button" onClick={() => setPlata((p) => p.filter((_, j) => j !== i))} aria-label="ia înapoi" className="flex min-h-tinta min-w-tinta items-center justify-center"><Piesa b={b} /></button>)}
         </div>
       </div>
       <p className="my-2 text-xl">Ai pus: <b>{text(total)}</b></p>

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { tranzitie } from "@/jocuri/miscare";
 import { AntetJoc, Feedback, Final, Tastatura } from "@/jocuri/componente";
 import { Adaptiv, inregistreaza, seteazaRezultat, steleDinGreseli } from "@/jocuri/progres";
 import { generator } from "@/motor/registru";
@@ -97,7 +98,7 @@ export default function Scara() {
 
   const parti = intrebare?.text.split("___") ?? [];
   return (
-    <main className="min-h-screen bg-gradient-to-b from-sky-100 to-mov-deschis pb-10">
+    <main className="min-h-screen pb-10">
       <AntetJoc titlu="🪜 Scara" clasa={clasa} runda={treapta} total={TREPTE} />
       {final ? (
         <Final stele={final.stele} trofeeNoi={final.trofee} clasa={clasa} onReia={() => start(clasa)}
@@ -111,14 +112,14 @@ export default function Scara() {
               <rect key={i} x="45" y={380 - i * 38} width="110" height="9" rx="3" fill={i < treapta ? "#f9c50f" : "#b08a64"} />
             ))}
             <text x="100" y="30" textAnchor="middle" fontSize="34">🏆</text>
-            <motion.g initial={false} animate={{ translateY: -treapta * 38 }} transition={{ type: "spring", stiffness: 120 }}>
+            <motion.g initial={false} animate={{ translateY: -treapta * 38 }} transition={tranzitie("lung")}>
               <text x="100" y="375" textAnchor="middle" fontSize="40">🐿️</text>
             </motion.g>
           </svg>
 
           <div className="text-center">
-            <motion.div key={intrebare?.text} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-              className="mx-auto mb-4 w-fit rounded-3xl bg-white px-8 py-5 text-4xl font-bold text-mov-inchis shadow-lg sm:text-5xl"
+            <motion.div key={intrebare?.text} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={tranzitie("mediu")}
+              className="mx-auto mb-4 w-fit rounded-3xl bg-hartie px-8 py-5 text-4xl font-bold text-mov-inchis shadow-lg sm:text-5xl"
               style={stare === "gresit" ? { animation: "none" } : undefined}>
               {parti.length > 1 ? (
                 <>{parti[0]}<span className="mx-1 inline-block min-w-16 rounded-xl border-4 border-dashed border-mov px-2">{valoare || "?"}</span>{parti[1]}</>

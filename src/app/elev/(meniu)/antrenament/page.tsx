@@ -63,23 +63,23 @@ export default function ConfigurareAntrenament() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-galben-deschis to-mov-deschis px-4 pb-16">
+    <main className="min-h-screen px-4 pb-16">
       <div className="mx-auto max-w-5xl">
         <div className="flex items-center justify-between py-4">
-          <Link href="/elev" className="rounded-xl bg-white px-4 py-2 font-bold text-mov shadow">← Jocuri</Link>
+          <Link href="/elev" className="flex h-tinta items-center rounded-2xl bg-hartie px-5 text-lg font-bold text-mov shadow-sm">← Jocuri</Link>
           <h1 className="text-2xl font-bold text-mov sm:text-3xl">Antrenament</h1>
           <span className="w-24" />
         </div>
 
         {deschisa && deschisa.stare !== "terminata" && (
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-3xl bg-white p-5 shadow-md ring-2 ring-galben">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-3xl bg-hartie p-5 shadow-md ring-2 ring-galben">
             <div>
               <div className="text-lg font-bold text-mov">Ai o sesiune începută</div>
               <div className="text-gray-600">
                 {deschisa.config.subiecte.map((id) => subiect(id)?.titlu).filter(Boolean).join(", ")} · {deschisa.pozitie} din {deschisa.config.n} exerciții
               </div>
             </div>
-            <button onClick={() => router.push("/elev/antrenament/joc")} className="h-14 rounded-2xl bg-mov px-6 text-lg font-bold text-white">▶ Continuă de unde ai rămas</button>
+            <button onClick={() => router.push("/elev/antrenament/joc")} className="h-tinta rounded-2xl bg-mov px-6 text-lg font-bold text-white">▶ Continuă de unde ai rămas</button>
           </div>
         )}
 
@@ -87,7 +87,7 @@ export default function ConfigurareAntrenament() {
           <div className="flex flex-wrap gap-2">
             {([1, 2, 3, 4] as Clasa[]).map((c) => (
               <button key={c} onClick={() => setClasa(c)} aria-pressed={clasa === c}
-                className={`h-14 rounded-2xl px-5 text-lg font-bold shadow ${clasa === c ? "bg-mov text-white" : "bg-white text-mov"}`}>Clasa {NUME_CLASA[c]}</button>
+                className={`h-tinta rounded-2xl px-5 text-lg font-bold shadow ${clasa === c ? "bg-mov text-white" : "bg-hartie text-mov"}`}>Clasa {NUME_CLASA[c]}</button>
             ))}
           </div>
         </Pas>
@@ -101,14 +101,14 @@ export default function ConfigurareAntrenament() {
                   <div className="mb-2 flex items-center gap-3">
                     <h3 className="text-lg font-bold text-mov">{DOMENII[d].icon} {DOMENII[d].nume}</h3>
                     <button onClick={() => setAlese((a) => (toate ? a.filter((x) => !lista.some((s) => s.id === x)) : [...new Set([...a, ...lista.map((s) => s.id)])]))}
-                      className="rounded-lg px-2 py-1 text-sm font-semibold text-mov underline">{toate ? "Debifează tot" : "Alege tot"}</button>
+                      className="h-tinta rounded-xl px-4 text-base font-semibold text-mov underline">{toate ? "Debifează tot" : "Alege tot"}</button>
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     {lista.map((s) => {
                       const ales = alese.includes(s.id);
                       return (
                         <button key={s.id} onClick={() => comuta(s.id)} aria-pressed={ales}
-                          className={`flex min-h-20 items-center gap-3 rounded-2xl p-3 text-left shadow transition ${ales ? "bg-mov text-white ring-4 ring-galben" : "bg-white hover:ring-2 hover:ring-mov/30"}`}>
+                          className={`flex min-h-20 items-center gap-3 rounded-2xl p-3 text-left shadow transition ${ales ? "bg-mov text-white ring-4 ring-galben" : "bg-hartie hover:ring-2 hover:ring-mov/30"}`}>
                           <span className="text-3xl" aria-hidden>{ales ? "✅" : s.icon}</span>
                           <span>
                             <span className="block font-bold">{s.titlu}</span>
@@ -144,12 +144,12 @@ export default function ConfigurareAntrenament() {
               return (
                 <button key={l} onClick={() => setN(l)} disabled={prea} aria-pressed={n === l}
                   title={prea ? `Selecția are doar ${maxPosibil} exerciții diferite la acest nivel` : undefined}
-                  className={`h-16 w-24 rounded-2xl text-2xl font-bold shadow ${n === l && !prea ? "bg-mov text-white" : "bg-white text-mov"} disabled:opacity-35`}>{l}</button>
+                  className={`h-tinta w-24 rounded-2xl text-2xl font-bold shadow ${n === l && !prea ? "bg-mov text-white" : "bg-hartie text-mov"} disabled:opacity-35`}>{l}</button>
               );
             })}
           </div>
           {selectate.length > 0 && maxPosibil < 100 && (
-            <p className="mt-3 rounded-xl bg-white/80 p-3 text-sm text-gray-700">
+            <p className="mt-3 rounded-xl bg-hartie/80 p-3 text-sm text-gray-700">
               ℹ️ Subiectele alese au împreună <b>{maxPosibil}</b> exerciții diferite la nivelul {NIVELURI_JOC.find((x) => x.id === nivel)?.nume}
               {selectate.length > 1 && <> ({selectate.map((s) => `${s.titlu}: ${capacitate(s, nivel, clasa)}`).join(", ")})</>}.
               Nu repetăm exerciții: pentru o sesiune mai lungă, adaugă un subiect sau alege alt nivel.
@@ -157,7 +157,7 @@ export default function ConfigurareAntrenament() {
           )}
         </Pas>
 
-        <div className="sticky bottom-4 mt-6 flex flex-wrap items-center justify-between gap-3 rounded-3xl bg-white p-4 shadow-lg">
+        <div className="sticky bottom-4 mt-6 flex flex-wrap items-center justify-between gap-3 rounded-3xl bg-hartie p-4 shadow-lg">
           <div className="text-gray-700">
             {selectate.length === 0 ? "Alege cel puțin un subiect." : (
               <>
@@ -176,7 +176,7 @@ export default function ConfigurareAntrenament() {
 
 function Pas({ nr, titlu, children }: { nr: number; titlu: string; children: React.ReactNode }) {
   return (
-    <section className="mt-5 rounded-3xl bg-white/60 p-4 sm:p-5">
+    <section className="mt-5 rounded-3xl bg-hartie/60 p-4 sm:p-5">
       <h2 className="mb-3 text-lg font-bold text-gray-700"><span className="mr-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-mov text-white">{nr}</span>{titlu}</h2>
       {children}
     </section>
