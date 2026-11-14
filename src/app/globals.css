@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+@theme {
+  --color-mov: #6a59a7;
+  --color-mov-inchis: #4f4183;
+  --color-mov-deschis: #ece9f6;
+  --color-galben: #f9c50f;
+  --color-galben-deschis: #fff6d6;
+  --color-verde: #2e9e5b;
+  --color-albastru: #2f6fd1;
+  --color-portocaliu: #e07a1f;
+  --font-sans: var(--font-quicksand), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  color-scheme: light;
+}
+body {
+  background: #faf9fd;
+  color: #1f1b2e;
+  font-family: var(--font-sans);
+}
+
+/* ───────── Fișa A4 ───────── */
+.fisa {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 14mm 15mm;
+  margin: 0 auto;
+  background: #fff;
+  color: #111;
+  font-size: 12.5pt;
+  line-height: 1.45;
+  box-shadow: 0 2px 16px #0002;
+}
+.fisa-antet-sus {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 3px solid var(--accent);
+  padding-bottom: 3mm;
+}
+.fisa-logo { height: 15mm; width: auto; }
+.fisa-meta { text-align: right; font-size: 10.5pt; color: #333; }
+.fisa-nume { margin: 4mm 0 2mm; }
+.fisa-titlu {
+  font-size: 15pt;
+  font-weight: 700;
+  margin: 2mm 0 4mm;
+  display: flex;
+  justify-content: space-between;
+  gap: 4mm;
+  align-items: baseline;
+}
+.fisa-nivel {
+  font-size: 10pt;
+  color: #fff;
+  background: var(--accent);
+  border-radius: 99px;
+  padding: 1mm 3.5mm;
+  white-space: nowrap;
+}
+.fisa-itemi { list-style: none; padding: 0; margin: 0; }
+.fisa-item {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  margin-bottom: 5mm;
+  padding-left: 1mm;
+}
+.fisa-enunt { font-weight: 600; margin-bottom: 2mm; }
+.fisa-nr { color: var(--accent); font-weight: 700; }
+.fisa-puncte { float: right; font-weight: 600; color: var(--accent); }
+.fisa-cerinte { display: grid; gap: 2.5mm 6mm; padding-left: 5mm; }
+.fisa-cerinta { display: flex; flex-direction: column; gap: 1mm; }
+.fisa-vizual { margin: 1mm 0; }
+.linie { display: inline-block; min-width: 22mm; border-bottom: 1.2px dotted #444; height: 1.1em; vertical-align: bottom; }
+.linie.medie { min-width: 45mm; }
+.linie.lunga { min-width: 120mm; }
+.casuta { display: inline-block; width: 11mm; height: 7mm; border: 1.3px solid #444; border-radius: 1.5mm; vertical-align: middle; margin: 0 1mm; }
+.af { font-weight: 700; letter-spacing: 1mm; }
+.raspuns { color: #c62828; font-weight: 700; padding: 0 1mm; }
+.fisa-optiuni { list-style: none; display: flex; flex-wrap: wrap; gap: 1.5mm 4mm; padding: 0 0 0 4mm; margin: 0; font-size: 11pt; }
+.fisa-optiuni li::before { content: "○ "; }
+.fisa-optiuni li.corect { color: #c62828; font-weight: 700; }
+.fisa-optiuni li.corect::before { content: "● "; }
+.fisa-lucru {
+  margin: 2mm 0 0 5mm;
+  background-image: linear-gradient(#cfd6e4 1px, transparent 1px), linear-gradient(90deg, #cfd6e4 1px, transparent 1px);
+  background-size: 5mm 5mm;
+  border: 1px solid #cfd6e4;
+}
+.fisa-rezolvare {
+  margin: 2mm 0 0 5mm;
+  padding: 2mm 3mm;
+  border-left: 3px solid #c62828;
+  background: #fff5f5;
+  font-size: 10.5pt;
+  color: #5a1010;
+}
+.fisa-barem-item { font-weight: 700; margin-top: 1mm; }
+.fisa-barem { break-inside: avoid; margin-top: 6mm; border-top: 2px solid var(--accent); padding-top: 3mm; }
+.fisa-barem h2 { font-size: 13pt; font-weight: 700; margin-bottom: 2mm; }
+.fisa-barem table { border-collapse: collapse; margin-top: 2mm; }
+.fisa-barem th, .fisa-barem td { border: 1px solid #999; padding: 1.5mm 4mm; text-align: left; }
+.fisa-rezultat { font-size: 13pt; font-weight: 700; text-align: right; }
+.fisa-subsol { margin-top: 8mm; font-size: 8.5pt; color: #888; text-align: center; }
+
+@page { size: A4; margin: 0; }
+@media print {
+  body { background: #fff; }
+  .nu-printa { display: none !important; }
+  .fisa { box-shadow: none; margin: 0; }
+}
+@media screen and (max-width: 860px) {
+  .fisa { width: 100%; min-height: auto; padding: 6mm; font-size: 11pt; }
+  .linie.lunga { min-width: 60mm; }
+}

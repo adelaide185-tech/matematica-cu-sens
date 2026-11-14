@@ -1,0 +1,9 @@
+node_modules
+.next
+out
+.env*
+!.env.example
+*.tsbuildinfo
+next-env.d.ts
+surse_materiale/softpak
+surse_materiale/eduten/*.pdf

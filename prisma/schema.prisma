@@ -1,0 +1,209 @@
+// Matematică cu Sens — schema bazei de date (Pasul 2, propunere)
+// PostgreSQL (Neon) atât local (ramură de dezvoltare), cât și în producție.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ───────────── Școli, conturi, licențe ─────────────
+
+model Scoala {
+  id        String     @id @default(cuid())
+  nume      String
+  localitate String?
+  logoUrl   String?
+  utilizatori Utilizator[]
+  clase     Clasa[]
+  creatLa   DateTime   @default(now())
+}
+
+enum Rol {
+  ADMIN_SCOALA
+  PROFESOR
+  ELEV
+}
+
+model Utilizator {
+  id            String    @id @default(cuid())
+  email         String    @unique          // elevi: adresă Proton Mail creată de școală
+  parolaHash    String
+  schimbaParola Boolean   @default(true)   // parolă temporară la import
+  nume          String
+  prenume       String
+  rol           Rol
+  scoalaId      String
+  scoala        Scoala    @relation(fields: [scoalaId], references: [id])
+  licenta       Licenta?
+
+  claseProfesor Clasa[]          @relation("ProfesorClasa")
+  inscrieri     Inscriere[]
+  fise          Fisa[]
+  teme          Tema[]
+  incercari     Incercare[]
+  stapaniri     Stapanire[]
+  recompense    RecompensaObtinuta[]
+  puncteLogica  Int       @default(0)
+  puncteViteza  Int       @default(0)
+
+  creatLa       DateTime  @default(now())
+  ultimaAutentificare DateTime?
+}
+
+enum TipLicenta {
+  GRATUIT
+  PLATIT
+}
+
+model Licenta {
+  id            String     @id @default(cuid())
+  utilizatorId  String     @unique
+  utilizator    Utilizator @relation(fields: [utilizatorId], references: [id], onDelete: Cascade)
+  tip           TipLicenta @default(GRATUIT)
+  valabilPanaLa DateTime?
+  pretEuro      Int?       // 25 când devine PLATIT
+}
+
+model Clasa {
+  id          String      @id @default(cuid())
+  nume        String      // ex. "a II-a B"
+  nivel       Int         // 1–5
+  anScolar    String      // ex. "2026-2027"
+  scoalaId    String
+  scoala      Scoala      @relation(fields: [scoalaId], references: [id])
+  profesori   Utilizator[] @relation("ProfesorClasa")
+  elevi       Inscriere[]
+  teme        Tema[]
+}
+
+model Inscriere {
+  elevId   String
+  elev     Utilizator @relation(fields: [elevId], references: [id], onDelete: Cascade)
+  clasaId  String
+  clasa    Clasa      @relation(fields: [clasaId], references: [id], onDelete: Cascade)
+  @@id([elevId, clasaId])
+}
+
+// ───────────── Curriculum (încărcat din /src/curriculum/*.json) ─────────────
+
+model Capitol {
+  id        String   @id                 // ex. "c2-cap02"
+  clasa     Int
+  ordine    Int
+  titlu     String
+  lectii    Lectie[]
+}
+
+model Lectie {
+  id          String   @id               // ex. "c2-cap02-l05"
+  capitolId   String
+  capitol     Capitol  @relation(fields: [capitolId], references: [id])
+  ordine      Int
+  titlu       String
+  competente  String[]                   // coduri CS
+  generatoare String[]                   // id-uri de generatoare din /src/motor
+}
+
+// ───────────── Fișe (profesor) ─────────────
+
+enum Nivel {
+  CONSOLIDARE
+  APROFUNDARE
+  EVALUARE
+  COMPETITIE
+}
+
+model Fisa {
+  id          String     @id @default(cuid())
+  profesorId  String
+  profesor    Utilizator @relation(fields: [profesorId], references: [id])
+  titlu       String
+  clasa       Int
+  lectieIds   String[]
+  competente  String[]
+  nivel       Nivel
+  seed        Int                          // regenerare identică (elev + barem)
+  config      Json                         // nr. itemi, generatoare alese, antet, alb-negru
+  creatLa     DateTime   @default(now())
+}
+
+// ───────────── Teme digitale și jocuri (elev) ─────────────
+
+model Tema {
+  id          String     @id @default(cuid())
+  cod         String     @unique           // 6 caractere, ex. "K7M2QX"
+  titlu       String
+  profesorId  String
+  profesor    Utilizator @relation(fields: [profesorId], references: [id])
+  clasaId     String?
+  clasa       Clasa?     @relation(fields: [clasaId], references: [id])
+  mecanica    String                       // "scara" | "numaratoare" | "fractii" | ...
+  generatoare String[]
+  nivel       Nivel
+  nrItemi     Int        @default(15)
+  seed        Int?                         // null = itemi diferiți pentru fiecare elev
+  termen      DateTime?
+  incercari   Incercare[]
+  creatLa     DateTime   @default(now())
+}
+
+model Incercare {
+  id          String     @id @default(cuid())
+  elevId      String
+  elev        Utilizator @relation(fields: [elevId], references: [id], onDelete: Cascade)
+  temaId      String?
+  tema        Tema?      @relation(fields: [temaId], references: [id])
+  mecanica    String
+  lectieId    String?
+  inceput     DateTime   @default(now())
+  terminat    DateTime?
+  corecte     Int        @default(0)
+  total       Int        @default(0)
+  stele       Int        @default(0)       // 0–3
+  raspunsuri  RaspunsItem[]
+}
+
+model RaspunsItem {
+  id           String    @id @default(cuid())
+  incercareId  String
+  incercare    Incercare @relation(fields: [incercareId], references: [id], onDelete: Cascade)
+  generatorId  String
+  competenta   String
+  dificultate  Int
+  item         Json                          // itemul generat (pentru revizuire de către profesor)
+  raspunsElev  Json
+  corect       Boolean
+  timpMs       Int
+}
+
+// Dificultate adaptivă: stăpânire per elev × competență
+model Stapanire {
+  elevId      String
+  elev        Utilizator @relation(fields: [elevId], references: [id], onDelete: Cascade)
+  competenta  String
+  scor        Float      @default(30)        // 0–100
+  incercari   Int        @default(0)
+  actualizat  DateTime   @updatedAt
+  @@id([elevId, competenta])
+}
+
+model Recompensa {
+  id        String   @id                     // ex. "trofeu-tabla-7"
+  nume      String
+  descriere String
+  icon      String
+  obtinute  RecompensaObtinuta[]
+}
+
+model RecompensaObtinuta {
+  elevId       String
+  elev         Utilizator @relation(fields: [elevId], references: [id], onDelete: Cascade)
+  recompensaId String
+  recompensa   Recompensa @relation(fields: [recompensaId], references: [id])
+  obtinutLa    DateTime   @default(now())
+  @@id([elevId, recompensaId])
+}
