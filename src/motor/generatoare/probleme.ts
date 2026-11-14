@@ -245,7 +245,7 @@ export const competitie: Generator = {
           `Presupunem că toate cele ${cap} animale sunt găini: ar avea ${cap} × 2 = ${2 * cap} picioare.`,
           `Lipsesc ${pic} − ${2 * cap} = ${pic - 2 * cap} picioare.`,
           `Fiecare iepure are cu 2 picioare mai mult decât o găină: ${pic - 2 * cap} : 2 = ${i} iepuri.`,
-          `Verificare: ${g} găini × 2 + ${i} iepuri × 4 = ${pic} picioare. Răspuns: ${i} iepuri.`,
+          `Verificare: ${g} găini × 2 + ${i} iepuri × 4 = ${cuSubstantiv(pic, "picior", "picioare")}. Răspuns: ${cuSubstantiv(i, "iepure", "iepuri")}.`,
         ],
       };
     } else if (tip === 1) {

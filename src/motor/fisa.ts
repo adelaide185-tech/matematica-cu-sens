@@ -38,8 +38,10 @@ export function genereazaFisa(config: ConfigFisa): Fisa {
 
   const itemi: Item[] = [];
   const dupaGenerator = new Map<string, Item>();
+  const probleme = ordine.filter((g) => g.id.startsWith("probleme."));
   for (let i = 0; i < config.nrItemi; i++) {
-    const g = ordine[i % ordine.length];
+    // după ce fiecare tip a apărut o dată, locurile rămase merg la probleme (dacă lecția are), altfel se reia lista
+    const g = i < ordine.length || !probleme.length ? ordine[i % ordine.length] : probleme[(i - ordine.length) % probleme.length];
     const nou = g.generate(rng.fork(i), config.nivel, config.clasa);
     const existent = dupaGenerator.get(g.id);
     // Problemele rămân itemi separați (fiecare are enunțul ei). Celelalte tipuri nu se repetă ca
