@@ -8,12 +8,14 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "valideaza:sympy": "CALCUL_EXPORT=/tmp/calcul.json vitest run src/motor/calcul && python3 scripts/valideaza_calcul.py /tmp/calcul.json"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
     "bcryptjs": "^3.0.3",
     "canvas-confetti": "^1.9.4",
+    "docx": "^9.15.4",
     "framer-motion": "^11.18.2",
     "jose": "^6.2.17",
     "next": "15.5.29",

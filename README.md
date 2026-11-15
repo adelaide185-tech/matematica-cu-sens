@@ -81,5 +81,13 @@ Gata (etapa 3, fazele A + B din `docs/03_PLAN_JOCURI.md`):
 - indicii pas cu pas, pauză și reluare, ecran final cu verdict pe noțiune
 - link direct pentru profesori: `/elev/antrenament?clasa=2&subiecte=op.tabla,op.impartire&nivel=mediu&n=50`
 
+Generatorul de calcul (`/profesor/calcul`, detalii în `docs/04_GENERATOR_CALCUL.md`):
+- 5–200 de exerciții; adunare, scădere, înmulțire, împărțire, operații combinate, ecuații simple, calcul mintal
+- intervale numerice, cu/fără trecere peste ordin, împărțire exactă sau cu rest, așezare în coloană; mai multe tipuri în aceeași fișă
+- previzualizare instantă și regenerarea oricărui exercițiu
+- PDF (fișă; fișă + barem), Word (.docx), CSV
+- teme și teste online pentru o grupă sau un elev, cu cronometru, verificare automată și rezultate pentru profesor
+- verificare matematică: teste automate + SymPy (`npm run valideaza:sympy`)
+
 Urmează:
-- teme cu cod pentru clasă și rapoarte de progres pentru profesor
+- rapoarte de progres pe noțiuni pentru profesor

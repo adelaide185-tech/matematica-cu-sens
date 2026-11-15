@@ -60,6 +60,15 @@ export default function ZonaElev() {
           <span className="rounded-2xl bg-galben px-5 py-3 text-lg font-bold text-mov-inchis">Începe ▶</span>
         </Link>
 
+        <Link href="/elev/teme"
+          className="mt-4 flex flex-wrap items-center gap-5 rounded-3xl bg-hartie p-5 shadow-md transition hover:-translate-y-1 hover:shadow-xl">
+          <span className="text-5xl" aria-hidden>✏️</span>
+          <span className="flex-1">
+            <span className="block text-2xl font-bold text-mov">Temele mele</span>
+            <span className="block text-gray-600">Temele și testele trimise de profesor, sau introdu codul primit.</span>
+          </span>
+        </Link>
+
         <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {JOCURI.map((j) => {
             const disponibil = j.clase.includes(clasa);

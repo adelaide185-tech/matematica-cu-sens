@@ -46,6 +46,10 @@ export default function PanouProfesor() {
       <aside className="bg-white p-5 shadow-md lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
         <Link href="/" className="text-sm font-semibold text-mov">← Acasă</Link>
         <h1 className="mt-2 text-2xl font-bold text-mov">Generator de fișe</h1>
+        <Link href="/profesor/calcul" className="mt-3 flex items-center gap-3 rounded-2xl bg-galben-deschis p-3 text-sm hover:brightness-95">
+          <span className="text-2xl" aria-hidden>🧮</span>
+          <span><b className="text-mov">Generator de calcul</b> — 5–200 de exerciții, PDF cu barem, Word, teme online</span>
+        </Link>
 
         <Sectiune titlu="1. Clasa">
           <div className="grid grid-cols-5 gap-2">
