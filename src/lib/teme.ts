@@ -7,6 +7,12 @@ import { cfgIncercare, curataC3 } from "@/motor/clasa3/config";
 import { genereazaC3 } from "@/motor/clasa3/generator";
 import { genereazaCalcul, hash } from "@/motor/calcul/generator";
 import type { ConfigCalcul, ExCalcul } from "@/motor/calcul/tipuri";
+import { curataC1 } from "@/motor/clasa1/config";
+import { genereazaClasa1 } from "@/motor/clasa1/sesiune";
+import type { ConfigClasa1, ExercitiuC1 } from "@/motor/clasa1/tipuri";
+
+/** Mecanicile temelor online: fișa de calcul și jocurile clasei I. */
+export const MECANICI_TEME = ["calcul", "clasa1"] as const;
 
 /** hash simplu al unui text (id de elev) → întreg */
 function hashText(s: string): number {
@@ -22,9 +28,16 @@ export function exercitiiTema(tema: Pick<Tema, "config" | "seed">, elevId: strin
   return { cfg: c, exercitii: genereazaCalcul(c).exercitii };
 }
 
+/** Exercițiile unei teme cu jocurile clasei I (aceleași pentru toți sau, cu seed null, diferite pentru fiecare elev). */
+export function exercitiiTemaClasa1(tema: Pick<Tema, "config" | "seed">, elevId: string): { cfg: ConfigClasa1; exercitii: ExercitiuC1[] } {
+  const cfg = curataC1((tema.config ?? {}) as Record<string, unknown>);
+  const c = tema.seed === null ? { ...cfg, seed: hash(cfg.seed, hashText(elevId)) % 2 ** 31 || 1 } : cfg;
+  return { cfg: c, exercitii: genereazaClasa1(c).exercitii };
+}
+
 /** Temele pe care le vede un elev: ale claselor în care e înscris și cele primite personal. */
 export function filtruTemeElev(elevId: string): Prisma.TemaWhereInput {
-  return { OR: [{ mecanica: "calcul" }, { mecanica: { startsWith: "c3:" } }], AND: { OR: [{ elevId }, { elevId: null, clasa: { elevi: { some: { elevId } } } }] } };
+  return { OR: [{ mecanica: { in: [...MECANICI_TEME] } }, { mecanica: { startsWith: "c3:" } }], AND: { OR: [{ elevId }, { elevId: null, clasa: { elevi: { some: { elevId } } } }] } };
 }
 
 /**

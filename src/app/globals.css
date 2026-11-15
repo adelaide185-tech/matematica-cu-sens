@@ -130,6 +130,20 @@ body {
 .fisa-rezultat { font-size: 13pt; font-weight: 700; text-align: right; }
 .fisa-subsol { margin-top: 8mm; font-size: 8.5pt; color: #888; text-align: center; }
 
+/* ───── Fișa clasei I: font mare, căsuțe mari, rânduri aerisite (copii de 7–8 ani) ───── */
+.fisa-c1 .fisa { font-size: 14pt; line-height: 1.55; }
+.fisa-c1 .fisa-enunt { font-size: 14.5pt; margin-bottom: 3mm; }
+.fisa-c1 .fisa-item { margin-bottom: 6mm; }
+.fisa-c1 .fisa-cerinte { gap: 5mm 8mm; }
+.fisa-c1 .casuta { width: 14mm; height: 10mm; border-width: 1.6px; border-radius: 2mm; }
+.fisa-c1 .linie { min-width: 26mm; height: 1.3em; }
+.fisa-c1 .fisa-optiuni { font-size: 13.5pt; gap: 2mm 6mm; }
+.fisa-c1 .fisa-mecanica { max-width: 82mm; }
+.fisa-c1 .fisa-mecanica svg { max-height: 38mm; }
+.fisa-c1 .fisa-lucru { height: 22mm !important; }
+.fisa-pagina-noua { break-before: page; page-break-before: always; }
+@media screen { .fisa-pagina-noua { margin-top: 8mm; } }
+
 @page { size: A4; margin: 0; }
 @media print {
   body { background: #fff; }

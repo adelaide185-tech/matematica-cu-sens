@@ -118,7 +118,7 @@ export interface RezultatTema {
 export async function trimiteTema(cod: string, raspunsuri: RaspunsDat[], timpMs: number): Promise<RezultatTema> {
   const s = await cereRol("ELEV");
   const tema = await temaPentruElev(cod, s.id);
-  if (!tema) return { eroare: "Tema nu există sau nu este pentru tine." };
+  if (!tema || tema.mecanica !== "calcul") return { eroare: "Tema nu există sau nu este pentru tine." };
   if (tema.test) {
     const deja = await db.incercare.count({ where: { temaId: tema.id, elevId: s.id, terminat: { not: null } } });
     if (deja) return { eroare: "Ai trimis deja acest test." };

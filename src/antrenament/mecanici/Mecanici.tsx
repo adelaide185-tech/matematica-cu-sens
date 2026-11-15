@@ -6,6 +6,7 @@ import type { Mecanica } from "../tipuri";
 import { AxaNumerelor, Numaratoare } from "@/componente/svg/Vizual";
 import { pas, tranzitie } from "@/jocuri/miscare";
 import { CorpSVG, Coordonate, Figura, Grafic, Grila, Linie, Obiecte, Scena, SimetrieGrila, Tabel, Unghi } from "./MecaniciD";
+import { Betisoare, Pozitie } from "./MecaniciC1";
 import { Bani, Benzi, CeasAfisat, CeasInteractiv, Cantar, Fasie, FractieAfisata, FractieInteractiva, Grila100, LinieTimp, Magazin, Recipient, Rigla } from "./MecaniciC";
 
 /**
@@ -86,6 +87,10 @@ export function VizualExercitiu({ m, indiciu, onValoare, rezolvat }: { m: Mecani
       return <Tabel titlu={m.titlu} coloane={m.coloane} randuri={m.randuri} />;
     case "grafic":
       return <Grafic titlu={m.titlu} bare={m.bare} pas={m.pas} pictograma={m.pictograma} />;
+    case "betisoare":
+      return <Betisoare zeci={m.zeci} unitati={m.unitati} />;
+    case "pozitie":
+      return <Pozitie reper={m.reper} obiect={m.obiect} relatie={m.relatie} />;
   }
 }
 

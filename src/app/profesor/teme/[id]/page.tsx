@@ -8,6 +8,7 @@ import { codificaC3 } from "@/motor/clasa3/config";
 import { MEDALII } from "@/motor/clasa3/generator";
 import { JOCURI_C3, NUME_CAPITOL, type CapitolC3, type JocC3 } from "@/motor/clasa3/tipuri";
 import { Reimprospatare } from "@/componente/Reimprospatare";
+import { RaportClasa1 } from "./RaportClasa1";
 
 export const dynamic = "force-dynamic";
 
@@ -23,12 +24,13 @@ export default async function RezultateTema({ params }: { params: Promise<{ id: 
     include: {
       clasa: { include: { elevi: { include: { elev: { select: { id: true, nume: true, prenume: true } } } } } },
       elev: { select: { id: true, nume: true, prenume: true } },
-      incercari: { where: { terminat: { not: null } }, orderBy: { terminat: "desc" }, include: { raspunsuri: { select: { item: true, corect: true, raspunsElev: true, competenta: true } } } },
+      incercari: { where: { terminat: { not: null } }, orderBy: { terminat: "desc" }, include: { raspunsuri: { select: { item: true, corect: true, raspunsElev: true, timpMs: true, competenta: true } } } },
     },
   });
   if (!t) notFound();
   const joc = t.mecanica.startsWith("c3:") ? (t.mecanica.slice(3) as JocC3) : null;
   const elevi = (t.elev ? [t.elev] : t.clasa?.elevi.map((i) => i.elev) ?? []).sort((a, b) => a.nume.localeCompare(b.nume, "ro"));
+  if (t.mecanica === "clasa1") return <RaportClasa1 t={t} elevi={elevi} />;
   const ultima = new Map<string, (typeof t.incercari)[number]>();
   const nrIncercari = new Map<string, number>();
   for (const i of t.incercari) {

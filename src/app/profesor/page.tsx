@@ -57,6 +57,10 @@ export default function PanouProfesor() {
           <span className="text-2xl" aria-hidden>🎮</span>
           <span><b className={p.clasa === 3 ? "" : "text-mov"}>Clasa a III-a: teme și jocuri</b> — capitole la alegere, 5 mini-jocuri online, fișă PDF cu barem</span>
         </Link>
+        <Link href="/profesor/clasa1" className={`mt-2 flex items-center gap-3 rounded-2xl p-3 text-sm hover:brightness-95 ${p.clasa === 1 ? "bg-mov text-white ring-4 ring-galben" : "bg-mov-deschis"}`}>
+          <span className="text-2xl" aria-hidden>🚀</span>
+          <span><b className={p.clasa === 1 ? "text-white" : "text-mov"}>Clasa I · jocuri și fișe pe capitole</b> — 5 mini-jocuri, 10–100 de exerciții, PDF cu barem, atribuire online</span>
+        </Link>
 
         <Sectiune titlu="1. Clasa">
           <div className="grid grid-cols-5 gap-2">

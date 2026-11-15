@@ -100,6 +100,36 @@ Clasa a III-a: teme și jocuri (`/profesor/clasa3`, detalii în `docs/05_CLASA3_
 - 5 mini-jocuri: Cursa contra cronometrului, Perechi, Balanța, Detectivul, Constructorul
 - trimise ca joc online unei grupe sau unui elev; rezultate cu medalie, acuratețe, timp mediu și greșeli, actualizate automat
 
+Clasa I · jocuri și fișe pe capitole (`/profesor/clasa1`):
+- 9 capitole, selectabile individual sau combinat:
+  - numerele 0–100;
+  - adunarea și scăderea 0–20 și 0–100, cu opțiunea „doar fără trecere / cu trecere / amestecat”;
+  - termenul necunoscut (□);
+  - geometrie și orientare spațială;
+  - timpul, banii, lungimea;
+  - probleme cu una sau două operații.
+- 10, 15, 20, 25, 50 sau 100 de exerciții unice; același cod dă aceleași exerciții pe fișă, în barem și în joc
+- 5 mini-jocuri pentru elev (`/elev/clasa1`, `src/jocuri/clasa1/`):
+  - Numără și grupează;
+  - Cursa prietenoasă (cronometru opțional, oprit implicit);
+  - Potrivește perechile / Memory;
+  - Balanța numerelor;
+  - Căsuța magică.
+- interfață pentru copii: butoane mari, tastatură numerică pe ecran, citirea cerinței cu voce (🔊)
+- PDF A4 cu font mare, pe 2–3 coloane; „Fișă + Barem” cu răspunsurile pe pagină separată
+- atribuire ca joc interactiv unei grupe sau unui elev; fiecare răspuns se verifică pe server
+- raportul profesorului:
+  - medalie (🥉 ≥ 50%, 🥈 ≥ 75%, 🥇 ≥ 90%, 💎 100%);
+  - acuratețe din prima;
+  - timp total și pe exercițiu;
+  - rezultate pe capitole;
+  - unde a greșit fiecare elev
+- motorul (`src/motor/clasa1/`) e testat în `clasa1.test.ts`:
+  - toate numerele sunt în concentrul ales, fără negative;
+  - regula „fără trecere” e respectată (unități ≤ 9 la adunare, fără împrumut la scădere);
+  - fără exerciții duplicate în joc sau pe fișă;
+  - reproductibil din seed
+
 Urmează:
 - clasa a II-a: mini-jocurile din specificația primită
 - rapoarte de progres pe noțiuni pentru profesor
