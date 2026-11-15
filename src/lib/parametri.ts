@@ -1,5 +1,5 @@
 import { CURRICULUM, cautaLectie } from "@/curriculum";
-import { genereazaFisa, ITEMI_IMPLICITI } from "@/motor/fisa";
+import { genereazaFisa, ITEMI_IMPLICITI, NR_MAX_FISA } from "@/motor/fisa";
 import type { Clasa, Nivel } from "@/motor/tipuri";
 import { NIVELURI } from "@/motor/tipuri";
 
@@ -30,7 +30,7 @@ export function citesteParametri(s: Sursa): ParametriFisa {
   const nivel = (NIVELURI.some((n) => n.id === nivelS) ? nivelS : "consolidare") as Nivel;
   const primaLectie = CURRICULUM[clasa].flatMap((c) => c.lectii).find((l) => l.generatoare.length)?.id ?? "";
   const lectie = get(s, "lectie") && cautaLectie(clasa, get(s, "lectie")!) ? get(s, "lectie")! : primaLectie;
-  const nr = Math.min(20, Math.max(1, Number(get(s, "nr")) || ITEMI_IMPLICITI[nivel]));
+  const nr = Math.min(NR_MAX_FISA, Math.max(1, Number(get(s, "nr")) || ITEMI_IMPLICITI[nivel]));
   return {
     clasa,
     lectie,

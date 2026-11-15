@@ -5,7 +5,7 @@ import Link from "next/link";
 import { CURRICULUM, NUME_CLASA } from "@/curriculum";
 import { FisaPrint } from "@/componente/FisaPrint";
 import { construiesteFisa, query, type ParametriFisa } from "@/lib/parametri";
-import { ITEMI_IMPLICITI } from "@/motor/fisa";
+import { ITEMI_IMPLICITI, NR_MAX_FISA } from "@/motor/fisa";
 import { NIVELURI, type Clasa, type Nivel } from "@/motor/tipuri";
 import { seedNou } from "@/motor/rng";
 
@@ -91,10 +91,20 @@ export default function PanouProfesor() {
               </button>
             ))}
           </div>
-          <label className="mt-3 flex items-center gap-3 text-sm">
-            Număr de exerciții: <b className="w-6">{p.nr}</b>
-            <input type="range" min={2} max={14} value={p.nr} onChange={(e) => set("nr", Number(e.target.value))} className="flex-1 accent-mov" />
+          <div className="mt-3 text-sm">Număr de exerciții: <b>{p.nr}</b></div>
+          <div className="mt-1 grid grid-cols-7 gap-1">
+            {[5, 10, 15, 20, 30, 50, 100].map((n) => (
+              <button key={n} type="button" onClick={() => set("nr", n)}
+                className={`rounded-lg py-1.5 text-sm font-bold ${p.nr === n ? "bg-mov text-white" : "bg-mov-deschis text-mov hover:bg-mov/20"}`}>{n}</button>
+            ))}
+          </div>
+          <label className="mt-2 flex items-center gap-2 text-sm">
+            Alt număr (1–{NR_MAX_FISA}):
+            <input type="number" min={1} max={NR_MAX_FISA} value={p.nr}
+              onChange={(e) => { const n = Number(e.target.value); if (n >= 1 && n <= NR_MAX_FISA) set("nr", n); }}
+              className="w-20 rounded-lg border-2 border-mov/20 p-1.5" />
           </label>
+          <p className="mt-1 text-xs text-gray-500">Exercițiile de același tip se grupează pe subpuncte (a, b, c…); pentru calcul rapid cu până la 200 de exerciții folosește Generatorul de calcul.</p>
         </Sectiune>
 
         <Sectiune titlu="4. Antet">

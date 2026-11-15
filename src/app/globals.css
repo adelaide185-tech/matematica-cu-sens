@@ -97,7 +97,7 @@ body {
 .fisa-mecanica > div { max-width: 78mm; }
 /* un exercițiu lung (mai multe desene) poate continua pe pagina următoare, dar o cerință cu desenul ei rămâne întreagă */
 .fisa-cerinta { break-inside: avoid; page-break-inside: avoid; }
-.fisa-item:has(.fisa-mecanica) { break-inside: auto; page-break-inside: auto; }
+.fisa-item:has(.fisa-mecanica), .fisa-item:has(.fisa-cerinta .fisa-vizual) { break-inside: auto; page-break-inside: auto; }
 .linie { display: inline-block; min-width: 22mm; border-bottom: 1.2px dotted #444; height: 1.1em; vertical-align: bottom; }
 .linie.medie { min-width: 45mm; }
 .linie.lunga { min-width: 120mm; }

@@ -99,3 +99,18 @@ describe("fișe și curriculum", () => {
       for (const cap of capitole) for (const l of cap.lectii) for (const g of l.generatoare) expect(exista(g), g).toBe(true);
   });
 });
+
+describe("fișe pe lecții cu multe exerciții", () => {
+  it("peste 14 exerciții: cerințele cresc, cel mult 10 subpuncte pe exercițiu", async () => {
+    const { CURRICULUM } = await import("@/curriculum");
+    const { genereazaFisa } = await import("./fisa");
+    const total = (n: number, gen: string[]) =>
+      genereazaFisa({ clasa: 2, nivel: "consolidare", generatoare: gen, nrItemi: n, seed: 4 }).itemi;
+    for (const l of CURRICULUM[2].flatMap((c) => c.lectii).filter((l) => l.generatoare.length).slice(0, 12)) {
+      const mic = total(14, l.generatoare), mare = total(100, l.generatoare);
+      const cer = (it: typeof mic) => it.reduce((s, x) => s + x.cerinte.length, 0);
+      expect(cer(mare), l.titlu).toBeGreaterThan(cer(mic));
+      mare.forEach((it) => expect(it.cerinte.length).toBeLessThanOrEqual(10));
+    }
+  });
+});

@@ -84,7 +84,12 @@ export const compunere: Generator = {
   generate(rng, nivel, clasa) {
     const n = nrCerinte(nivel, 4);
     const k = cifreClasa(clasa);
-    const nums = rng.distinct(n, () => numarCifre(rng, k));
+    // cel puțin doi termeni nenuli (300 = … nu e un calcul)
+    const nums = rng.distinct(n, () => {
+      let x = numarCifre(rng, k);
+      for (let i = 0; i < 20 && caSuma(x).split("+").length < 2; i++) x = numarCifre(rng, k);
+      return x;
+    });
     const cerinte: Cerinta[] = nums.map((x) => {
       const termeni = caSuma(x).split("+");
       // aprofundare: termenii amestecați (30 + 400 + 7)
