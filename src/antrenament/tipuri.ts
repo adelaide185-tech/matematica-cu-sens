@@ -92,7 +92,9 @@ export type Raspuns =
   /** valoarea e construită direct pe obiect (blocuri, numărătoare) */
   | { tip: "construit"; valoare: number }
   /** o mulțime de elemente, fără ordine (ex. pătrățelele colorate pe rețea) */
-  | { tip: "multime"; valori: number[] };
+  | { tip: "multime"; valori: number[] }
+  /** număr zecimal scris cu virgulă, ca la școală („0,35”); se acceptă și punctul */
+  | { tip: "zecimal"; valoare: number; text: string };
 
 export interface Exercitiu {
   subiectId: string;
@@ -130,6 +132,11 @@ export function verificaRaspuns(r: Raspuns, dat: unknown): boolean {
       return Array.isArray(dat) && r.valori.every((v, i) => Number(dat[i]) === v);
     case "ordine":
       return Array.isArray(dat) && dat.length === r.valori.length && r.valori.every((v, i) => Number(dat[i]) === v);
+    case "zecimal": {
+      const t = String(dat ?? "").trim().replace(",", ".");
+      if (!/^\d+(\.\d+)?$/.test(t)) return false;
+      return Math.abs(Number(t) - r.valoare) < 1e-9;
+    }
     case "multime": {
       if (!Array.isArray(dat)) return false;
       const a = new Set(dat.map(Number));
@@ -168,5 +175,7 @@ export function raspunsText(r: Raspuns): string {
       return r.valori.join(", ");
     case "multime":
       return r.valori.join(", ");
+    case "zecimal":
+      return r.text;
   }
 }

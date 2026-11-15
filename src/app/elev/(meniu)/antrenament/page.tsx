@@ -25,11 +25,11 @@ export default function ConfigurareAntrenament() {
   useEffect(() => {
     const q = new URLSearchParams(location.search);
     const c = Number(q.get("clasa"));
-    if ([1, 2, 3, 4].includes(c)) setClasa(c as Clasa);
+    if ([1, 2, 3, 4, 5].includes(c)) setClasa(c as Clasa);
     else {
       try {
         const p = JSON.parse(localStorage.getItem("mcs-progres") ?? "{}");
-        if ([1, 2, 3, 4].includes(p.clasa)) setClasa(p.clasa);
+        if ([1, 2, 3, 4, 5].includes(p.clasa)) setClasa(p.clasa);
       } catch {}
     }
     const niv = q.get("nivel");
@@ -85,7 +85,7 @@ export default function ConfigurareAntrenament() {
 
         <Pas nr={1} titlu="Clasa">
           <div className="flex flex-wrap gap-2">
-            {([1, 2, 3, 4] as Clasa[]).map((c) => (
+            {([1, 2, 3, 4, 5] as Clasa[]).map((c) => (
               <button key={c} onClick={() => setClasa(c)} aria-pressed={clasa === c}
                 className={`h-tinta rounded-2xl px-5 text-lg font-bold shadow ${clasa === c ? "bg-mov text-white" : "bg-hartie text-mov"}`}>Clasa {NUME_CLASA[c]}</button>
             ))}

@@ -226,7 +226,7 @@ export const comparare: Subiect = {
   titlu: "Comparăm numere",
   descriere: "Balanța: <, > sau =",
   domeniu: "numeratie",
-  clase: [1, 2, 3, 4],
+  clase: [1, 2, 3, 4, 5],
   icon: "⚖️",
   exercitiu(rng, nivel, clasa) {
     const I = interval(clasa, nivel);
@@ -271,7 +271,7 @@ export const ordonare: Subiect = {
   titlu: "Ordonăm numere",
   descriere: "Atinge numerele în ordine",
   domeniu: "numeratie",
-  clase: [1, 2, 3, 4],
+  clase: [1, 2, 3, 4, 5],
   icon: "📶",
   exercitiu(rng, nivel, clasa) {
     const k = nivel === "usor" ? 4 : nivel === "mediu" ? 5 : 6;
@@ -342,7 +342,7 @@ export const rotunjire: Subiect = {
   titlu: "Rotunjim numere",
   descriere: "La ce zece (sută, mie) e mai aproape?",
   domeniu: "numeratie",
-  clase: [2, 3, 4],
+  clase: [2, 3, 4, 5],
   icon: "🎯",
   exercitiu(rng, nivel, clasa) {
     const p = nivel === "usor" ? 10 : nivel === "mediu" ? (clasa === 2 ? 10 : 100) : clasa === 2 ? 100 : clasa === 3 ? 1000 : rng.pick([1000, 10000]);

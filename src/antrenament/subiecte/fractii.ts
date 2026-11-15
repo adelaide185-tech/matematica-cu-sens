@@ -152,7 +152,7 @@ export const fractieDinNumar: Subiect = {
   titlu: "Fracția dintr-un număr",
   descriere: "Împarte în părți egale, apoi ia câteva",
   domeniu: "fractii",
-  clase: [3, 4],
+  clase: [3, 4, 5],
   icon: "🧮",
   exercitiu(rng, nivel, clasa) {
     const p = rng.pick(numitori(clasa, nivel).filter((x) => x <= 10));
@@ -213,7 +213,7 @@ export const procente: Subiect = {
   titlu: "Procente",
   descriere: "Grila de 100 de pătrățele",
   domeniu: "fractii",
-  clase: [4],
+  clase: [4, 5],
   icon: "💯",
   exercitiu(rng, nivel) {
     if (nivel === "usor" || rng.bool(0.4)) {

@@ -10,6 +10,18 @@ const NIV: NivelJoc[] = NIVELURI_JOC.map((n) => n.id);
 const MAX: Record<number, number> = { 1: 100, 2: 1000, 3: 10000, 4: 1000000 };
 
 /** Verifică faptele matematice care se pot citi din mecanică și limitele clasei. */
+const gcd = (a: number, b: number): number => (b ? gcd(b, a % b) : a);
+const SUPS = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+/** Evaluează expresii cu puteri (²) și paranteze ( ) [ ] { }. */
+function calculeaza(expr: string): number {
+  const js = expr
+    .replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]+/g, (m) => "**" + m.split("").map((c) => SUPS.indexOf(c)).join(""))
+    .replace(/[[{]/g, "(").replace(/[\]}]/g, ")")
+    .replace(/·/g, "*").replace(/−/g, "-").replace(/:/g, "/").replace(/\s/g, "");
+  if (!/^[\d+\-*/().]+$/.test(js)) throw new Error(`expresie nesigură: ${expr}`);
+  return Function(`"use strict"; return (${js});`)();
+}
+
 function verificaMatematic(e: Omit<Exercitiu, "subiectId"> & { subiectId?: string }, clasa: Clasa) {
   const m = e.mecanica;
   const r = e.raspuns;
@@ -131,6 +143,37 @@ function verificaMatematic(e: Omit<Exercitiu, "subiectId"> & { subiectId?: strin
   }
   if (m.tip === "grafic" && m.pictograma) m.bare.forEach((b) => { expect(b.valoare % m.pictograma!.valoare).toBe(0); expect(b.valoare / m.pictograma!.valoare).toBeLessThanOrEqual(8); });
   if (m.tip === "scena") { expect(val).toBeGreaterThanOrEqual(1); expect(val).toBeLessThanOrEqual(m.forme.length); }
+  // ── faza E (clasa a V-a) ──
+  if (r.tip === "zecimal") {
+    expect(verificaRaspuns(r, r.text), `${e.enunt} → ${r.text}`).toBe(true);
+    expect(r.text).not.toMatch(/\./);
+    expect(r.valoare).toBeGreaterThanOrEqual(0);
+  }
+  if (e.subiectId === "v.ordine" || e.cheie.startsWith("ord5:")) {
+    expect(val).toBe(calculeaza(e.enunt.replace(" = ?", "")));
+  }
+  if (e.cheie.startsWith("frop5:")) {
+    const [, a, p, op, b, q] = e.cheie.match(/(\d+)\/(\d+) (.) (\d+)\/(\d+)/)!.map((x, i) => (i === 3 ? x : Number(x))) as [string, number, number, string, number, number];
+    const v = op === "+" ? a / p + b / q : op === "−" ? a / p - b / q : op === "·" ? (a * b) / (p * q) : (a / p) / (b / q);
+    const rr = r as { valori: number[] };
+    expect(rr.valori[0] / rr.valori[1]).toBeCloseTo(v, 9);
+    expect(v).toBeGreaterThan(0);
+    expect(gcd(rr.valori[0], rr.valori[1])).toBe(1);
+  }
+  if (e.cheie.startsWith("zop:") || e.cheie.startsWith("zp10:") || e.cheie.startsWith("znat:") || e.cheie.startsWith("zz:")) {
+    const v = calculeaza(e.enunt.replace(" = ?", "").replace(/,/g, "."));
+    expect((r as { valoare: number }).valoare).toBeCloseTo(v, 9);
+  }
+  if (e.cheie.startsWith("u5calc:")) {
+    const [, g1, m1, op, g2, m2] = e.enunt.match(/(\d+)°(\d+)′ (.) (\d+)°(\d+)′/)!;
+    const t = op === "+" ? Number(g1) * 60 + Number(m1) + Number(g2) * 60 + Number(m2) : Number(g1) * 60 + Number(m1) - (Number(g2) * 60 + Number(m2));
+    expect((r as { valori: number[] }).valori).toEqual([Math.floor(t / 60), t % 60]);
+    expect((r as { valori: number[] }).valori[1]).toBeLessThan(60);
+  }
+  if (e.cheie.startsWith("pow:")) {
+    const [, b, ex] = e.cheie.match(/pow:(\d+)\^(\d+)/)!;
+    expect(val).toBe(Number(b) ** Number(ex));
+  }
   if (r.tip === "campuri") r.valori.forEach((v) => expect(v).toBeGreaterThanOrEqual(0));
   if (r.tip === "optiune") expect(r.optiuni).toContain(r.valoare);
   expect(e.indicii.length).toBeGreaterThanOrEqual(3);

@@ -38,7 +38,8 @@ export function dinSubiect(s: Subiect): Generator {
         ex.push(e);
       }
       const cerinte: Cerinta[] = ex.map((e) => ({
-        text: e.enunt,
+        // pe fișă, „= ?” de la final devine „=” urmat de linia de răspuns
+        text: e.enunt.replace(/ = \?( \(|$)/, " =$1").replace(/^(.*) = \? \((.*)\)$/, "$1 = ($2)"),
         raspuns: raspunsText(e.raspuns),
         mecanica: e.mecanica,
         ...(e.raspuns.tip === "optiune" && { optiuni: e.raspuns.optiuni, alegere: true }),
@@ -51,7 +52,7 @@ export function dinSubiect(s: Subiect): Generator {
         interactiune: "input",
         coloane: ex.length > 1 ? 2 : 1,
         cerinte,
-        rezolvare: ex.map((e, i) => `${String.fromCharCode(97 + i)}) ${e.indicii[e.indicii.length - 1]}`),
+        rezolvare: ex.map((e) => e.indicii[e.indicii.length - 1]),
         punctaj: cerinte.length,
         dificultate: ex[0]?.dificultate ?? 3,
       };
@@ -64,6 +65,9 @@ const PENTRU_FISE = [
   "geo.figuri", "geo.corpuri", "geo.linii", "geo.unghiuri", "geo.numara", "geo.perimetru", "geo.arie", "geo.simetrie", "geo.coordonate",
   "date.tabel", "date.grafic", "date.pictograma",
   "mas.lungime", "mas.masa", "mas.capacitate", "timp.calendar", "timp.durata", "bani.numara", "bani.rest", "fr.procente", "fr.operatii",
+  // clasa a V-a
+  "v.puteri", "v.ordine", "v.factor-comun", "v.unitate", "v.metode", "v.divizibilitate", "v.prime",
+  "v.fr-echivalente", "v.fr-comparare", "v.fr-operatii", "v.zecimale", "v.zecimale-op", "v.segmente", "v.unghiuri", "v.arie-volum",
 ];
 
 export const GENERATOARE_DIN_ANTRENAMENT: Generator[] = SUBIECTE.filter((s) => PENTRU_FISE.includes(s.id)).map(dinSubiect);

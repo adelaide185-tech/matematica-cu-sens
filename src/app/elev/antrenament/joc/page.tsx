@@ -107,6 +107,7 @@ function Sesiune({ stareInitiala, exercitii }: { stareInitiala: StareSesiune; ex
     if (!ex) return;
     const r = ex.raspuns;
     if (r.tip === "numar") trimite(text === "" ? null : Number(text));
+    else if (r.tip === "zecimal") trimite(text);
     else if (r.tip === "campuri") trimite(campuri.map((x) => (x === "" ? NaN : Number(x))));
     else trimite(valoare);
   };
@@ -115,8 +116,9 @@ function Sesiune({ stareInitiala, exercitii }: { stareInitiala: StareSesiune; ex
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
       if (!ex || blocat) return;
-      if (ex.raspuns.tip !== "numar" && ex.raspuns.tip !== "campuri") return;
+      if (ex.raspuns.tip !== "numar" && ex.raspuns.tip !== "campuri" && ex.raspuns.tip !== "zecimal") return;
       if (/^\d$/.test(e.key)) scrie((v) => (v + e.key).slice(0, 8));
+      else if ((e.key === "," || e.key === ".") && ex.raspuns.tip === "zecimal") scrie((v) => (v.includes(",") ? v : (v || "0") + ",").slice(0, 8));
       else if (e.key === "Backspace") scrie((v) => v.slice(0, -1));
       else if (e.key === "Enter") verificaCurent();
       else if (e.key === "Tab" && ex.raspuns.tip === "campuri") { e.preventDefault(); setCampActiv((i) => (i + 1) % campuri.length); }
@@ -226,9 +228,16 @@ function Intrare({ ex, text, campuri, campActiv, setCampActiv, indiciu, scrie, t
           <div className="min-w-40 rounded-2xl border-4 border-dashed border-mov bg-hartie px-6 py-2 text-center text-5xl font-bold text-mov-inchis" aria-label="răspunsul tău">{text || "?"}</div>
         )}
       </div>
-      <Tastatura valoare={r.tip === "campuri" ? campuri[campActiv] ?? "" : text} onChange={(v) => scrie(() => v)} onTrimite={verifica} />
+      <Tastatura valoare={r.tip === "campuri" ? campuri[campActiv] ?? "" : text} onChange={(v) => scrie(() => (r.tip === "zecimal" ? normalizeazaVirgula(v) : v))} onTrimite={verifica} extra={r.tip === "zecimal" ? [","] : []} />
     </div>
   );
+}
+
+/** O singură virgulă; „,5” devine „0,5”. */
+function normalizeazaVirgula(v: string): string {
+  const prima = v.indexOf(",");
+  const fara = prima < 0 ? v : v.slice(0, prima + 1) + v.slice(prima + 1).replace(/,/g, "");
+  return fara.startsWith(",") ? `0${fara}` : fara;
 }
 
 function Final({ stare, exercitii }: { stare: StareSesiune; exercitii: Exercitiu[] }) {

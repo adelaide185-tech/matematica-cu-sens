@@ -139,7 +139,7 @@ export const problemaDoua: Subiect = {
   titlu: "Probleme cu două operații",
   descriere: "Pas cu pas: întrebarea ajutătoare",
   domeniu: "probleme",
-  clase: [2, 3, 4],
+  clase: [2, 3, 4, 5],
   icon: "🪜",
   exercitiu(rng, nivel, clasa) {
     const p = douaOperatii(rng, clasa, nivel);
@@ -179,7 +179,7 @@ export const logica: Subiect = {
   titlu: "Probleme de logică",
   descriere: "Probleme de perspicacitate, tip concurs",
   domeniu: "probleme",
-  clase: [2, 3, 4],
+  clase: [2, 3, 4, 5],
   icon: "🧠",
   exercitiu(rng, nivel, clasa) {
     const item = genComp.generate(rng, "competitie", clasa);

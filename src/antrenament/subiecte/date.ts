@@ -75,7 +75,7 @@ export const tabel: Subiect = {
   titlu: "Citim tabele",
   descriere: "Află informații dintr-un tabel",
   domeniu: "date",
-  clase: [1, 2, 3, 4],
+  clase: [1, 2, 3, 4, 5],
   icon: "📋",
   exercitiu(rng, nivel, clasa) {
     const d = genereaza(rng, clasa, nivel, 1);
@@ -89,7 +89,7 @@ export const grafic: Subiect = {
   titlu: "Grafice cu bare",
   descriere: "Citește graficul: cel mai mult, cel mai puțin, diferențe",
   domeniu: "date",
-  clase: [2, 3, 4],
+  clase: [2, 3, 4, 5],
   icon: "📊",
   exercitiu(rng, nivel, clasa) {
     const pas = clasa === 2 ? 2 : clasa === 3 ? 5 : 10;

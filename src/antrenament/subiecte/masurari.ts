@@ -53,7 +53,7 @@ export const transformari: Subiect = {
   titlu: "Transformăm unități",
   descriere: "Scara unităților: ×10, ×100, ×1000",
   domeniu: "masurari",
-  clase: [2, 3, 4],
+  clase: [2, 3, 4, 5],
   icon: "🔁",
   exercitiu(rng, nivel, clasa) {
     const [mare, mic, f] = rng.pick(reguli(clasa));

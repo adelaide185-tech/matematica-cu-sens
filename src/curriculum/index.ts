@@ -69,6 +69,8 @@ const N = {
   rest: "antr.bani.rest",
   proc: "antr.fr.procente",
   frOp: "antr.fr.operatii",
+  // clasa a V-a
+  v: (id: string) => `antr.v.${id}`,
 } as const;
 
 let k = 0;
@@ -259,12 +261,36 @@ export const CURRICULUM: Record<Clasa, Capitol[]> = {
     ]),
   ],
   5: [
-    C("c5-cap1", "Numere naturale", [L("Operații, puteri, ordinea operațiilor", [])]),
-    C("c5-cap2", "Metode aritmetice", [L("Reducerea la unitate, comparația, figurativă, mers invers, falsa ipoteză", [])]),
-    C("c5-cap3", "Divizibilitate", [L("Divizori, multipli, criterii de divizibilitate", [])]),
-    C("c5-cap4", "Fracții ordinare", [L("Fracții, operații, procente", [])]),
-    C("c5-cap5", "Fracții zecimale", [L("Scriere, comparare, operații", [])]),
-    C("c5-cap6", "Geometrie și unități de măsură", [L("Segment, unghi, unități de măsură", [])]),
+    C("c5-cap1", "Numere naturale", [
+      L("Scrierea, compararea, rotunjirea numerelor naturale", [N.compar, N.ordon, N.rotunj]),
+      L("Puteri: pătrat, cub, puteri ale lui 10, reguli de calcul", [N.v("puteri")]),
+      L("Ordinea efectuării operațiilor; paranteze", [N.v("ordine")]),
+      L("Factorul comun", [N.v("factor-comun")]),
+    ]),
+    C("c5-cap2", "Metode aritmetice de rezolvare a problemelor", [
+      L("Metoda reducerii la unitate", [N.v("unitate")]),
+      L("Metoda figurativă, mersul invers, falsa ipoteză", [N.v("metode"), N.pb2]),
+    ]),
+    C("c5-cap3", "Divizibilitate", [
+      L("Divizor, multiplu; criterii de divizibilitate cu 2, 5, 10, 3, 9", [N.v("divizibilitate")]),
+      L("Numere prime și compuse", [N.v("prime")]),
+    ]),
+    C("c5-cap4", "Fracții ordinare", [
+      L("Amplificare, simplificare, fracții echivalente", [N.v("fr-echivalente")]),
+      L("Compararea fracțiilor", [N.v("fr-comparare")]),
+      L("Operații cu fracții ordinare", [N.v("fr-operatii")]),
+      L("Fracții dintr-un număr; procente", [N.frDin, N.proc]),
+    ]),
+    C("c5-cap5", "Fracții zecimale", [
+      L("Scriere, transformare, comparare, rotunjire", [N.v("zecimale")]),
+      L("Operații cu fracții zecimale; media aritmetică", [N.v("zecimale-op")]),
+    ]),
+    C("c5-cap6", "Geometrie și unități de măsură", [
+      L("Segmente: lungime, mijloc, puncte coliniare", [N.v("segmente")]),
+      L("Unghiuri: măsură, clasificare, calcule cu grade și minute", [N.v("unghiuri")]),
+      L("Arii și volume; unități de măsură", [N.v("arie-volum"), N.transf]),
+    ]),
+    C("c5-cap7", "Organizarea datelor", [L("Tabele și grafice", [N.tabel, N.grafic])]),
   ],
 };
 
