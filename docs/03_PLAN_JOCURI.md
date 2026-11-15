@@ -1,8 +1,12 @@
 # Plan: jocuri educaționale pentru fiecare noțiune
 
 > **Stadiu:**
-> - Fazele A (motorul), B (numerație, operații, probleme: 28 de subiecte) și C (fracții, măsurări, timp, bani: 16 subiecte) sunt implementate și testate.
-> - Fazele D–E urmează.
+> - Implementate și testate:
+>   - faza A (motorul);
+>   - faza B (numerație, operații, probleme: 28 de subiecte);
+>   - faza C (fracții, măsurări, timp, bani: 16 subiecte);
+>   - faza D (geometrie și date: 12 subiecte; completează și lecțiile de pe fișe).
+> - Faza E (clasa a V-a) urmează.
 > - Capacitatea măsurată a fiecărui subiect apare în testul `src/antrenament/antrenament.test.ts`.
 
 ## 1. Auditul codului actual

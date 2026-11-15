@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import type { Mecanica } from "../tipuri";
 import { AxaNumerelor, Numaratoare } from "@/componente/svg/Vizual";
 import { pas, tranzitie } from "@/jocuri/miscare";
+import { CorpSVG, Coordonate, Figura, Grafic, Grila, Linie, Obiecte, Scena, SimetrieGrila, Tabel, Unghi } from "./MecaniciD";
 import { Bani, Benzi, CeasAfisat, CeasInteractiv, Cantar, Fasie, FractieAfisata, FractieInteractiva, Grila100, LinieTimp, Magazin, Recipient, Rigla } from "./MecaniciC";
 
 /**
@@ -63,6 +64,28 @@ export function VizualExercitiu({ m, indiciu, onValoare, rezolvat }: { m: Mecani
       return <Fasie elemente={m.elemente} evidentiat={m.evidentiat} />;
     case "linieTimp":
       return <LinieTimp start={m.start} durata={m.durata} indiciu={indiciu} />;
+    case "figura":
+      return <Figura forma={m.forma} rotatie={m.rotatie} culoare={m.culoare} axa={m.axa} />;
+    case "corp":
+      return <CorpSVG corp={m.corp} culoare={m.culoare} />;
+    case "obiecte":
+      return <Obiecte elemente={m.elemente} />;
+    case "linie":
+      return <Linie fel={m.fel} rotatie={m.rotatie} />;
+    case "unghi":
+      return <Unghi grade={m.grade} rotatie={m.rotatie} indiciu={indiciu} />;
+    case "scena":
+      return <Scena forme={m.forme} />;
+    case "grila":
+      return <Grila latime={m.latime} inaltime={m.inaltime} celule={m.celule} laturi={m.laturi} indiciu={indiciu} />;
+    case "simetrie":
+      return <SimetrieGrila latime={m.latime} inaltime={m.inaltime} celule={m.celule} axa={m.axa} interactiv={m.interactiv} onValoare={onValoare} />;
+    case "coordonate":
+      return <Coordonate max={m.max} punct={m.punct} interactiv={m.interactiv} onValoare={onValoare} />;
+    case "tabel":
+      return <Tabel titlu={m.titlu} coloane={m.coloane} randuri={m.randuri} />;
+    case "grafic":
+      return <Grafic titlu={m.titlu} bare={m.bare} pas={m.pas} pictograma={m.pictograma} />;
   }
 }
 
@@ -72,7 +95,9 @@ export function areIntrareProprie(m: Mecanica): boolean {
     m.tip === "blocuri" || m.tip === "ordonare" || m.tip === "magazin" ||
     (m.tip === "numaratoare" && Boolean(m.construieste)) ||
     (m.tip === "fractie" && Boolean(m.interactiv)) ||
-    (m.tip === "ceas" && Boolean(m.interactiv))
+    (m.tip === "ceas" && Boolean(m.interactiv)) ||
+    (m.tip === "simetrie" && m.interactiv) ||
+    (m.tip === "coordonate" && Boolean(m.interactiv))
   );
 }
 

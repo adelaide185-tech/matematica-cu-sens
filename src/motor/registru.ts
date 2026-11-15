@@ -3,12 +3,14 @@ import { GENERATOARE_NUMERATIE } from "./generatoare/numeratie";
 import { GENERATOARE_OPERATII } from "./generatoare/operatii";
 import { GENERATOARE_FRACTII_MASURI } from "./generatoare/fractii-masuri";
 import { GENERATOARE_PROBLEME } from "./generatoare/probleme";
+import { GENERATOARE_DIN_ANTRENAMENT } from "./generatoare/din-antrenament";
 
 export const GENERATOARE: Generator[] = [
   ...GENERATOARE_NUMERATIE,
   ...GENERATOARE_OPERATII,
   ...GENERATOARE_FRACTII_MASURI,
   ...GENERATOARE_PROBLEME,
+  ...GENERATOARE_DIN_ANTRENAMENT,
 ];
 
 const INDEX = new Map(GENERATOARE.map((g) => [g.id, g]));

@@ -4,6 +4,7 @@ import { SUBIECTE, subiect } from "./registru";
 import { capacitate, construiesteSesiune, cote, SPATIERE_FAPT, verdicte } from "./sesiune";
 import { NIVELURI_JOC, verificaRaspuns, type Exercitiu, type NivelJoc } from "./tipuri";
 import type { Clasa } from "@/motor/tipuri";
+import { perimetruCelule } from "./subiecte/geometrie";
 
 const NIV: NivelJoc[] = NIVELURI_JOC.map((n) => n.id);
 const MAX: Record<number, number> = { 1: 100, 2: 1000, 3: 10000, 4: 1000000 };
@@ -94,11 +95,47 @@ function verificaMatematic(e: Omit<Exercitiu, "subiectId"> & { subiectId?: strin
   if (m.tip === "balanta" && r.tip === "optiune" && !r.optiuni.includes("<")) {
     expect(r.valoare).toBe(m.valStanga > m.valDreapta ? r.optiuni[0] : r.optiuni[1]);
   }
+  // ── faza D ──
+  if (m.tip === "grila" && !m.laturi) {
+    if (e.enunt.includes("perimetrul")) expect(val).toBe(perimetruCelule(m.latime, m.celule));
+    if (e.enunt.includes("aria")) expect(val).toBe(m.celule.length);
+    m.celule.forEach((c) => expect(c).toBeLessThan(m.latime * m.inaltime));
+  }
+  if (m.tip === "grila" && m.laturi) {
+    const nums = (e.enunt.match(/\d+/g) ?? []).map(Number);
+    if (e.enunt.includes("lățimea?")) expect(2 * (nums[1] + val!)).toBe(nums[0]);
+    else if (e.enunt.includes("perimetrul")) expect(val).toBe(2 * (m.laturi.L + m.laturi.l));
+    else if (e.enunt.includes("aria")) expect(val).toBe(m.laturi.L * m.laturi.l);
+  }
+  if (m.tip === "simetrie" && r.tip === "multime") {
+    const oglinda = (c: number) => (m.axa === "verticala" ? Math.floor(c / m.latime) * m.latime + (m.latime - 1 - (c % m.latime)) : (m.inaltime - 1 - Math.floor(c / m.latime)) * m.latime + (c % m.latime));
+    expect([...r.valori].sort((a, b) => a - b)).toEqual(m.celule.map(oglinda).sort((a, b) => a - b));
+    r.valori.forEach((v) => expect(m.celule).not.toContain(v));
+  }
+  if (m.tip === "coordonate") {
+    if (r.tip === "construit") { expect(Math.floor(r.valoare / 100)).toBeLessThanOrEqual(m.max); expect(r.valoare % 100).toBeLessThanOrEqual(m.max); }
+    if (r.tip === "campuri") expect(r.valori).toEqual(m.punct);
+  }
+  if ((m.tip === "tabel" || m.tip === "grafic") && r.tip === "numar") {
+    const valori = m.tip === "tabel" ? m.randuri.map((x) => x[1]) : m.bare.map((x) => x.valoare);
+    expect(new Set(valori).size).toBe(valori.length);
+    if (e.enunt.includes("total")) expect(val).toBe(valori.reduce((a, b) => a + b, 0));
+    else if (e.enunt.startsWith("Cu cât")) expect(valori.some((a) => valori.some((b) => a - b === val))).toBe(true);
+    else expect(valori).toContain(val);
+  }
+  if ((m.tip === "tabel" || m.tip === "grafic") && r.tip === "optiune") {
+    const perechi: [string, number][] = m.tip === "tabel" ? m.randuri : m.bare.map((x) => [x.eticheta, x.valoare]);
+    const v = perechi.map((x) => x[1]);
+    const asteptat = perechi.find((x) => x[1] === (e.enunt.includes("multe") ? Math.max(...v) : Math.min(...v)))![0];
+    expect(r.valoare).toBe(asteptat);
+  }
+  if (m.tip === "grafic" && m.pictograma) m.bare.forEach((b) => { expect(b.valoare % m.pictograma!.valoare).toBe(0); expect(b.valoare / m.pictograma!.valoare).toBeLessThanOrEqual(8); });
+  if (m.tip === "scena") { expect(val).toBeGreaterThanOrEqual(1); expect(val).toBeLessThanOrEqual(m.forme.length); }
   if (r.tip === "campuri") r.valori.forEach((v) => expect(v).toBeGreaterThanOrEqual(0));
   if (r.tip === "optiune") expect(r.optiuni).toContain(r.valoare);
   expect(e.indicii.length).toBeGreaterThanOrEqual(3);
   // răspunsul propriu trece verificarea
-  const dat = r.tip === "campuri" || r.tip === "ordine" ? r.valori : r.tip === "optiune" ? r.valoare : r.valoare;
+  const dat = r.tip === "campuri" || r.tip === "ordine" || r.tip === "multime" ? r.valori : r.valoare;
   expect(verificaRaspuns(r, dat)).toBe(true);
 }
 

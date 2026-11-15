@@ -203,7 +203,7 @@ function Intrare({ ex, text, campuri, campActiv, setCampActiv, indiciu, scrie, t
       </div>
     );
   }
-  if (r.tip === "construit" || r.tip === "ordine" || areIntrareProprie(ex.mecanica)) {
+  if (r.tip === "construit" || r.tip === "ordine" || r.tip === "multime" || areIntrareProprie(ex.mecanica)) {
     return (
       <div className="text-center">
         <button onClick={verifica} disabled={blocat || valoare === null || (Array.isArray(valoare) && valoare.length === 0)}

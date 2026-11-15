@@ -89,6 +89,15 @@ body {
 .fisa-cerinte { display: grid; gap: 2.5mm 6mm; padding-left: 5mm; }
 .fisa-cerinta { display: flex; flex-direction: column; gap: 1mm; }
 .fisa-vizual { margin: 1mm 0; }
+.fisa-mecanica { margin: 1mm 0; max-width: 78mm; }
+.fisa-mecanica svg { max-height: 34mm; width: auto; max-width: 100%; height: auto; margin: 0; }
+.fisa-mecanica svg[aria-label^="Grafic"] { max-height: 48mm; }
+.fisa-mecanica table { font-size: 9.5pt; min-width: 0; }
+.fisa-mecanica table td, .fisa-mecanica table th { padding: 0.6mm 3mm; }
+.fisa-mecanica > div { max-width: 78mm; }
+/* un exercițiu lung (mai multe desene) poate continua pe pagina următoare, dar o cerință cu desenul ei rămâne întreagă */
+.fisa-cerinta { break-inside: avoid; page-break-inside: avoid; }
+.fisa-item:has(.fisa-mecanica) { break-inside: auto; page-break-inside: auto; }
 .linie { display: inline-block; min-width: 22mm; border-bottom: 1.2px dotted #444; height: 1.1em; vertical-align: bottom; }
 .linie.medie { min-width: 45mm; }
 .linie.lunga { min-width: 120mm; }

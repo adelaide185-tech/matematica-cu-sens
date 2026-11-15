@@ -1,4 +1,5 @@
 import type { Rng } from "./rng";
+import type { Mecanica } from "@/antrenament/tipuri";
 
 export type Clasa = 1 | 2 | 3 | 4 | 5;
 export type Nivel = "consolidare" | "aprofundare" | "evaluare" | "competitie";
@@ -32,6 +33,12 @@ export interface Cerinta {
   optiuni?: string[];
   /** lățimea spațiului pe fișă: s = scurt, m = mediu, l = rând întreg */
   latime?: "s" | "m" | "l";
+  /** desen din antrenament (geometrie, grafice, măsurări…) afișat deasupra cerinței */
+  mecanica?: Mecanica;
+  /** variantele se încercuiesc (chiar dacă itemul nu e de tip „alegere”) */
+  alegere?: boolean;
+  /** răspuns pe mai multe câmpuri (ex. „ora … minute …”) */
+  campuri?: string[];
 }
 
 export interface Item {
