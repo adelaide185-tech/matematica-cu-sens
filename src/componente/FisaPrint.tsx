@@ -4,6 +4,7 @@ import { NIVELURI } from "@/motor/tipuri";
 import { LITERE } from "@/motor/generatoare/comun";
 import { NUME_CLASA } from "@/curriculum";
 import { Vizual } from "./svg/Vizual";
+import { VizualExercitiu } from "@/antrenament/mecanici/Mecanici";
 
 export interface Antet {
   scoala?: string;
@@ -96,12 +97,13 @@ function ItemFisa({ item, nr, rezolvari, arataPunctaj }: { item: Item; nr: numbe
 }
 
 function CerintaFisa({ c, litera, rezolvari, tip }: { c: Cerinta; litera?: string; rezolvari: boolean; tip: Item["interactiune"] }) {
-  const cuOptiuni = tip === "alegere" && c.optiuni;
+  const cuOptiuni = (tip === "alegere" || c.alegere) && c.optiuni;
   const raspuns = <span className="raspuns">{c.raspuns}</span>;
   const linie = <span className={`linie ${c.latime === "l" ? "lunga" : c.latime === "m" ? "medie" : ""}`} />;
   return (
     <div className="fisa-cerinta">
       {c.vizual && <div className="fisa-vizual"><Vizual v={c.vizual} marime={0.85} /></div>}
+      {c.mecanica && c.mecanica.tip !== "expresie" && <div className="fisa-mecanica"><VizualExercitiu m={c.mecanica} indiciu={0} rezolvat={false} /></div>}
       <div>
         {litera && <b>{litera}) </b>}
         {c.text.includes("___") ? (
@@ -113,7 +115,9 @@ function CerintaFisa({ c, litera, rezolvari, tip }: { c: Cerinta; litera?: strin
         ) : (
           <>
             {c.text}{" "}
-            {cuOptiuni ? null : rezolvari ? raspuns : tip === "adevarat-fals" ? <span className="af">A / F</span> : linie}
+            {c.campuri && !rezolvari ? (
+              <span className="block">{c.campuri.map((e) => <span key={e} className="mr-4 inline-block">{e} <span className="linie" /></span>)}</span>
+            ) : cuOptiuni ? null : rezolvari ? raspuns : tip === "adevarat-fals" ? <span className="af">A / F</span> : linie}
             {c.dupa}
           </>
         )}

@@ -10,7 +10,23 @@
   --color-albastru: #2f6fd1;
   --color-portocaliu: #e07a1f;
   --font-sans: var(--font-quicksand), ui-sans-serif, system-ui, sans-serif;
+
+  /* ── Zona elev (jocuri): tabletă și tablă interactivă ── */
+  --color-crem: #fbf4e6;         /* fundal cald, mat, anti-oboseală (fără alb pur pe suprafețe mari) */
+  --color-crem-inchis: #f3e6cc;
+  --color-hartie: #fffaf1;       /* cardurile de joc */
+  --color-cerneala: #2b2540;     /* text principal, contrast ~13:1 pe crem */
+  --spacing-tinta: 4rem;         /* ținta minimă de atingere: 64px */
 }
+
+/* Animațiile explicative se opresc pentru cine a cerut mișcare redusă. */
+@media (prefers-reduced-motion: reduce) {
+  .zona-elev *, .zona-elev *::before, .zona-elev *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}
+.zona-elev button, .zona-elev a { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 
 html {
   color-scheme: light;
@@ -73,6 +89,15 @@ body {
 .fisa-cerinte { display: grid; gap: 2.5mm 6mm; padding-left: 5mm; }
 .fisa-cerinta { display: flex; flex-direction: column; gap: 1mm; }
 .fisa-vizual { margin: 1mm 0; }
+.fisa-mecanica { margin: 1mm 0; max-width: 78mm; }
+.fisa-mecanica svg { max-height: 34mm; width: auto; max-width: 100%; height: auto; margin: 0; }
+.fisa-mecanica svg[aria-label^="Grafic"] { max-height: 48mm; }
+.fisa-mecanica table { font-size: 9.5pt; min-width: 0; }
+.fisa-mecanica table td, .fisa-mecanica table th { padding: 0.6mm 3mm; }
+.fisa-mecanica > div { max-width: 78mm; }
+/* un exercițiu lung (mai multe desene) poate continua pe pagina următoare, dar o cerință cu desenul ei rămâne întreagă */
+.fisa-cerinta { break-inside: avoid; page-break-inside: avoid; }
+.fisa-item:has(.fisa-mecanica), .fisa-item:has(.fisa-cerinta .fisa-vizual) { break-inside: auto; page-break-inside: auto; }
 .linie { display: inline-block; min-width: 22mm; border-bottom: 1.2px dotted #444; height: 1.1em; vertical-align: bottom; }
 .linie.medie { min-width: 45mm; }
 .linie.lunga { min-width: 120mm; }
@@ -114,4 +139,56 @@ body {
 @media screen and (max-width: 860px) {
   .fisa { width: 100%; min-height: auto; padding: 6mm; font-size: 11pt; }
   .linie.lunga { min-width: 60mm; }
+}
+
+/* ───── Fișa de calcul (generatorul de calcul): A4, 2–4 coloane, barem pe pagină separată ───── */
+@page calcul { size: A4; margin: 12mm 13mm; }
+.fc {
+  width: 210mm; min-height: 297mm; margin: 0 auto 8mm; padding: 12mm 13mm;
+  background: #fff; color: #1d1b26; box-shadow: 0 4px 24px rgb(0 0 0 / 0.12);
+  font-family: var(--font-sans, system-ui), sans-serif; font-size: 13pt;
+}
+.fc-col2 { font-size: 14pt; }
+.fc-col3 { font-size: 13pt; }
+.fc-col4 { font-size: 11.5pt; }
+.fc-antet { border-bottom: 2px solid #6a59a7; padding-bottom: 3mm; margin-bottom: 5mm; }
+.fc-antet-sus { display: flex; align-items: center; justify-content: space-between; gap: 6mm; }
+.fc-logo { height: 13mm; width: auto; }
+.fc-antet-text { text-align: right; font-size: 10pt; color: #444; }
+.fc-centru { font-weight: 700; color: #6a59a7; font-size: 11pt; }
+.fc-titlu { margin: 3mm 0 2mm; text-align: center; font-size: 17pt; font-weight: 800; color: #4a3d80; }
+.fc-campuri { display: flex; flex-wrap: wrap; gap: 2mm 8mm; font-size: 10.5pt; }
+.fc-linie { display: inline-block; min-width: 16mm; border-bottom: 1.2px solid #333; height: 1em; vertical-align: -0.15em; }
+.fc-linie-lunga { min-width: 62mm; }
+.fc-itemi { display: grid; column-gap: 7mm; row-gap: 0; list-style: none; padding: 0; margin: 0; }
+.fc-item { position: relative; display: flex; align-items: center; gap: 1.5mm; padding: 0.8mm 0; break-inside: avoid; white-space: nowrap; }
+.fc-nr { color: #6a59a7; font-weight: 700; font-size: 0.85em; min-width: 7mm; text-align: right; }
+.fc-text { font-variant-numeric: tabular-nums; }
+.fc-text .fc-linie { min-width: 14mm; }
+.fc-col4 .fc-text .fc-linie { min-width: 11mm; }
+.fc-inainte { margin-left: 2mm; }
+.fc-r { color: #c62828; font-weight: 700; }
+.fc-item-coloana { align-items: flex-start; padding: 2mm 0 3mm; }
+.fc-col-calc { display: inline-flex; flex-direction: column; align-items: flex-end; font-family: ui-monospace, "Courier New", monospace; font-size: 1.05em; line-height: 1.3; min-width: 22mm; }
+.fc-col-rand { display: flex; justify-content: space-between; width: 100%; gap: 3mm; letter-spacing: 0.08em; }
+.fc-col-op { font-weight: 700; }
+.fc-col-bara { width: 100%; border-top: 1.5px solid #222; margin: 0.5mm 0; }
+.fc-col-rez { justify-content: flex-end; min-height: 1.4em; }
+.fc-col-lung { min-height: 4.2em; align-items: flex-end; }
+.fc-regen { position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border-radius: 999px; background: #f9c50f; color: #2a2150; font-weight: 800; opacity: 0; transition: opacity .15s; cursor: pointer; }
+.fc-item:hover .fc-regen, .fc-regen:focus { opacity: 1; }
+@media (hover: none) { .fc-regen { opacity: 0.85; } }
+.fc-subsol { margin-top: 6mm; padding-top: 2mm; border-top: 1px solid #ddd; text-align: center; font-size: 8.5pt; color: #777; }
+.fc-antet-barem h1 { font-size: 16pt; font-weight: 800; color: #4a3d80; margin: 0; }
+.fc-antet-barem { border-bottom: 2px solid #6a59a7; padding-bottom: 2mm; margin-bottom: 4mm; font-size: 10pt; }
+.fc-raspunsuri { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1.5mm 4mm; list-style: none; padding: 0; margin: 0; font-size: 10.5pt; }
+.fc-raspunsuri li { break-inside: avoid; white-space: nowrap; }
+@media print {
+  .fc { page: calcul; width: auto; min-height: 0; margin: 0; padding: 0; box-shadow: none; }
+  .fc + .fc { break-before: page; }
+}
+@media screen and (max-width: 860px) {
+  .fc { width: 100%; min-height: auto; padding: 5mm; }
+  .fc-itemi { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .fc-raspunsuri { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }

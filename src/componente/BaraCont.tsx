@@ -13,10 +13,13 @@ export async function BaraCont() {
         <Image src="/brand/logo-mic.jpg" alt="" width={32} height={32} className="rounded-lg" />
         <span className="hidden sm:inline">Matematică cu Sens</span>
       </Link>
-      <nav className="flex items-center gap-3">
+      <nav className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1">
         {s.rol === "ADMIN_SCOALA" && <Link href="/admin" className="font-semibold text-mov hover:underline">Administrare</Link>}
         {s.rol !== "ELEV" && <Link href="/profesor" className="font-semibold text-mov hover:underline">Fișe</Link>}
         {s.rol !== "ELEV" && <Link href="/profesor/lectii" className="font-semibold text-mov hover:underline">Lecții</Link>}
+        {s.rol !== "ELEV" && <Link href="/profesor/calcul" className="font-semibold text-mov hover:underline">Calcul</Link>}
+        {s.rol !== "ELEV" && <Link href="/profesor/teme" className="font-semibold text-mov hover:underline">Teme</Link>}
+        {s.rol === "ELEV" && <Link href="/elev/teme" className="font-semibold text-mov hover:underline">Temele mele</Link>}
         <Link href="/elev" className="font-semibold text-mov hover:underline">Jocuri</Link>
         <Link href="/elev/atelier" className="font-semibold text-mov hover:underline">Atelier</Link>
         <span className="hidden text-gray-600 md:inline">{s.nume} · {ROL_NUME[s.rol]}</span>

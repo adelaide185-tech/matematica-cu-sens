@@ -18,6 +18,9 @@ export interface Fisa {
   descriptori: { eticheta: string; text: string }[];
 }
 
+/** Numărul maxim de exerciții pe care îl poate cere profesorul pe o fișă pe lecții. */
+export const NR_MAX_FISA = 100;
+
 /** Numărul implicit de itemi pe nivel (după fișele voastre: Nivel 1 ~ 8–10, evaluare 10–12). */
 export const ITEMI_IMPLICITI: Record<Nivel, number> = { consolidare: 6, aprofundare: 6, evaluare: 8, competitie: 4 };
 
@@ -46,7 +49,8 @@ export function genereazaFisa(config: ConfigFisa): Fisa {
     const existent = dupaGenerator.get(g.id);
     // Problemele rămân itemi separați (fiecare are enunțul ei). Celelalte tipuri nu se repetă ca
     // exerciții numerotate: cerințele noi se adaugă la exercițiul existent (a, b, c… până la 10).
-    if (existent && !g.id.startsWith("probleme.") && !existent.vizual) {
+    // Când un exercițiu are deja 10 cerințe, următoarele formează un exercițiu nou de același tip.
+    if (existent && !g.id.startsWith("probleme.") && !existent.vizual && existent.cerinte.length < 10) {
       const vazute = new Set(existent.cerinte.map((c) => c.text + c.raspuns));
       const noi = nou.cerinte.filter((c) => !vazute.has(c.text + c.raspuns)).slice(0, Math.max(0, 10 - existent.cerinte.length));
       if (noi.length) {

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { tranzitie } from "@/jocuri/miscare";
 import { AntetJoc, Feedback, Final } from "@/jocuri/componente";
 import { Adaptiv, inregistreaza, seteazaRezultat, steleDinGreseli } from "@/jocuri/progres";
 import { Fractie } from "@/componente/svg/Vizual";
@@ -87,7 +88,7 @@ export default function JocFractii() {
 
   const colorate = sel.filter(Boolean).length;
   return (
-    <main className="min-h-screen bg-gradient-to-b from-orange-50 to-galben-deschis pb-10">
+    <main className="min-h-screen pb-10">
       <AntetJoc titlu="🍕 Pizza fracțiilor" clasa={clasa} runda={nr} total={RUNDE} />
       {final ? (
         <Final stele={final.stele} trofeeNoi={final.trofee} clasa={clasa} onReia={() => start(clasa)} mesaj="Ești un adevărat bucătar de fracții!" />
@@ -98,27 +99,27 @@ export default function JocFractii() {
               <p className="text-2xl font-bold text-mov-inchis">
                 Colorează <Frac c={r.c} p={r.p} /> din {r.forma === "cerc" ? "pizza" : "ciocolată"}
               </p>
-              <p className="mt-1 text-gray-600">Atinge feliile ca să le colorezi.</p>
-              <motion.div key={`${nr}-${r.p}`} initial={{ rotate: -20, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} className="mt-4 flex justify-center">
-                <Fractie forma={r.forma} parti={r.p} colorate={0} selectate={sel} marime={2.4} culoare={r.forma === "cerc" ? "#e07a1f" : "#7b4a2a"}
+              <p className="mt-1 text-lg text-gray-700">Atinge feliile ca să le colorezi.</p>
+              <motion.div key={`${nr}-${r.p}`} initial={{ rotate: -20, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} transition={tranzitie("mediu")} className="mt-4 flex justify-center">
+                <Fractie forma={r.forma} parti={r.p} colorate={0} selectate={sel} marime={3.2} culoare={r.forma === "cerc" ? "#e07a1f" : "#7b4a2a"}
                   onParte={(i) => !stare && setSel((s) => s.map((v, j) => (j === i ? !v : v)))} />
               </motion.div>
-              <p className="mt-3 text-lg">Ai colorat <b>{colorate}</b> din <b>{r.p}</b> părți</p>
+              <p className="mt-3 text-xl">Ai colorat <b>{colorate}</b> din <b>{r.p}</b> părți</p>
               <Feedback stare={stare} mesaj={`Trebuie colorate ${r.c} părți din ${r.p}.`} />
               <button onClick={() => raspunde(colorate === r.c)} className="mt-4 h-16 w-full max-w-xs rounded-2xl bg-mov text-2xl font-bold text-white shadow active:scale-95">Verifică ✓</button>
             </>
           ) : (
             <>
               <p className="text-2xl font-bold text-mov-inchis">Ce fracție este colorată?</p>
-              <motion.div key={`${nr}-${r.p}`} initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="mt-4 flex justify-center">
-                <Fractie forma={r.forma} parti={r.p} colorate={r.c} marime={2.2} culoare="#6a59a7" />
+              <motion.div key={`${nr}-${r.p}`} initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={tranzitie("mediu")} className="mt-4 flex justify-center">
+                <Fractie forma={r.forma} parti={r.p} colorate={r.c} marime={3} culoare="#6a59a7" />
               </motion.div>
               <div className="mx-auto mt-5 grid max-w-md grid-cols-2 gap-3">
                 {r.optiuni.map((o) => {
                   const [c, p] = o.split("/").map(Number);
                   return (
                     <button key={o} onClick={() => raspunde(o === `${r.c}/${r.p}`)}
-                      className="h-24 rounded-2xl bg-white text-3xl font-bold text-mov shadow ring-2 ring-mov/20 active:scale-95">
+                      className="h-24 rounded-2xl bg-hartie text-3xl font-bold text-mov shadow ring-2 ring-mov/20 active:scale-95">
                       <Frac c={c} p={p} />
                     </button>
                   );

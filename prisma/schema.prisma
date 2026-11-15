@@ -46,10 +46,12 @@ model Utilizator {
   claseProfesor Clasa[]          @relation("ProfesorClasa")
   inscrieri     Inscriere[]
   fise          Fisa[]
-  teme          Tema[]
+  teme          Tema[]    @relation("TemeProfesor")
+  temePrimite   Tema[]    @relation("TemeElev")
   incercari     Incercare[]
   stapaniri     Stapanire[]
   recompense    RecompensaObtinuta[]
+  sesiuniJoc    SesiuneJoc[]
   puncteLogica  Int       @default(0)
   puncteViteza  Int       @default(0)
 
@@ -141,14 +143,23 @@ model Tema {
   cod         String     @unique           // 6 caractere, ex. "K7M2QX"
   titlu       String
   profesorId  String
-  profesor    Utilizator @relation(fields: [profesorId], references: [id])
+  profesor    Utilizator @relation("TemeProfesor", fields: [profesorId], references: [id])
   clasaId     String?
   clasa       Clasa?     @relation(fields: [clasaId], references: [id])
-  mecanica    String                       // "scara" | "numaratoare" | "fractii" | ...
+  /// temă pentru un singur elev (altfel: pentru toată clasa/grupa)
+  elevId      String?
+  elev        Utilizator? @relation("TemeElev", fields: [elevId], references: [id], onDelete: Cascade)
+  mecanica    String                       // "calcul" | "scara" | "numaratoare" | "fractii" | ...
+  /// generatorul de calcul: configurația fișei (blocuri, seed, înlocuiri)
+  config      Json?
+  /// timp de lucru în minute (null = fără limită; cronometrul merge oricum)
+  limitaMinute Int?
   generatoare String[]
   nivel       Nivel
   nrItemi     Int        @default(15)
   seed        Int?                         // null = itemi diferiți pentru fiecare elev
+  /// tema e tratată ca test: elevul o poate trimite o singură dată
+  test        Boolean    @default(false)
   termen      DateTime?
   incercari   Incercare[]
   creatLa     DateTime   @default(now())
@@ -209,4 +220,22 @@ model RecompensaObtinuta {
   recompensa   Recompensa @relation(fields: [recompensaId], references: [id])
   obtinutLa    DateTime   @default(now())
   @@id([elevId, recompensaId])
+}
+
+// Sesiuni de antrenament (10–100 exerciții, unul sau mai multe subiecte), cu pauză și reluare
+model SesiuneJoc {
+  id         String     @id @default(cuid())
+  elevId     String
+  elev       Utilizator @relation(fields: [elevId], references: [id], onDelete: Cascade)
+  /// { clasa, nivel, subiecte, n, seed } — exercițiile se regenerează identic din seed
+  config     Json
+  pozitie    Int        @default(0)
+  /// rezultatele pe exercițiu: { subiectId, incercari, cuAjutor, timpMs }[]
+  rezultate  Json
+  /// „in_curs” | „pauza” | „terminata”
+  stare      String     @default("in_curs")
+  creatLa    DateTime   @default(now())
+  actualizat DateTime   @updatedAt
+
+  @@index([elevId, stare])
 }

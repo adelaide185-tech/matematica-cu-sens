@@ -30,12 +30,12 @@ export default function ZonaElev() {
   const totalStele = pr ? Object.values(pr.stele).reduce((a, b) => a + b, 0) : 0;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-galben-deschis to-mov-deschis px-4 pb-12">
+    <main className="min-h-screen px-4 pb-12">
       <header className="mx-auto flex max-w-5xl items-center justify-between py-4">
-        <Link href="/"><Image src="/brand/logo-mic.jpg" alt="Fabrica de Inteligență" width={56} height={56} className="rounded-xl" /></Link>
+        <Link href="/"><Image src="/brand/logo-mic.jpg" alt="Fabrica de Inteligență" width={64} height={64} className="h-16 w-16 rounded-xl" /></Link>
         <div className="flex gap-3 text-lg font-bold">
-          <span className="rounded-2xl bg-white px-4 py-2 shadow">⭐ {totalStele}</span>
-          <span className="rounded-2xl bg-white px-4 py-2 shadow" title="Puncte de Logică + Puncte de Viteză">🧠 {(pr?.puncteLogica ?? 0) + (pr?.puncteViteza ?? 0)}</span>
+          <span className="rounded-2xl bg-hartie px-4 py-2 shadow">⭐ {totalStele}</span>
+          <span className="rounded-2xl bg-hartie px-4 py-2 shadow" title="Puncte de Logică + Puncte de Viteză">🧠 {(pr?.puncteLogica ?? 0) + (pr?.puncteViteza ?? 0)}</span>
         </div>
       </header>
 
@@ -44,13 +44,32 @@ export default function ZonaElev() {
         <div className="mt-5 flex flex-wrap justify-center gap-2">
           {[1, 2, 3, 4, 5].map((c) => (
             <button key={c} onClick={() => alegeClasa(c)}
-              className={`rounded-2xl px-5 py-3 text-lg font-bold shadow ${clasa === c ? "bg-mov text-white" : "bg-white text-mov"}`}>
+              className={`h-tinta rounded-2xl px-5 text-lg font-bold shadow ${clasa === c ? "bg-mov text-white" : "bg-hartie text-mov"}`}>
               Clasa {["I", "a II-a", "a III-a", "a IV-a", "a V-a"][c - 1]}
             </button>
           ))}
         </div>
 
-        <div className="mt-8 grid gap-5 sm:grid-cols-2">
+        <Link href={`/elev/antrenament?clasa=${clasa}`}
+          className="mt-8 flex flex-wrap items-center gap-5 rounded-3xl bg-mov p-6 text-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl">
+          <span className="text-6xl" aria-hidden>🎒</span>
+          <span className="flex-1">
+            <span className="block text-2xl font-bold">Antrenament pe noțiuni</span>
+            <span className="block text-white/90">Alege una sau mai multe noțiuni din programă și exersează 10, 20, 50 sau 100 de exerciții, cu ajutor pas cu pas.</span>
+          </span>
+          <span className="rounded-2xl bg-galben px-5 py-3 text-lg font-bold text-mov-inchis">Începe ▶</span>
+        </Link>
+
+        <Link href="/elev/teme"
+          className="mt-4 flex flex-wrap items-center gap-5 rounded-3xl bg-hartie p-5 shadow-md transition hover:-translate-y-1 hover:shadow-xl">
+          <span className="text-5xl" aria-hidden>✏️</span>
+          <span className="flex-1">
+            <span className="block text-2xl font-bold text-mov">Temele mele</span>
+            <span className="block text-gray-600">Temele și testele trimise de profesor, sau introdu codul primit.</span>
+          </span>
+        </Link>
+
+        <div className="mt-5 grid gap-5 sm:grid-cols-2">
           <Link href="/elev/lectii" className="flex items-center gap-4 rounded-3xl bg-mov p-6 text-white shadow-md transition hover:-translate-y-1 hover:shadow-xl">
             <span className="text-6xl" aria-hidden>🧱</span>
             <span>
@@ -72,7 +91,7 @@ export default function ZonaElev() {
             const disponibil = j.clase.includes(clasa);
             const stele = pr?.stele[`${j.id}-${clasa}`] ?? 0;
             const card = (
-              <div className={`h-full rounded-3xl bg-white p-6 shadow-md transition ${disponibil ? "hover:-translate-y-1 hover:shadow-xl" : "opacity-50"}`}
+              <div className={`h-full rounded-3xl bg-hartie p-6 shadow-md transition ${disponibil ? "hover:-translate-y-1 hover:shadow-xl" : "opacity-50"}`}
                 style={{ borderTop: `8px solid ${j.culoare}` }}>
                 <div className="text-6xl">{j.icon}</div>
                 <h2 className="mt-3 text-2xl font-bold" style={{ color: j.culoare }}>{j.nume}</h2>
@@ -86,7 +105,7 @@ export default function ZonaElev() {
         </div>
 
         {pr && pr.trofee.length > 0 && (
-          <section className="mt-10 rounded-3xl bg-white p-6 shadow">
+          <section className="mt-10 rounded-3xl bg-hartie p-6 shadow">
             <h2 className="text-2xl font-bold text-mov">Trofeele mele</h2>
             <div className="mt-3 flex flex-wrap gap-3">
               {pr.trofee.map((t) => (
