@@ -9,7 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "postinstall": "prisma generate",
-    "valideaza:sympy": "CALCUL_EXPORT=/tmp/calcul.json vitest run src/motor/calcul && python3 scripts/valideaza_calcul.py /tmp/calcul.json"
+    "valideaza:sympy": "CALCUL_EXPORT=/tmp/calcul.json C3_EXPORT=/tmp/c3.json vitest run src/motor/calcul src/motor/clasa3 && python3 scripts/valideaza_calcul.py /tmp/calcul.json && python3 scripts/valideaza_clasa3.py /tmp/c3.json"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

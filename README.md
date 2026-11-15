@@ -95,5 +95,11 @@ Generatorul de calcul (`/profesor/calcul`, detalii în `docs/04_GENERATOR_CALCUL
 - teme și teste online pentru o grupă sau un elev, cu cronometru, verificare automată și rezultate pentru profesor
 - verificare matematică: teste automate + SymPy (`npm run valideaza:sympy`)
 
+Clasa a III-a: teme și jocuri (`/profesor/clasa3`, detalii în `docs/05_CLASA3_JOCURI.md`):
+- 8 capitole din programă, cu opțiuni; 10–100 de exerciții; fișă PDF cu barem
+- 5 mini-jocuri: Cursa contra cronometrului, Perechi, Balanța, Detectivul, Constructorul
+- trimise ca joc online unei grupe sau unui elev; rezultate cu medalie, acuratețe, timp mediu și greșeli, actualizate automat
+
 Urmează:
+- clasa a II-a: mini-jocurile din specificația primită
 - rapoarte de progres pe noțiuni pentru profesor

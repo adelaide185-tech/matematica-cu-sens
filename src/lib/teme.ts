@@ -3,6 +3,8 @@ import type { Prisma, Tema } from "@prisma/client";
 import { db } from "./db";
 import type { Sesiune } from "./sesiune-token";
 import { curata } from "@/motor/calcul/config";
+import { cfgIncercare, curataC3 } from "@/motor/clasa3/config";
+import { genereazaC3 } from "@/motor/clasa3/generator";
 import { genereazaCalcul, hash } from "@/motor/calcul/generator";
 import type { ConfigCalcul, ExCalcul } from "@/motor/calcul/tipuri";
 
@@ -22,7 +24,22 @@ export function exercitiiTema(tema: Pick<Tema, "config" | "seed">, elevId: strin
 
 /** Temele pe care le vede un elev: ale claselor în care e înscris și cele primite personal. */
 export function filtruTemeElev(elevId: string): Prisma.TemaWhereInput {
-  return { mecanica: "calcul", OR: [{ elevId }, { elevId: null, clasa: { elevi: { some: { elevId } } } }] };
+  return { OR: [{ mecanica: "calcul" }, { mecanica: { startsWith: "c3:" } }], AND: { OR: [{ elevId }, { elevId: null, clasa: { elevi: { some: { elevId } } } }] } };
+}
+
+/**
+ * Exercițiile unui joc de clasa a III-a dat ca temă: aceleași pentru toți (sau, cu seed null, diferite pentru fiecare elev).
+ * La „Mai încerc o dată”, încercarea n folosește alt seed, ca elevul să nu învețe răspunsurile pe de rost.
+ */
+export function itemiTemaC3(tema: Pick<Tema, "config" | "seed">, elevId: string, incercare = 0) {
+  const c = cfgIncercare(cfgTemaC3(tema, elevId), incercare);
+  return { cfg: c, itemi: genereazaC3(c).itemi };
+}
+
+/** Configurația de bază a temei pentru un elev (încercarea 0). */
+export function cfgTemaC3(tema: Pick<Tema, "config" | "seed">, elevId: string) {
+  const cfg = curataC3((tema.config ?? {}) as Record<string, unknown>);
+  return tema.seed === null ? { ...cfg, seed: hash(cfg.seed, hashText(elevId)) % 2 ** 31, inlocuiri: {} } : cfg;
 }
 
 export async function temaPentruElev(cod: string, elevId: string) {

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { db, dbConfigurata } from "@/lib/db";
 import { cereRol } from "@/lib/auth";
-import { exercitiiTema, temaPentruElev } from "@/lib/teme";
+import { cfgTemaC3, exercitiiTema, temaPentruElev } from "@/lib/teme";
+import { JocTema } from "@/jocuri/c3/JocTema";
 import { RezolvaTema, type ExercitiuElev } from "./RezolvaTema";
 
 export const dynamic = "force-dynamic";
@@ -14,6 +15,7 @@ export default async function PaginaTema({ params }: { params: Promise<{ cod: st
   if (!tema) return <Mesaj text={`Nu am găsit tema cu codul „${cod.toUpperCase()}”. Verifică codul primit de la profesor.`} />;
   const trimis = await db.incercare.findFirst({ where: { temaId: tema.id, elevId: s.id, terminat: { not: null } }, orderBy: { terminat: "desc" } });
   if (tema.test && trimis) return <Mesaj text={`Ai trimis deja testul „${tema.titlu}”: ${trimis.corecte} din ${trimis.total} corecte.`} />;
+  if (tema.mecanica.startsWith("c3:")) return <JocTema cod={tema.cod} titlu={tema.titlu} baza={cfgTemaC3(tema, s.id)} test={tema.test} />;
   const { cfg, exercitii } = exercitiiTema(tema, s.id);
   // la elev ajung doar enunțurile, nu și răspunsurile (verificarea se face pe server)
   const ex: ExercitiuElev[] = exercitii.map((e) => ({ text: e.text, inainte: e.inainte, coloana: e.coloana, rest: e.raspuns.tip === "rest" }));

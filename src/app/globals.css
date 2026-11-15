@@ -192,3 +192,12 @@ body {
   .fc-itemi { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
   .fc-raspunsuri { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+
+/* fișa de clasa a III-a (aceleași reguli ca fișa de calcul, plus desene și texte lungi) */
+.fc-item-c3 { align-items: flex-start; }
+.fc-wrap { white-space: normal; line-height: 1.35; }
+.fc-cu-desen { display: flex; flex-direction: column; gap: 1mm; white-space: normal; }
+.fc-caroiaj { display: block; margin-top: 1.5mm; }
+.fc-instructiune { margin: 2mm 0 0; font-size: 10.5pt; font-style: italic; color: #4a3d80; }
+.fc-raspunsuri-c3 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.fc-raspunsuri-c3 li { white-space: normal; }

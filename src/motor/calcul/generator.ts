@@ -84,8 +84,8 @@ export function evalueaza(expr: string, nenegativ = true): number | null {
   return ok && i === t.length ? v : null;
 }
 
-type Partial = Omit<ExCalcul, "id" | "bloc" | "tip" | "duplicat">;
-interface Ctx { x: string; nec: string }
+export type Partial = Omit<ExCalcul, "id" | "bloc" | "tip" | "duplicat">;
+export interface Ctx { x: string; nec: string }
 
 function adunare(rng: Rng, b: Bloc): Partial | null {
   const k = Math.min(4, Math.max(2, b.termeni ?? 2));
@@ -299,7 +299,7 @@ function mental(rng: Rng, b: Bloc, c: Ctx): Partial | null {
   }
 }
 
-function exercitiuBloc(rng: Rng, b: Bloc, c: Ctx): Partial | null {
+export function exercitiuBloc(rng: Rng, b: Bloc, c: Ctx): Partial | null {
   switch (b.tip) {
     case "adunare": return adunare(rng, b);
     case "scadere": return scadere(rng, b);

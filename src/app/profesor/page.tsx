@@ -53,6 +53,10 @@ export default function PanouProfesor() {
           <span className="text-2xl" aria-hidden>🧮</span>
           <span><b className="text-mov">Generator de calcul</b> — 5–200 de exerciții, PDF cu barem, Word, teme online</span>
         </Link>
+        <Link href="/profesor/clasa3" className={`mt-2 flex items-center gap-3 rounded-2xl p-3 text-sm hover:brightness-95 ${p.clasa === 3 ? "bg-mov text-white" : "bg-mov-deschis"}`}>
+          <span className="text-2xl" aria-hidden>🎮</span>
+          <span><b className={p.clasa === 3 ? "" : "text-mov"}>Clasa a III-a: teme și jocuri</b> — capitole la alegere, 5 mini-jocuri online, fișă PDF cu barem</span>
+        </Link>
 
         <Sectiune titlu="1. Clasa">
           <div className="grid grid-cols-5 gap-2">

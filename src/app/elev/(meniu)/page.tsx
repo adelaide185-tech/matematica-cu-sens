@@ -60,6 +60,17 @@ export default function ZonaElev() {
           <span className="rounded-2xl bg-galben px-5 py-3 text-lg font-bold text-mov-inchis">Începe ▶</span>
         </Link>
 
+        {clasa === 3 && (
+          <Link href="/elev/clasa3"
+            className="mt-4 flex flex-wrap items-center gap-5 rounded-3xl bg-galben p-5 text-mov-inchis shadow-md transition hover:-translate-y-1 hover:shadow-xl">
+            <span className="text-5xl" aria-hidden>🎮</span>
+            <span className="flex-1">
+              <span className="block text-2xl font-bold">Jocuri de clasa a III-a</span>
+              <span className="block">Cursa contra cronometrului, Perechi, Balanța, Detectivul și Constructorul.</span>
+            </span>
+          </Link>
+        )}
+
         <Link href="/elev/teme"
           className="mt-4 flex flex-wrap items-center gap-5 rounded-3xl bg-hartie p-5 shadow-md transition hover:-translate-y-1 hover:shadow-xl">
           <span className="text-5xl" aria-hidden>✏️</span>
