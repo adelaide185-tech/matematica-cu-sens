@@ -55,7 +55,7 @@ export default function PanouProfesor() {
         </Link>
         <Link href="/profesor/clasa2" className={`mt-2 flex items-center gap-3 rounded-2xl p-3 text-sm hover:brightness-95 ${p.clasa === 2 ? "bg-mov text-white" : "bg-mov-deschis"}`}>
           <span className="text-2xl" aria-hidden>🎮</span>
-          <span><b className={p.clasa === 2 ? "" : "text-mov"}>Clasa a II-a: jocuri și fișe</b> — noțiuni la alegere, 3 niveluri, 7 mini-jocuri, fișă PDF cu barem</span>
+          <span><b className={p.clasa === 2 ? "" : "text-mov"}>Clasa a II-a: jocuri și fișe</b> — noțiuni la alegere, 3 niveluri, 9 mini-jocuri, fișă PDF cu barem</span>
         </Link>
         <Link href="/profesor/clasa3" className={`mt-2 flex items-center gap-3 rounded-2xl p-3 text-sm hover:brightness-95 ${p.clasa === 3 ? "bg-mov text-white" : "bg-mov-deschis"}`}>
           <span className="text-2xl" aria-hidden>🎮</span>

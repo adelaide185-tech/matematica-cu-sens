@@ -132,8 +132,8 @@ Clasa I · jocuri și fișe pe capitole (`/profesor/clasa1`):
 
 Clasa a II-a: mini-jocuri (`/profesor/clasa2`, detalii în `docs/06_CLASA2_JOCURI.md`):
 - conținut pe noțiunile din antrenament, 3 niveluri, greșeli tipice etichetate, numere cu litere și ora spusă românește
-- Perechi rapide, Bule care cad, Scara, Completează căsuțele, Balanța (și „echilibrează”), Ordonează, Memorie; fișă PDF cu barem; trimitere ca joc; raport cu greșeli tipice
+- Perechi rapide, Bule care cad, Scara, Completează căsuțele, Balanța (și „echilibrează”), Ordonează, Memorie, Ceasul (citește ora / mută acele), Magazinul (plătește exact, câți bani sunt, rest); fișă PDF cu barem; trimitere ca joc; raport cu greșeli tipice
 
 Urmează:
-- clasa a II-a, etapele 4–5: Ceasul, Magazinul, Provocarea, Integrama, Ținte, puzzle, „Mix automat”, raport pentru părinți
+- clasa a II-a, etapa 5: Provocarea, Integrama, Ținte, puzzle, „Mix automat”, raport pentru părinți
 - rapoarte de progres pe noțiuni pentru profesor

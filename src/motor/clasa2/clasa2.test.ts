@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import { writeFileSync } from "node:fs";
 import { evalueaza } from "@/motor/calcul/generator";
 import { numarInLitere } from "@/motor/limba";
-import { LUNI, ZILE, clasificaEroare, genereazaC2, oraInLitere, trecereAdunare, trecereScadere, verificaC2 } from "./generator";
+import { LUNI, ZILE, clasificaEroare, genereazaC2, inBani, oraInLitere, textBani, trecereAdunare, trecereScadere, verificaC2 } from "./generator";
 import { JOCURI_LISTA_C2, NOTIUNI_C2, codificaC2, configC2Implicita, decodificaC2, optiuniC2Implicite } from "./config";
-import { COMPATIBIL, type ConfigC2, type ItemC2, type NivelC2, type NotiuneC2 } from "./tipuri";
+import { BANCNOTE, COMPATIBIL, MONEDE, type ConfigC2, type ItemC2, type NivelC2, type NotiuneC2 } from "./tipuri";
 
 const NIVELURI: NivelC2[] = ["usor", "mediu", "provocare"];
 const cfg = (p: Partial<ConfigC2>): ConfigC2 => ({ ...configC2Implicita(9), ...p });
@@ -27,6 +27,7 @@ function verifica(it: ItemC2): string | null {
       }
       return null;
     }
+    case "bani": return evalueaza(v.expr, false) === v.valoare && textBani(v.valoare) === v.text && (it.raspuns as { valoare: string }).valoare === v.text ? null : "bani";
     case "litere": return numarInLitere(v.n) === v.text ? null : "litere";
     case "ora": return oraInLitere(v.ore, v.minute) === v.text ? null : "ora";
     case "text": return v.din.includes(v.corect) || ["iarna", "primăvara", "vara", "toamna"].includes(v.corect) ? null : "text";
@@ -56,7 +57,7 @@ function verifica(it: ItemC2): string | null {
 
 function raspunsCorect(it: ItemC2): string {
   const r = it.raspuns;
-  return r.tip === "valoare" ? r.valoare : r.tip === "casute" ? r.solutii[0].join("|") : r.tip === "ordine" ? r.corect.join("|") : "ok";
+  return r.tip === "valoare" ? r.valoare : r.tip === "casute" ? r.solutii[0].join("|") : r.tip === "ordine" ? r.corect.join("|") : r.tip === "ora" ? `${r.ore}:${r.minute}` : "ok";
 }
 
 describe("clasa a II-a: conținutul", () => {
@@ -157,6 +158,7 @@ describe("clasa a II-a: conținutul", () => {
   it("fără duplicate în sesiune; la Perechi nici fețele nu se repetă", () => {
     for (const joc of JOCURI_LISTA_C2)
       for (const nr of [10, 25, 50, 100]) {
+        if (joc === "ceas" && nr > 25) continue; // ceasul are doar 48 de ore diferite la Mediu (pas 30 min)
         const { itemi } = genereazaC2(cfg({ joc, notiuni: COMPATIBIL[joc], nr, seed: nr }), "mediu");
         expect(itemi).toHaveLength(nr);
         expect(new Set(itemi.map((i) => i.cheie)).size, `${joc} ${nr}`).toBe(nr);
@@ -178,6 +180,36 @@ describe("clasa a II-a: conținutul", () => {
       const o = genereazaC2(cfg({ joc: "ordonare", notiuni: ["num.ordonare"], nr: 20, optiuni: { ...optiuniC2Implicite(), sens } }), "provocare").itemi;
       o.forEach((i) => { expect(i.sens).toBe(sens); expect(i.cartonase).toHaveLength(6); expect(new Set(i.cartonase!.map((x) => x[0])).size).toBe(1); });
     }
+  });
+
+  it("Ceasul și Magazinul: ora de arătat, banii, restul", () => {
+    for (const nivel of NIVELURI) {
+      const c = genereazaC2(cfg({ joc: "ceas", notiuni: ["timp.ceas"], nr: 20, optiuni: { ...optiuniC2Implicite(), timpPas: 15 } }), nivel).itemi;
+      for (const it of c) {
+        if (nivel === "usor") expect(it.modCeas).toBe("potriveste");
+        if (it.raspuns.tip === "ora") {
+          expect(it.text).toBe(`Arată ${oraInLitere(it.raspuns.ore, it.raspuns.minute)}`);
+          expect(verificaC2(it, `${it.raspuns.ore + 12}:${it.raspuns.minute}`)).toBe(true); // ora 20 = ora 8
+          it.distractori.forEach((d) => expect(verificaC2(it, d.v)).toBe(false));
+        }
+      }
+      const m = genereazaC2(cfg({ joc: "magazin", notiuni: ["bani.numara", "bani.rest"], nr: 40 }), nivel).itemi;
+      for (const it of m) {
+        const g = it.magazin!;
+        if (g.mod === "numara") {
+          const total = g.bani!.reduce((a, b) => a + b, 0);
+          expect(it.afis).toBe(textBani(total));
+          g.bani!.forEach((b) => expect([...MONEDE, ...BANCNOTE]).toContain(b));
+        }
+        if (g.mod === "plateste") { expect(inBani(g.pret!, [...MONEDE, ...BANCNOTE]).reduce((a, b) => a + b, 0)).toBe(g.pret); expect(g.pret!).toBeLessThanOrEqual(10000); }
+        if (g.mod === "rest") { expect(g.platit!).toBeGreaterThan(g.pret!); expect(Number(it.afis) * (g.inBani ? 1 : 100)).toBe(g.platit! - g.pret!); }
+        if (nivel === "usor" && g.pret) expect(g.pret % 100).toBe(0);
+      }
+    }
+    expect(textBani(1230)).toBe("12 lei și 30 de bani");
+    expect(textBani(100)).toBe("1 leu");
+    expect(textBani(50)).toBe("50 de bani");
+    expect(textBani(205)).toBe("2 lei și 5 bani");
   });
 
   it("numerele cu litere și ora spusă românește", () => {

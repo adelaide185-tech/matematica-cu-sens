@@ -21,7 +21,7 @@ export type TipEroare =
   | "trecere_omisa" | "imprumut_omis" | "ordin_gresit" | "tabel_vecin" | "operatie_inversa" | "necunoscuta_inversata"
   | "ceas_ace_inversate" | "ceas_fara_un_sfert" | "bani_lei_bani" | "unitate_m_cm" | "fractie_parti_inegale" | "timp_expirat" | "altele";
 
-export type JocC2 = "perechi" | "bule" | "scara" | "casute" | "balanta" | "ordonare" | "memorie";
+export type JocC2 = "perechi" | "bule" | "scara" | "casute" | "balanta" | "ordonare" | "memorie" | "ceas" | "magazin";
 export type FormaNecunoscuta = "a+x=b" | "x+a=b" | "x-a=b" | "a-x=b" | "xb=c" | "ax=c";
 
 export interface OptiuniC2 {
@@ -66,6 +66,8 @@ export type RaspunsC2 =
   | { tip: "valoare"; valoare: string }
   /** Ordonează: ordinea corectă a cartonașelor */
   | { tip: "ordine"; corect: string[] }
+  /** Ceasul, „mută acele”: ora de arătat (răspuns „h:m”) */
+  | { tip: "ora"; ore: number; minute: number }
   /** căsuțe: toate soluțiile acceptate (ex. □ × □ = 12 → 2·6, 3·4, 4·3, 6·2) */
   | { tip: "casute"; solutii: number[][] }
   | { tip: "pereche" };
@@ -80,7 +82,9 @@ export type VerificareC2 =
   | { tip: "compara"; numere: number[]; valoare: number; mare: boolean }
   /** Balanța: cele două părți, în aceeași unitate (expresii ASCII) */
   | { tip: "semn"; st: string; dr: string; semn: "<" | ">" | "=" }
-  | { tip: "ordine"; valori: number[]; sens: "crescator" | "descrescator" };
+  | { tip: "ordine"; valori: number[]; sens: "crescator" | "descrescator" }
+  /** Magazinul: suma banilor (expresie în bani) și cum se spune */
+  | { tip: "bani"; expr: string; valoare: number; text: string };
 
 export interface ItemC2 {
   id: string;
@@ -98,6 +102,10 @@ export interface ItemC2 {
   /** Ordonează: cartonașele (amestecate) și sensul */
   cartonase?: string[];
   sens?: "crescator" | "descrescator";
+  /** Ceasul: „potrivește” (citește ora) sau „muta” (potrivește acele) */
+  modCeas?: "potriveste" | "muta";
+  /** Magazinul: produsul, prețul și banii (în bani; 100 bani = 1 leu) */
+  magazin?: { mod: "plateste" | "numara" | "rest"; produs?: string; emoji?: string; pret?: number; platit?: number; bani?: number[]; inBani?: boolean };
   raspuns: RaspunsC2;
   /** răspunsul corect afișat (barem, Perechi, variante) */
   afis: string;
@@ -126,6 +134,8 @@ export const JOCURI_C2: Record<JocC2, { nume: string; icon: string; instructiune
   casute: { nume: "Completează căsuțele", icon: "🔲", instructiune: "Completează căsuța!", culoare: "#6a59a7", descriere: "Află numărul care lipsește din căsuță." },
   balanta: { nume: "Balanța", icon: "⚖️", instructiune: "Care parte e mai grea?", culoare: "#8b5e3c", descriere: "Alege <, = sau >. La Provocare, echilibrezi balanța cu greutăți." },
   ordonare: { nume: "Ordonează", icon: "📶", instructiune: "Pune în ordine!", culoare: "#e0483e", descriere: "Atinge cartonașele în ordine, crescător sau descrescător." },
+  ceas: { nume: "Ceasul", icon: "🕒", instructiune: "Cât arată ceasul?", culoare: "#2f6fd1", descriere: "Citește ora sau mută acele ceasului până arată ora cerută." },
+  magazin: { nume: "Magazinul", icon: "🛒", instructiune: "Hai la cumpărături!", culoare: "#2e9e5b", descriere: "Plătește exact, numără banii și află restul." },
   memorie: { nume: "Memorie", icon: "🃏", instructiune: "Găsește perechile!", culoare: "#0f8a8a", descriere: "Întoarce câte două cărți și găsește calculul și rezultatul lui. Fără inimi!" },
 };
 
@@ -150,8 +160,14 @@ export const COMPATIBIL: Record<JocC2, NotiuneC2[]> = {
   casute: ["num.descompunere", "num.vecini", "num.sir", "op.adunare", "op.scadere", "op.termen", "op.tabla", "op.comutativ", "op.impartire", "op.dublu", "op.ordine", "fr.din", "mas.transformari", "timp.durata", "bani.numara", "bani.rest", "pb.una"],
   balanta: ["num.comparare", "op.adunare", "op.scadere", "op.termen", "op.tabla", "op.impartire", "op.dublu", "mas.transformari", "mas.masa-lichid", "bani.numara"],
   ordonare: ["num.ordonare", "num.extreme", "num.comparare", "timp.calendar"],
+  ceas: ["timp.ceas"],
+  magazin: ["bani.numara", "bani.rest"],
   memorie: ["num.formare", "num.litere", "num.descompunere", "op.adunare", "op.scadere", "op.tabla", "op.comutativ", "op.impartire", "op.dublu", "fr.parte", "fr.din", "mas.transformari", "timp.ceas", "timp.calendar", "bani.numara"],
 };
+
+/** Banii (în bani): monede de 1, 5, 10, 50 de bani; bancnote de 1, 5, 10, 50, 100 de lei */
+export const MONEDE = [1, 5, 10, 50];
+export const BANCNOTE = [100, 500, 1000, 5000, 10000];
 
 export const NR_RAPIDE_C2 = [10, 15, 20, 25, 50, 100] as const;
 /** Bule: secunde de sus până jos, pe nivel */

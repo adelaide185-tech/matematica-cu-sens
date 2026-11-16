@@ -1,4 +1,4 @@
-# Clasa a II-a: mini-jocuri (etapele 1–3)
+# Clasa a II-a: mini-jocuri (etapele 1–4)
 
 Implementarea urmează specificația `mate-cu-sens-clasa-2-jocuri.md`. Profesorul configurează jocurile la `/profesor/clasa2`; elevul le găsește la `/elev/clasa2` (joc liber) și la „Temele mele”.
 
@@ -46,6 +46,8 @@ Implementarea urmează specificația `mate-cu-sens-clasa-2-jocuri.md`. Profesoru
 | ⚖️ Balanța | Alege <, = sau >; balanța se înclină spre partea mai grea. La „Numărul care lipsește” (și la adunare, nivelul Provocare): **echilibrează balanța** punând greutăți (1, 2, 5, 10, 50, 100) pe taler; balanța se mișcă pe loc. Aproximativ o treime din comparații sunt egale. | Balanța se clatină, −1 inimă; după o greșeală apare un indiciu. |
 | 📶 Ordonează | Atinge cartonașele în ordine (crescător / descrescător sau zilele și lunile în ordinea din calendar); fiecare se mută în rândul numerotat. La Provocare, numerele au aceeași cifră a sutelor. | Cartonașul tremură, −1 inimă și rămâne pe loc. |
 | 🃏 Memorie | Grilă 4×4 (8 perechi), 4×5 la Provocare; spatele cărților are logo-ul Fabrica de Inteligență. Joc de explorare: **fără inimi**. | Contur roșu 1 s, apoi cărțile se întorc. |
+| 🕒 Ceasul | **Potrivește**: citește ora de pe ceasul analogic și alege-o dintre 4–6 variante („ora 8”, „8 și jumătate”, „9 fără un sfert”). **Mută acele** (Mediu, Provocare): butoane ▲ ▼ mari pentru ora mică și pentru minutar (din 15 în 15 minute), apoi „Verifică”. Ora 20 e acceptată ca ora 8. | Acele revin, −1 inimă; după prima greșeală: „sus = fix, jos = jumătate”. |
+| 🛒 Magazinul | **Plătește exact**: produsul cu preț, portofelul cu bani desenați de noi (bancnote de 1, 5, 10, 50, 100 de lei; monede de 1, 5, 10, 50 de bani), tejgheaua cu suma pusă (se vede pe loc). **Câți bani sunt?**: numără și alege. **Cât rest primești?**: tastează restul, în lei (sau în bani, la Provocare). Ușor: doar lei, până la 20. | Banii se întorc în portofel, −1 inimă. Greșeli tipice: lei ↔ bani, operația inversă. |
 | 🔲 Completează căsuțele | Completează una sau două căsuțe, cu tastatura de pe ecran. Pentru `□ × □ = 12` sunt acceptate toate soluțiile, iar la final apar celelalte („Mai erau: …”). | Abia după a doua greșeală se arată răspunsul. |
 
 Comun tuturor jocurilor:
@@ -89,7 +91,7 @@ npm run valideaza:sympy
 ```
 
 Testele verifică:
-- 11 280 de exerciții (joc × noțiune × nivel), cu rezultatul și ecuațiile căsuțelor;
+- 11 640 de exerciții (joc × noțiune × nivel), cu rezultatul și ecuațiile căsuțelor;
 - produsele ≤ 100 și împărțirile exacte;
 - regula „fără / cu trecere” 100%, la zeci și la sute;
 - soluția unică la căsuțe, sau toate soluțiile listate;
@@ -98,8 +100,7 @@ Testele verifică:
 
 `scripts/valideaza_clasa2.py` recalculează totul cu SymPy și verifică numerele scrise cu litere și ora cu implementări independente, scrise în Python.
 
-## Urmează (etapele 4–5)
+## Urmează (etapa 5)
 
-- Ceasul cu ace, Magazinul;
 - Provocarea în imagini, Integrama, Ținte, puzzle-ul de recompensă;
 - ecranul „Mix automat”, semaforul pe elevi, raportul pentru părinți și diploma.

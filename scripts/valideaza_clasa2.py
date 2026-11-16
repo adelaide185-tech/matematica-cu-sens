@@ -74,6 +74,13 @@ def verifica(v: dict) -> str | None:
         a, b = s(v["st"]), s(v["dr"])
         semn = "<" if a < b else ">" if a > b else "="
         return None if semn == v["semn"] else f"{v['st']} {semn} {v['dr']}, generator {v['semn']}"
+    if t == "bani":
+        total = s(v["expr"])
+        lei, bani = divmod(int(total), 100)
+        def cu(n, sg, pl):
+            return f"{n} {sg}" if n == 1 and sg == "ban" else ("1 leu" if n == 1 else f"{n} {'de ' if n % 100 >= 20 or n % 100 == 0 else ''}{pl}")
+        txt = cu(bani, "ban", "bani") if not lei else (f"{cu(lei, 'leu', 'lei')} și {cu(bani, 'ban', 'bani')}" if bani else cu(lei, "leu", "lei"))
+        return None if total == v["valoare"] and txt == v["text"] else f"bani: {v['expr']} = {total} „{txt}” ≠ „{v['text']}”"
     if t == "ordine":
         return None if len(set(v["valori"])) == len(v["valori"]) else "valori repetate la ordonare"
     if t == "fractie":

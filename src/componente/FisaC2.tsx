@@ -3,6 +3,8 @@ import type { ConfigC2, ItemC2 } from "@/motor/clasa2/tipuri";
 import { JOCURI_C2 } from "@/motor/clasa2/tipuri";
 import { TextMate } from "@/jocuri/c3/Vizuale";
 import { VizualC2View } from "@/jocuri/c2/JocC2";
+import { GramadaBani } from "@/jocuri/c2/Bani";
+import { Ceas } from "@/componente/svg/Vizual";
 import type { ModFisaCalcul } from "./FisaCalcul";
 
 /** Fișa de clasa a II-a: font mare, 2–3 coloane, aceleași exerciții ca în joc; baremul pe pagină separată. */
@@ -43,13 +45,17 @@ export function FisaC2({ cfg, itemi, mod = "fisa", cuRaspunsuri = false, onRegen
                 <span className="fc-nr">{i + 1}.</span>
                 <span className="fc-cu-desen">
                   {e.vizual && <VizualC2View v={e.vizual} marime={0.55} />}
+                  {e.modCeas === "muta" && <Ceas ore={12} minute={0} ace={false} marime={0.7} />}
+                  {e.magazin?.mod === "numara" && <GramadaBani bani={e.magazin.bani!} marime={0.55} />}
                   <span className={`fc-text ${e.text.length > 30 ? "fc-wrap" : ""}`}>
-                    {e.echilibru ? <TextMate text={`${e.st} = ${e.dr}${cuRaspunsuri ? `  (□ = ${e.afis})` : ""}`} />
+                    {e.modCeas === "muta" ? <>Desenează acele: <b>{e.afis}</b></>
+                      : e.magazin?.mod === "plateste" ? <>Ce bani dai pentru {e.afis}? {cuRaspunsuri ? <span className="fc-r">{e.afis}</span> : <span className="fc-linie fc-linie-lunga" />}</>
+                      : e.echilibru ? <TextMate text={`${e.st} = ${e.dr}${cuRaspunsuri ? `  (□ = ${e.afis})` : ""}`} />
                       : e.raspuns.tip === "ordine" ? <><TextMate text={e.text} /><span className="fc-linie fc-linie-lunga" style={{ display: "block", marginTop: "3mm" }} />{cuRaspunsuri && <span className="fc-r">{e.afis}</span>}</>
                       : e.text.includes("○") ? <TextMate text={cuRaspunsuri ? e.text.replace("○", `‹${e.afis}›`) : e.text} />
                       : e.raspuns.tip === "casute"
                       ? <TextMate text={cuRaspunsuri ? e.text.replace(/□/g, "▢") + `  (${e.afis})` : e.text} />
-                      : <><TextMate text={e.raspuns.tip === "pereche" && !e.vizual && !e.text.includes("…") ? `${e.st} =` : e.text.replace(/ …$/, "").replace(" … ", " ___ ")} /> {cuRaspunsuri ? <span className="fc-r"><TextMate text={e.afis} /></span> : <span className="fc-linie" />}</>}
+                      : <><TextMate text={e.raspuns.tip === "pereche" && !e.vizual && !e.text.includes("…") ? `${e.st} =` : e.text.replace(/ …$/, "").replace(" … ", cuRaspunsuri ? ` ‹${e.afis}› ` : " ______ ")} /> {e.text.includes(" … ") && e.raspuns.tip !== "pereche" ? null : cuRaspunsuri ? <span className="fc-r"><TextMate text={e.afis} /></span> : <span className="fc-linie" />}</>}
                   </span>
                 </span>
                 {onRegenereaza && <button type="button" onClick={() => onRegenereaza(e.id)} title="Alt exercițiu" className="fc-regen nu-printa" aria-label={`Regenerează exercițiul ${i + 1}`}>↻</button>}

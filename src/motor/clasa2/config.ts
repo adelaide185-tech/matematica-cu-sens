@@ -3,7 +3,7 @@ import { hash } from "@/motor/calcul/generator";
 import { CAPITOLE_C2, type ConfigC2, type JocC2, type NotiuneC2, type OptiuniC2 } from "./tipuri";
 
 export const NOTIUNI_C2: NotiuneC2[] = CAPITOLE_C2.flatMap((c) => c.notiuni.map(([n]) => n));
-export const JOCURI_LISTA_C2: JocC2[] = ["perechi", "bule", "scara", "casute", "balanta", "ordonare", "memorie"];
+export const JOCURI_LISTA_C2: JocC2[] = ["perechi", "bule", "scara", "casute", "balanta", "ordonare", "memorie", "ceas", "magazin"];
 
 export const optiuniC2Implicite = (): OptiuniC2 => ({
   trecere: "oricum", trecereLa: "zeci", forme: ["a+x=b", "x+a=b", "x-a=b", "a-x=b"], table: [2, 3, 4, 5, 6, 7, 8, 9, 10],

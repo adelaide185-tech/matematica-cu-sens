@@ -94,9 +94,11 @@ export function GeneratorC2({ grupe, online }: { grupe: Grupa[]; online: boolean
               );
             })}
           </div>
-          <p className="mt-2 text-xs text-gray-500">În curând: Ceasul, Magazinul, Provocarea în imagini, Integrama, Ținte.</p>
+          <p className="mt-2 text-xs text-gray-500">În curând: Provocarea în imagini, Integrama, Ținte.</p>
           {cfg.joc === "ordonare" && <div className="mt-2 flex flex-wrap items-center gap-1 text-sm">Sensul: {(["ambele", "crescator", "descrescator"] as const).map((x) => <Cip key={x} ales={o.sens === x} onClick={() => opt("sens", x)}>{x === "ambele" ? "amestecat" : x === "crescator" ? "crescător" : "descrescător"}</Cip>)}</div>}
           {cfg.joc === "balanta" && <p className="mt-2 text-xs text-gray-500">„Numărul care lipsește” (și adunarea la Provocare) apare ca „echilibrează balanța” cu greutăți.</p>}
+          {cfg.joc === "ceas" && <p className="mt-2 text-xs text-gray-500">Ușor: citește ora (fix și jumătate). Mediu și Provocare: și „mută acele”; sferturile apar cu opțiunea „+ sferturi” de la Ceasul.</p>}
+          {cfg.joc === "magazin" && <p className="mt-2 text-xs text-gray-500">Plătește exact, „Câți bani sunt?” și „Cât rest primești?”. Ușor: doar lei, până la 20; Provocare: și monede de 1, 5, 10, 50 de bani.</p>}
           {cfg.joc === "memorie" && <p className="mt-2 text-xs text-gray-500">Memorie e joc de explorare: fără inimi; 8 perechi pe tablă (10 la Provocare).</p>}
           {cfg.joc === "scara" && <div className="mt-2 flex flex-wrap items-center gap-1 text-sm">Răspuns: <Cip ales={cfg.modScara === "variante"} onClick={() => set({ modScara: "variante" })}>variante (butoane)</Cip><Cip ales={cfg.modScara === "tastatura"} onClick={() => set({ modScara: "tastatura" })}>tastatură</Cip></div>}
         </Sectiune>

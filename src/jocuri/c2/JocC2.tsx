@@ -11,6 +11,9 @@ import { verificaC2 } from "@/motor/clasa2/generator";
 import { JOCURI_C2, NIVELURI_C2, VITEZA_BULE, type ConfigC2, type ItemC2, type NivelC2, type VizualC2 } from "@/motor/clasa2/tipuri";
 import { Rng } from "@/motor/rng";
 import { seteazaSunet, sunetActiv, sunetBland } from "@/antrenament/stare-client";
+import { BANCNOTE, MONEDE } from "@/motor/clasa2/tipuri";
+import { textBani } from "@/motor/clasa2/generator";
+import { BanDesen, GramadaBani } from "./Bani";
 
 export interface RaspunsJocC2 { id: string; dat: string | null; corect: boolean; incercari: number; timpMs: number; greseli: string[] }
 export interface FinalJocC2 { raspunsuri: RaspunsJocC2[]; nivel: NivelC2; incercare: number; terminat: boolean }
@@ -141,6 +144,8 @@ export function JocC2({ cfg, itemiPentru, inapoi, titlu, onFinal, onReia, incerc
       {cfg.joc === "casute" && <Casute itemi={itemi} rez={rez} onGata={gata} onGreseala={greseala} onCorect={corect} />}
       {cfg.joc === "balanta" && <Balanta itemi={itemi} rez={rez} vieti={cuInimi} onGata={gata} onGreseala={greseala} onCorect={corect} />}
       {cfg.joc === "ordonare" && <Ordonare itemi={itemi} rez={rez} onGata={gata} onGreseala={greseala} onCorect={corect} />}
+      {cfg.joc === "ceas" && <CeasJoc itemi={itemi} rez={rez} vieti={cuInimi} onGata={gata} onGreseala={greseala} onCorect={corect} />}
+      {cfg.joc === "magazin" && <Magazin itemi={itemi} rez={rez} nivel={nivel} vieti={cuInimi} onGata={gata} onGreseala={greseala} onCorect={corect} />}
       {cfg.joc === "memorie" && <Memorie itemi={itemi} rez={rez} nivel={nivel} onGata={gata} onGreseala={greseala} onCorect={corect} seed={cfg.seed} />}
     </main>
   );
@@ -594,6 +599,164 @@ function Ordonare({ itemi, rez, onGata, onGreseala, onCorect }: PropsJoc) {
         ))}
       </div>
       {greseli.current.length >= 2 && <p className="max-w-xl rounded-2xl bg-galben-deschis px-4 py-2 text-lg text-mov-inchis" role="status">💡 {it.indiciu}</p>}
+    </section>
+  );
+}
+
+// ───────────────────────── încercări comune (Ceas, Magazin) ─────────────────────────
+
+/** Răspuns cu încercări: corect → următorul; greșit → −1 inimă, a doua oară indiciu, a treia (sau fără inimi, a doua) arată răspunsul. */
+function useIncercari(it: ItemC2 | undefined, vieti: number, { onGata, onGreseala, onCorect }: Pick<PropsJoc, "onGata" | "onGreseala" | "onCorect">) {
+  const [gresite, setGresite] = useState<string[]>([]);
+  const [stare, setStare] = useState<"ok" | "arata" | null>(null);
+  const start = useRef(Date.now());
+  useEffect(() => { setGresite([]); setStare(null); start.current = Date.now(); }, [it?.id]);
+  const raspunde = (v: string) => {
+    if (!it || stare) return false;
+    if (verificaC2(it, v)) {
+      setStare("ok");
+      onCorect();
+      setTimeout(() => onGata({ id: it.id, dat: v, corect: true, incercari: gresite.length + 1, timpMs: Date.now() - start.current, greseli: gresite }), 900);
+      return true;
+    }
+    const g = [...gresite, v];
+    setGresite(g);
+    onGreseala();
+    if (g.length >= (vieti ? 3 : 2)) {
+      setStare("arata");
+      setTimeout(() => onGata({ id: it.id, dat: v, corect: false, incercari: g.length, timpMs: Date.now() - start.current, greseli: g }), 2000);
+    }
+    return false;
+  };
+  return { gresite, stare, raspunde };
+}
+
+// ───────────────────────── T10: Ceasul ─────────────────────────
+
+function Sageti({ eticheta, sus, jos }: { eticheta: string; sus: () => void; jos: () => void }) {
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <span className="font-bold text-mov-inchis">{eticheta}</span>
+      <button type="button" onClick={sus} className="h-16 w-20 rounded-2xl bg-white text-3xl font-extrabold text-mov shadow ring-2 ring-mov/20 active:scale-95" aria-label={`${eticheta}: înainte`}>▲</button>
+      <button type="button" onClick={jos} className="h-16 w-20 rounded-2xl bg-white text-3xl font-extrabold text-mov shadow ring-2 ring-mov/20 active:scale-95" aria-label={`${eticheta}: înapoi`}>▼</button>
+    </div>
+  );
+}
+
+function CeasJoc({ itemi, rez, vieti, onGata, onGreseala, onCorect }: PropsJoc & { vieti: number }) {
+  const it = itemi[rez.length];
+  const { gresite, stare, raspunde } = useIncercari(it, vieti, { onGata, onGreseala, onCorect });
+  const [ore, setOre] = useState(12);
+  const [min, setMin] = useState(0);
+  const [clipire, setClipire] = useState(false);
+  useEffect(() => { setOre(12); setMin(0); }, [it?.id]);
+  const variante = useMemo(() => (it ? new Rng(it.cheie.length * 17 + rez.length).shuffle([it.afis, ...it.distractori.map((d) => d.v)]) : []), [it, rez.length]);
+  if (!it) return null;
+  if (it.modCeas === "muta") {
+    const r = it.raspuns as { ore: number; minute: number };
+    const arata = stare === "arata";
+    const verifica = () => {
+      if (!raspunde(`${ore}:${min}`)) { setClipire(true); setTimeout(() => { setClipire(false); if (!arata) { setOre(12); setMin(0); } }, 500); }
+    };
+    return (
+      <section className="mt-3 flex flex-1 flex-col items-center gap-3">
+        <p className="rounded-3xl bg-white px-6 py-3 text-3xl font-extrabold text-mov-inchis shadow">🕒 {it.text}</p>
+        <div className={`flex flex-wrap items-center justify-center gap-6 ${clipire ? "animate-[scutura_0.4s]" : ""}`}>
+          <Sageti eticheta="Ora" sus={() => setOre((h) => (h % 12) + 1)} jos={() => setOre((h) => (h === 1 ? 12 : h - 1))} />
+          <div className={`rounded-full p-2 ${stare === "ok" ? "bg-green-200" : "bg-white"} shadow-lg`}><Ceas ore={arata ? r.ore : ore} minute={arata ? r.minute : min} marime={2.1} /></div>
+          <Sageti eticheta="Minutarul" sus={() => setMin((m) => (m + 15) % 60)} jos={() => setMin((m) => (m + 45) % 60)} />
+        </div>
+        {gresite.length >= 1 && !stare && <p className="max-w-xl rounded-2xl bg-galben-deschis px-4 py-2 text-lg text-mov-inchis" role="status">💡 Minutarul (acul lung, mov): sus = fix, jos = jumătate.{gresite.length >= 2 ? ` ${it.indiciu}` : ""}</p>}
+        {stare === "arata" && <p className="rounded-2xl bg-galben-deschis px-6 py-2 text-2xl font-bold text-mov-inchis">Așa arată {it.afis}.</p>}
+        {!stare && <button type="button" onClick={verifica} className="h-tinta w-full max-w-sm rounded-2xl bg-mov text-2xl font-extrabold text-white shadow">Verifică ✓</button>}
+      </section>
+    );
+  }
+  return (
+    <section className="mt-3 flex flex-1 flex-col items-center gap-4">
+      <div className={`rounded-full p-2 shadow-lg ${stare === "ok" ? "bg-green-200" : "bg-white"}`}>{it.vizual && <VizualC2View v={it.vizual} marime={1.7} />}</div>
+      {stare === "arata" && <p className="rounded-2xl bg-galben-deschis px-6 py-2 text-2xl font-bold text-mov-inchis">Ceasul arată {it.afis}.</p>}
+      {gresite.length >= 2 && !stare && <p className="max-w-xl rounded-2xl bg-galben-deschis px-4 py-2 text-lg text-mov-inchis" role="status">💡 {it.indiciu}</p>}
+      {!stare && (
+        <div className="grid w-full max-w-2xl grid-cols-2 gap-3 sm:grid-cols-3">
+          {variante.map((v) => (
+            <button key={v} type="button" disabled={gresite.includes(v)} onClick={() => raspunde(v)}
+              className={`min-h-tinta rounded-2xl px-3 text-2xl font-extrabold shadow active:scale-95 ${gresite.includes(v) ? "bg-red-100 text-red-400 line-through" : "bg-white text-mov-inchis ring-2 ring-mov/20 hover:bg-mov-deschis"}`}>{v}</button>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ───────────────────────── T11: Magazinul ─────────────────────────
+
+function Magazin({ itemi, rez, nivel, vieti, onGata, onGreseala, onCorect }: PropsJoc & { nivel: NivelC2; vieti: number }) {
+  const it = itemi[rez.length];
+  const { gresite, stare, raspunde } = useIncercari(it, vieti, { onGata, onGreseala, onCorect });
+  const [tejghea, setTejghea] = useState<number[]>([]);
+  const [scutura, setScutura] = useState(false);
+  useEffect(() => setTejghea([]), [it?.id]);
+  const variante = useMemo(() => (it ? new Rng(it.cheie.length * 23 + rez.length).shuffle([it.afis, ...it.distractori.slice(0, 3).map((d) => d.v)]) : []), [it, rez.length]);
+  if (!it || !it.magazin) return null;
+  const g = it.magazin;
+  const portofel = nivel === "usor" ? [100, 500, 1000] : nivel === "mediu" ? [50, 100, 500, 1000, 5000] : [...MONEDE, ...BANCNOTE];
+  const suma = tejghea.reduce((a, b) => a + b, 0);
+  const greseala = () => { setScutura(true); setTimeout(() => setScutura(false), 400); };
+  return (
+    <section className="mt-3 flex flex-1 flex-col items-center gap-4">
+      {g.mod !== "numara" && (
+        <div className="flex items-center gap-4 rounded-3xl bg-white px-6 py-3 shadow">
+          <span className="text-6xl" aria-hidden>{g.emoji}</span>
+          <span className="text-left">
+            <span className="block text-xl text-gray-600">{g.produs}</span>
+            <span className="block rounded-xl bg-galben px-3 py-1 text-2xl font-extrabold text-mov-inchis">{textBani(g.pret!)}</span>
+          </span>
+          {g.mod === "rest" && <span className="ml-2 flex flex-col items-center text-lg text-gray-600">Plătești cu<BanDesen v={g.platit!} marime={1.2} /></span>}
+        </div>
+      )}
+      {g.mod === "numara" && (
+        <>
+          <p className="rounded-3xl bg-white px-6 py-2 text-3xl font-extrabold text-mov-inchis shadow">{it.text}</p>
+          <div className="rounded-3xl bg-[#f3e6cf] p-4 shadow-inner"><GramadaBani bani={g.bani!} marime={1.2} /></div>
+          {stare === "arata" && <p className="rounded-2xl bg-galben-deschis px-6 py-2 text-2xl font-bold text-mov-inchis">Sunt {it.afis}.</p>}
+          {gresite.length >= 1 && !stare && <p className="max-w-xl rounded-2xl bg-galben-deschis px-4 py-2 text-lg text-mov-inchis" role="status">💡 {it.indiciu}</p>}
+          {!stare && (
+            <div className="grid w-full max-w-2xl grid-cols-2 gap-3">
+              {variante.map((v) => <button key={v} type="button" disabled={gresite.includes(v)} onClick={() => raspunde(v)} className={`min-h-tinta rounded-2xl px-3 text-xl font-extrabold shadow active:scale-95 ${gresite.includes(v) ? "bg-red-100 text-red-400 line-through" : "bg-white text-mov-inchis ring-2 ring-mov/20 hover:bg-mov-deschis"}`}>{v}</button>)}
+            </div>
+          )}
+        </>
+      )}
+      {g.mod === "plateste" && (
+        <>
+          <p className="text-2xl font-extrabold text-mov-inchis">Plătește exact! <span className="text-gray-500">Atinge banii din portofel.</span></p>
+          <div className={`flex min-h-28 w-full max-w-3xl flex-wrap items-center justify-center gap-2 rounded-3xl border-4 p-3 ${stare === "ok" ? "border-green-400 bg-green-50" : "border-dashed border-[#8b5e3c]/40 bg-[#f3e6cf]"} ${scutura ? "animate-[scutura_0.4s]" : ""}`} aria-label="Tejgheaua">
+            {tejghea.length ? tejghea.map((v, i) => <button key={i} type="button" disabled={!!stare} onClick={() => setTejghea((t) => t.filter((_, j) => j !== i))} aria-label="Întoarce în portofel"><BanDesen v={v} /></button>) : <span className="text-lg text-gray-500">Tejgheaua e goală</span>}
+          </div>
+          <p className="text-xl text-gray-700">Pe tejghea: <b className="text-mov-inchis">{suma ? textBani(suma) : "0 lei"}</b></p>
+          {gresite.length >= 1 && !stare && <p className="max-w-xl rounded-2xl bg-galben-deschis px-4 py-2 text-lg text-mov-inchis" role="status">💡 {it.indiciu}</p>}
+          {stare === "arata" && <p className="rounded-2xl bg-galben-deschis px-6 py-2 text-xl font-bold text-mov-inchis">De exemplu: <span className="inline-flex flex-wrap gap-1 align-middle">{[...BANCNOTE, ...MONEDE].sort((a, b) => b - a).reduce<number[]>((acc, v) => { let r = g.pret! - acc.reduce((x, y) => x + y, 0); while (r >= v) { acc.push(v); r -= v; } return acc; }, []).map((v, i) => <BanDesen key={i} v={v} marime={0.7} />)}</span></p>}
+          {!stare && (
+            <>
+              <div className="flex flex-wrap items-center justify-center gap-3 rounded-3xl bg-white p-3 shadow" aria-label="Portofelul">
+                {portofel.map((v) => <button key={v} type="button" onClick={() => setTejghea((t) => [...t, v].slice(0, 20))} className="rounded-xl p-1 transition hover:bg-mov-deschis active:scale-95"><BanDesen v={v} marime={1.1} /></button>)}
+              </div>
+              <button type="button" disabled={!suma} onClick={() => { if (!raspunde(String(suma))) { greseala(); setTejghea([]); } }} className="h-tinta w-full max-w-sm rounded-2xl bg-mov text-2xl font-extrabold text-white shadow disabled:opacity-40">Plătesc 🛒</button>
+            </>
+          )}
+        </>
+      )}
+      {g.mod === "rest" && (
+        <>
+          <p className="text-2xl font-extrabold text-mov-inchis">Cât rest primești? <span className="text-gray-500">({g.inBani ? "în bani" : "în lei"})</span></p>
+          {gresite.length >= 1 && !stare && <p className="max-w-xl rounded-2xl bg-galben-deschis px-4 py-2 text-lg text-mov-inchis" role="status">💡 {it.indiciu}</p>}
+          {stare === "arata" && <p className="rounded-2xl bg-galben-deschis px-6 py-2 text-2xl font-bold text-mov-inchis">Restul: {it.afis} {g.inBani ? "bani" : "lei"}</p>}
+          {stare === "ok" && <p className="rounded-2xl bg-green-100 px-6 py-2 text-3xl font-extrabold text-green-800">✓</p>}
+          {!stare && <IntrareNumar key={gresite.length} onRaspuns={(v) => raspunde(v)} scutura={gresite.length > 0} />}
+        </>
+      )}
+      {stare === "ok" && g.mod !== "rest" && <p className="rounded-2xl bg-green-100 px-6 py-2 text-3xl font-extrabold text-green-800" role="status">✓ {g.mod === "plateste" ? "🛒" : ""}</p>}
     </section>
   );
 }

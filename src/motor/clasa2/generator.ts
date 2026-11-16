@@ -540,6 +540,81 @@ function ordonare(n: NotiuneC2, rng: Rng, niv: NivelC2, o: OptiuniC2): { cheie: 
   return { cheie: `on${[...nums].sort((a, b) => a - b).join(",")}:${sens}`, cartonase: nums.map(s), corect: sortat.map(s), sens, valori: nums, indiciu: sute ? "Sutele sunt la fel: uită-te la zeci, apoi la unități." : "Caută întâi cel mai " + (sens === "crescator" ? "mic" : "mare") + " număr." };
 }
 
+
+// ───────────────────────── Ceasul și Magazinul ─────────────────────────
+
+/** Suma în lei și bani, spusă ca la școală: „12 lei și 30 de bani”, „1 leu”, „50 de bani”. */
+export function textBani(b: number): string {
+  const L = Math.floor(b / 100), B = b % 100;
+  if (!L) return cu(B, "ban", "bani");
+  return B ? `${lei(L)} și ${cu(B, "ban", "bani")}` : lei(L);
+}
+
+const PRODUSE: [string, string][] = [["un caiet", "📒"], ["o minge", "⚽"], ["un creion", "✏️"], ["o carte", "📘"], ["un suc", "🧃"], ["o înghețată", "🍦"], ["un ghiozdan", "🎒"], ["o jucărie", "🧸"], ["un măr", "🍎"], ["o pâine", "🍞"]];
+
+/** Împarte o sumă în bancnote și monede (cele mai mari întâi), ca să o putem desena. */
+export function inBani(suma: number, permise: number[]): number[] {
+  const out: number[] = [];
+  let r = suma;
+  for (const v of [...permise].sort((a, b) => b - a)) while (r >= v && out.length < 14) { out.push(v); r -= v; }
+  return r === 0 ? out : [];
+}
+
+function magazinItem(n: NotiuneC2, rng: Rng, niv: NivelC2, o: OptiuniC2): Omit<ItemC2, "id" | "notiune" | "nivel"> | null {
+  const maxLei = Math.min(o.baniMax, niv === "usor" ? 20 : 100);
+  const [produs, emoji] = rng.pick(PRODUSE);
+  const permise = niv === "usor" ? [100, 500, 1000] : niv === "mediu" ? [50, 100, 500, 1000, 5000] : [1, 5, 10, 50, 100, 500, 1000, 5000, 10000];
+  const pretBani = () => (niv === "usor" ? 100 * rng.int(1, maxLei) : niv === "mediu" ? 50 * rng.int(2, 2 * maxLei - 1) : 5 * rng.int(20, 20 * maxLei - 1));
+  if (n === "bani.rest") {
+    const pret = niv === "provocare" ? pretBani() : 100 * rng.int(1, Math.max(2, maxLei - 1));
+    const platit = rng.pick([500, 1000, 5000, 10000].filter((x) => x > pret && x <= 100 * Math.max(10, maxLei)));
+    if (!platit) return null;
+    const rest = platit - pret;
+    const inLei = rest % 100 === 0;
+    const v = inLei ? rest / 100 : rest;
+    return {
+      cheie: `mr${pret}:${platit}`, text: `${produs[0].toUpperCase()}${produs.slice(1)} costă ${textBani(pret)}. Plătești cu ${textBani(platit)}. Rest: … ${inLei ? "lei" : "bani"}`,
+      magazin: { mod: "rest", produs, emoji, pret, platit, inBani: !inLei }, raspuns: { tip: "valoare", valoare: s(v) }, afis: s(v),
+      distractori: distractori(rng, s(v), [[inLei ? (platit + pret) / 100 : platit + pret, "operatie_inversa"], [inLei ? v + 1 : v + 10, "altele"], [inLei ? rest : rest / 100, "bani_lei_bani"]].filter(([x]) => Number.isInteger(Number(x))) as [number, TipEroare][]),
+      indiciu: "Restul = cât ai dat − cât costă.", verificare: egal(inLei ? `(${platit} - ${pret}) / 100` : `${platit} - ${pret}`, v),
+    };
+  }
+  if (rng.bool()) {
+    // Câți bani sunt? (numără și alege)
+    const total = pretBani();
+    const bani = inBani(total, permise);
+    if (!bani.length || bani.length > 9) return null;
+    const corect = textBani(total);
+    const L = Math.floor(total / 100), B = total % 100;
+    const cand: [string, TipEroare][] = [[textBani(total + (B ? 0 : 50)), "altele"], [textBani(B ? 100 * B + L : total + 100), "bani_lei_bani"], [textBani(Math.max(1, total - 100)), "altele"], [textBani(total + 10), "altele"]];
+    return {
+      cheie: `mn${bani.join(",")}`, text: "Câți bani sunt?", st: "bani", magazin: { mod: "numara", bani }, raspuns: { tip: "valoare", valoare: corect }, afis: corect,
+      distractori: distractori(rng, corect, cand, false), indiciu: "Numără întâi bancnotele (lei), apoi monedele (bani). 100 de bani = 1 leu.", verificare: { tip: "bani", expr: bani.join(" + "), valoare: total, text: corect },
+    };
+  }
+  // Plătește exact
+  const pret = pretBani();
+  return {
+    cheie: `mp${pret}`, text: `Plătește exact ${textBani(pret)}`, magazin: { mod: "plateste", produs, emoji, pret }, raspuns: { tip: "valoare", valoare: s(pret) }, afis: textBani(pret),
+    distractori: ([{ v: s(pret + 100), eroare: "altele" }, { v: s(Math.floor(pret / 100) + (pret % 100) * 100), eroare: "bani_lei_bani" }] as Distractor[]).filter((d) => d.v !== s(pret)),
+    indiciu: "Pune întâi bancnotele pentru lei, apoi monedele pentru bani.", verificare: egal(s(pret), pret),
+  };
+}
+
+function ceasItem(rng: Rng, niv: NivelC2, o: OptiuniC2): Omit<ItemC2, "id" | "notiune" | "nivel"> {
+  const b = ceas(rng, niv, o);
+  const muta = niv === "provocare" ? rng.bool(0.7) : niv === "mediu" ? rng.bool() : false;
+  const v = b.verificare as { ore: number; minute: number; text: string };
+  if (!muta) return { cheie: `cp${b.cheie}`, text: b.text, vizual: b.vizual, modCeas: "potriveste", raspuns: { tip: "valoare", valoare: b.valoare }, afis: b.valoare, distractori: b.distractori.slice(0, niv === "usor" ? 3 : 5), indiciu: b.indiciu, verificare: b.verificare };
+  const cand: Distractor[] = [];
+  if (v.minute === 45) cand.push({ v: `${v.ore % 12 + 1}:45`, eroare: "ceas_fara_un_sfert" });
+  if (SFERT.includes((v.ore % 12) * 5)) cand.push({ v: `${v.minute / 5 || 12}:${(v.ore % 12) * 5}`, eroare: "ceas_ace_inversate" });
+  return {
+    cheie: `cm${b.cheie}`, text: `Arată ${v.text}`, modCeas: "muta", raspuns: { tip: "ora", ore: v.ore, minute: v.minute }, afis: v.text,
+    distractori: cand.filter((d) => d.v !== `${v.ore}:${v.minute}`), indiciu: "Acul scurt arată ora. Acul lung: sus = fix, jos = jumătate, dreapta = un sfert, stânga = fără un sfert.", verificare: b.verificare,
+  };
+}
+
 // ───────────────────────── sesiunea ─────────────────────────
 
 const afisSolutii = (sol: number[][]) => sol.map((x) => x.join(" și ")).join(" / ");
@@ -553,6 +628,8 @@ function itemNou(rng: Rng, n: NotiuneC2, joc: JocC2, niv: NivelC2, o: OptiuniC2)
       afis: afisSolutii(c.solutii), distractori: [], indiciu: c.indiciu, verificare: { tip: "ecuatie", expr: c.expr, solutii: c.solutii }, vizual: c.vizual,
     };
   }
+  if (joc === "ceas") { if (n !== "timp.ceas") return null; const c = ceasItem(rng, niv, o); return { ...c, cheie: `t:${c.cheie}`, notiune: n, nivel: niv }; }
+  if (joc === "magazin") { const m = magazinItem(n, rng, niv, o); return m && { ...m, cheie: `m:${m.cheie}`, notiune: n, nivel: niv }; }
   if (joc === "balanta") {
     if (n === "op.termen" || (niv === "provocare" && n === "op.adunare" && rng.bool(0.4))) {
       const e = echilibru(rng, niv);
@@ -634,6 +711,7 @@ export function verificaC2(it: Pick<ItemC2, "raspuns">, dat: string): boolean {
   const r = it.raspuns;
   if (r.tip === "pereche") return dat === "ok";
   if (r.tip === "ordine") return String(dat) === r.corect.join("|");
+  if (r.tip === "ora") { const [h, m] = String(dat).split(":").map(Number); return h % 12 === r.ore % 12 && m === r.minute; }
   if (r.tip === "valoare") return /^\d+$/.test(r.valoare) ? intreg(dat) === Number(r.valoare) : String(dat).trim() === r.valoare;
   const v = String(dat).split("|").map(intreg);
   return r.solutii.some((sol) => sol.length === v.length && sol.every((x, i) => x === v[i]));
