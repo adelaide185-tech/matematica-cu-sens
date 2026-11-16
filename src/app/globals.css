@@ -215,3 +215,14 @@ body {
 .fc-instructiune { margin: 2mm 0 0; font-size: 10.5pt; font-style: italic; color: #4a3d80; }
 .fc-raspunsuri-c3 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .fc-raspunsuri-c3 li { white-space: normal; }
+
+/* mini-jocurile clasei a II-a */
+@keyframes scutura { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+@keyframes cade { from { top: -7rem; } to { top: 100%; } }
+.bula { top: -7rem; animation-name: cade; animation-timing-function: linear; animation-iteration-count: infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .bula { animation: none; top: 30%; }
+  .bula:nth-child(even) { top: 60%; }
+}
+.fc-c2 { font-size: 15pt; }
+.fc-c2.fc-col3 { font-size: 14pt; }

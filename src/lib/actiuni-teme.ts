@@ -8,9 +8,12 @@ import { decodifica } from "@/motor/calcul/config";
 import { decodificaC3 } from "@/motor/clasa3/config";
 import { puncteaza, verificaC3 } from "@/motor/clasa3/generator";
 import { JOCURI_C3, SECUNDE_VITEZA } from "@/motor/clasa3/tipuri";
+import { decodificaC2 } from "@/motor/clasa2/config";
+import { clasificaEroare, verificaC2 } from "@/motor/clasa2/generator";
+import { JOCURI_C2, NIVELURI_C2, type NivelC2 } from "@/motor/clasa2/tipuri";
 import type { Sesiune } from "./sesiune-token";
 import { corect, textRaspuns, totalExercitii } from "@/motor/calcul/generator";
-import { exercitiiTema, filtruClaseProfesor, filtruTemeProfesor, itemiTemaC3, steleDinProcent, temaPentruElev } from "./teme";
+import { exercitiiTema, filtruClaseProfesor, filtruTemeProfesor, itemiTemaC2, itemiTemaC3, steleDinProcent, temaPentruElev } from "./teme";
 
 export interface DateTemaNoua {
   /** configurația codificată (aceeași ca în URL-ul fișei) */
@@ -78,6 +81,21 @@ export async function creeazaTemaCalcul(d: DateTemaNoua): Promise<StareTema> {
     titlu: d.titlu.trim().slice(0, 120) || cfg.antet.titlu, profesorId: s.id, ...t,
     mecanica: "calcul", generatoare: [], nivel: d.test ? "EVALUARE" : "CONSOLIDARE",
     nrItemi: Math.min(totalExercitii(cfg), 200), seed: d.diferite ? null : cfg.seed,
+    config: cfg as unknown as Prisma.InputJsonValue, ...limitaSiTermen(d), test: d.test,
+  });
+}
+
+/** Jocurile de clasa a II-a trimise ca temă (noțiuni, joc, nivel, număr de exerciții). */
+export async function creeazaTemaJocC2(d: DateTemaNoua): Promise<StareTema> {
+  const s = await cereRol("PROFESOR", "ADMIN_SCOALA");
+  const cfg = decodificaC2(d.c);
+  if (!cfg) return { eroare: "Configurația jocului nu a putut fi citită." };
+  const t = await tintaTema(s, d.tinta);
+  if ("eroare" in t) return t;
+  return salveazaTema({
+    titlu: d.titlu.trim().slice(0, 120) || `${JOCURI_C2[cfg.joc].nume} – clasa a II-a`, profesorId: s.id, ...t,
+    mecanica: `c2:${cfg.joc}`, generatoare: cfg.notiuni, nivel: d.test ? "EVALUARE" : "CONSOLIDARE",
+    nrItemi: cfg.nr, seed: d.diferite ? null : cfg.seed,
     config: cfg as unknown as Prisma.InputJsonValue, ...limitaSiTermen(d), test: d.test,
   });
 }
@@ -192,4 +210,58 @@ export async function trimiteJocC3(cod: string, raspunsuri: RaspunsJocTrimis[], 
   });
   revalidatePath("/elev/teme");
   return { scor: p.scor, medalie: p.medalie, procent: p.procent };
+}
+
+export interface RaspunsJocC2Trimis { id: string; dat: string | null; incercari: number; timpMs: number; greseli: string[] }
+
+/**
+ * Elevul termină un joc de clasa a II-a: serverul regenerează exercițiile (cod + încercare + nivel),
+ * verifică fiecare răspuns, eticheteză greșeala tipică și salvează punctajul și medalia.
+ */
+export async function trimiteJocC2(cod: string, raspunsuri: RaspunsJocC2Trimis[], nivel: NivelC2, incercare: number, terminat: boolean): Promise<RezultatJocC3> {
+  const s = await cereRol("ELEV");
+  const tema = await temaPentruElev(cod, s.id);
+  if (!tema || !tema.mecanica.startsWith("c2:")) return { eroare: "Tema nu există sau nu este pentru tine." };
+  if (tema.test) {
+    const deja = await db.incercare.count({ where: { temaId: tema.id, elevId: s.id, terminat: { not: null } } });
+    if (deja) return { eroare: "Ai trimis deja acest test." };
+  }
+  const niv: NivelC2 = (["usor", "mediu", "provocare"] as const).includes(nivel) ? nivel : "mediu";
+  const { nivel: jucat, itemi } = itemiTemaC2(tema, s.id, Math.max(0, Math.min(1000, Math.floor(Number(incercare) || 0))), niv);
+  const dupaId = new Map(raspunsuri.slice(0, 200).map((r) => [String(r.id), r]));
+  const rez = itemi.map((it) => {
+    const r = dupaId.get(it.id);
+    const dat = r?.dat === null || r?.dat === undefined ? null : String(r.dat).slice(0, 40);
+    const greseli = Array.isArray(r?.greseli) ? r!.greseli.slice(0, 9).map((g) => String(g).slice(0, 40)) : [];
+    return {
+      it, dat, greseli, raspuns: !!r, corect: !!r && dat !== null && verificaC2(it, dat),
+      incercari: Math.max(1, Math.min(9, Math.floor(Number(r?.incercari) || 1))), timpMs: Math.max(0, Math.min(600000, Math.floor(Number(r?.timpMs) || 0))),
+    };
+  });
+  const p = puncteaza(rez.filter((r) => r.raspuns), itemi.length);
+  const mult = NIVELURI_C2[jucat].multiplicator;
+  const timp = rez.reduce((a, r) => a + r.timpMs, 0);
+  const acum = new Date();
+  await db.incercare.create({
+    data: {
+      elevId: s.id, temaId: tema.id, mecanica: tema.mecanica, inceput: new Date(acum.getTime() - timp), terminat: acum,
+      corecte: p.corecte, total: itemi.length, stele: p.stele, scor: Math.round(p.scor * mult), scorMax: Math.round(p.scorMax * mult), medalie: p.medalie, comboMax: p.comboMax,
+      raspunsuri: {
+        create: rez.map((r) => {
+          const gresit = r.greseli[0] ?? (r.corect ? null : r.dat);
+          return {
+            generatorId: `c2.${r.it.notiune}`, competenta: r.it.notiune, dificultate: r.incercari,
+            item: { id: r.it.id, text: r.it.st ? `${r.it.st}` : r.it.text, inainte: null, raspuns: r.it.afis },
+            raspunsElev: {
+              valoare: gresit ?? r.dat ?? (r.raspuns ? "(timp expirat)" : "(nerezolvat)"), incercari: r.incercari, terminat, nivel: jucat,
+              eroare: r.corect && !r.greseli.length ? null : r.raspuns ? clasificaEroare(r.it, gresit) : "altele",
+            },
+            corect: r.corect, timpMs: r.timpMs,
+          };
+        }),
+      },
+    },
+  });
+  revalidatePath("/elev/teme");
+  return { scor: Math.round(p.scor * mult), medalie: p.medalie, procent: p.procent };
 }

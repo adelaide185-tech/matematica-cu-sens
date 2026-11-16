@@ -2,11 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db, dbConfigurata } from "@/lib/db";
 import { cereRol } from "@/lib/auth";
-import { cfgTemaC3, exercitiiTema, filtruTemeProfesor } from "@/lib/teme";
+import { cfgTemaC2, cfgTemaC3, exercitiiTema, filtruTemeProfesor } from "@/lib/teme";
 import { codifica } from "@/motor/calcul/config";
 import { codificaC3 } from "@/motor/clasa3/config";
 import { MEDALII } from "@/motor/clasa3/generator";
 import { JOCURI_C3, NUME_CAPITOL, type CapitolC3, type JocC3 } from "@/motor/clasa3/tipuri";
+import { JOCURI_C2, NUME_EROARE, NUME_NOTIUNE, type JocC2, type NotiuneC2, type TipEroare } from "@/motor/clasa2/tipuri";
+import { codificaC2 } from "@/motor/clasa2/config";
 import { Reimprospatare } from "@/componente/Reimprospatare";
 import { RaportClasa1 } from "./RaportClasa1";
 
@@ -28,7 +30,10 @@ export default async function RezultateTema({ params }: { params: Promise<{ id: 
     },
   });
   if (!t) notFound();
-  const joc = t.mecanica.startsWith("c3:") ? (t.mecanica.slice(3) as JocC3) : null;
+  const c2 = t.mecanica.startsWith("c2:");
+  const joc = t.mecanica.startsWith("c3:") ? (t.mecanica.slice(3) as JocC3) : c2 ? (t.mecanica.slice(3) as JocC2) : null;
+  const infoJoc = joc ? (c2 ? JOCURI_C2[joc as JocC2] : JOCURI_C3[joc as JocC3]) : null;
+  const numeCap = (c: string) => NUME_CAPITOL[c as CapitolC3] ?? NUME_NOTIUNE[c as NotiuneC2] ?? c;
   const elevi = (t.elev ? [t.elev] : t.clasa?.elevi.map((i) => i.elev) ?? []).sort((a, b) => a.nume.localeCompare(b.nume, "ro"));
   if (t.mecanica === "clasa1") return <RaportClasa1 t={t} elevi={elevi} />;
   const ultima = new Map<string, (typeof t.incercari)[number]>();
@@ -61,17 +66,17 @@ export default async function RezultateTema({ params }: { params: Promise<{ id: 
     }
   const grele = [...greseli.values()].filter((g) => g.gresit).sort((a, b) => b.gresit - a.gresit).slice(0, 8);
   const link = t.seed === null ? null
-    : joc ? `/fisa/clasa3?c=${codificaC3(cfgTemaC3(t, ""))}&mod=fisa%2Bbarem` : `/fisa/calcul?c=${codifica(exercitiiTema(t, "").cfg)}&mod=fisa%2Bbarem`;
+    : c2 ? `/fisa/clasa2?c=${codificaC2(cfgTemaC2(t, ""))}&mod=fisa%2Bbarem` : joc ? `/fisa/clasa3?c=${codificaC3(cfgTemaC3(t, ""))}&mod=fisa%2Bbarem` : `/fisa/calcul?c=${codifica(exercitiiTema(t, "").cfg)}&mod=fisa%2Bbarem`;
   const trimisi = elevi.filter((e) => ultima.has(e.id)).length;
 
   return (
     <main className="mx-auto max-w-6xl p-4 sm:p-8">
       <Link href="/profesor/teme" className="text-sm font-semibold text-mov">← Toate temele</Link>
-      <h1 className="mt-2 text-3xl font-bold text-mov">{joc && <span aria-hidden>{JOCURI_C3[joc].icon} </span>}{t.titlu}</h1>
+      <h1 className="mt-2 text-3xl font-bold text-mov">{infoJoc && <span aria-hidden>{infoJoc.icon} </span>}{t.titlu}</h1>
       <p className="text-gray-600">
-        {joc ? `${JOCURI_C3[joc].nume} · ` : ""}{t.test ? "Test" : "Temă"} · cod <b className="font-mono tracking-widest">{t.cod}</b> · {t.nrItemi} exerciții
+        {infoJoc ? `${infoJoc.nume} · ` : ""}{t.test ? "Test" : "Temă"} · cod <b className="font-mono tracking-widest">{t.cod}</b> · {t.nrItemi} exerciții
         {t.limitaMinute ? ` · ${t.limitaMinute} minute` : ""}{t.seed === null ? " · exerciții diferite pentru fiecare elev" : ""}
-        {joc && t.generatoare.length ? ` · ${t.generatoare.map((g) => NUME_CAPITOL[g as CapitolC3] ?? g).join(", ")}` : ""}
+        {joc && t.generatoare.length ? ` · ${t.generatoare.map(numeCap).join(", ")}` : ""}
       </p>
       <div className="mt-1 flex flex-wrap items-center gap-4 text-sm">
         {link && <a className="font-semibold text-mov underline" target="_blank" href={link}>Vezi fișa și baremul</a>}
@@ -129,7 +134,7 @@ export default async function RezultateTema({ params }: { params: Promise<{ id: 
               const p = Math.round((100 * (v.total - v.gresit)) / Math.max(1, v.total));
               return (
                 <li key={c}>
-                  <div className="flex justify-between text-sm"><span>{NUME_CAPITOL[c as CapitolC3] ?? c}</span><b>{p}% corecte</b></div>
+                  <div className="flex justify-between text-sm"><span>{numeCap(c)}</span><b>{p}% corecte</b></div>
                   <div className="mt-1 h-2.5 overflow-hidden rounded-full bg-gray-200"><div className={`h-full ${p >= 80 ? "bg-green-500" : p >= 60 ? "bg-galben" : "bg-red-400"}`} style={{ width: `${p}%` }} /></div>
                 </li>
               );
@@ -137,6 +142,23 @@ export default async function RezultateTema({ params }: { params: Promise<{ id: 
           </ul>
         </section>
       )}
+
+      {c2 && (() => {
+        const tipuri = new Map<TipEroare, Set<string>>();
+        for (const [elevId, i] of ultima) for (const r of i.raspunsuri) {
+          const e = (r.raspunsElev as { eroare?: TipEroare | null })?.eroare;
+          if (e) { const nume = elevi.find((x) => x.id === elevId); (tipuri.get(e) ?? tipuri.set(e, new Set()).get(e)!).add(nume ? `${nume.nume} ${nume.prenume}` : "?"); }
+        }
+        if (!tipuri.size) return null;
+        return (
+          <section className="mt-6 rounded-2xl bg-white p-4 shadow">
+            <h2 className="font-bold text-mov">Greșeli tipice</h2>
+            <ul className="mt-2 grid gap-1 text-sm">
+              {[...tipuri.entries()].sort((a, b) => b[1].size - a[1].size).map(([e, el]) => <li key={e}><b>{el.size} {el.size === 1 ? "elev" : "elevi"}</b>: {NUME_EROARE[e]} <span className="text-gray-500">({[...el].join(", ")})</span></li>)}
+            </ul>
+          </section>
+        );
+      })()}
 
       {grele.length > 0 && (
         <section className="mt-6 rounded-2xl bg-white p-4 shadow">
