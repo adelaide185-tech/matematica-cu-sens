@@ -27,6 +27,7 @@ function verifica(it: ItemC2): string | null {
       }
       return null;
     }
+    case "integrama": return evalueaza(v.expr, false) === v.valoare && numarInLitere(v.valoare) === v.text && !v.text.includes(" ") && it.raspuns.tip === "valoare" && it.raspuns.valoare === v.text.toUpperCase() ? null : `integrama ${v.expr} → ${v.text}`;
     case "bani": return evalueaza(v.expr, false) === v.valoare && textBani(v.valoare) === v.text && (it.raspuns as { valoare: string }).valoare === v.text ? null : "bani";
     case "litere": return numarInLitere(v.n) === v.text ? null : "litere";
     case "ora": return oraInLitere(v.ore, v.minute) === v.text ? null : "ora";
@@ -159,6 +160,7 @@ describe("clasa a II-a: conținutul", () => {
     for (const joc of JOCURI_LISTA_C2)
       for (const nr of [10, 25, 50, 100]) {
         if (joc === "ceas" && nr > 25) continue; // ceasul are doar 48 de ore diferite la Mediu (pas 30 min)
+        if (joc === "integrama") { const g = genereazaC2(cfg({ joc, notiuni: COMPATIBIL[joc], nr, seed: nr }), "mediu").itemi; expect(g.length, `integrama ${nr}`).toBeGreaterThanOrEqual(Math.min(nr, 28) * 0.7); expect(new Set(g.map((i) => i.cheie)).size).toBe(g.length); continue; }
         const { itemi } = genereazaC2(cfg({ joc, notiuni: COMPATIBIL[joc], nr, seed: nr }), "mediu");
         expect(itemi).toHaveLength(nr);
         expect(new Set(itemi.map((i) => i.cheie)).size, `${joc} ${nr}`).toBe(nr);
@@ -210,6 +212,44 @@ describe("clasa a II-a: conținutul", () => {
     expect(textBani(100)).toBe("1 leu");
     expect(textBani(50)).toBe("50 de bani");
     expect(textBani(205)).toBe("2 lei și 5 bani");
+  });
+
+  it("Integrama: cuvintele se încrucișează corect; Provocarea are pașii; Mix automat urmează ordinea", () => {
+    for (const nivel of NIVELURI) {
+      const { itemi } = genereazaC2(cfg({ joc: "integrama", notiuni: ["op.adunare", "op.tabla", "num.litere"], nr: 20, seed: 4 }), nivel);
+      expect(itemi.length).toBeGreaterThanOrEqual(15);
+      const grupe = new Map<number, ItemC2[]>();
+      itemi.forEach((i) => grupe.set(i.integrama!.grup, [...(grupe.get(i.integrama!.grup) ?? []), i]));
+      for (const g of grupe.values()) {
+        const grila = new Map<string, string>();
+        for (const it of g) {
+          const w = (it.raspuns as { valoare: string }).valoare, q = it.integrama!;
+          for (let k = 0; k < w.length; k++) {
+            const key = `${q.r + (q.dir === "v" ? k : 0)},${q.c + (q.dir === "o" ? k : 0)}`;
+            if (grila.has(key)) expect(grila.get(key), `${w} se încrucișează greșit`).toBe(w[k]);
+            grila.set(key, w[k]);
+            expect(q.r + (q.dir === "v" ? k : 0)).toBeLessThan(q.rows);
+            expect(q.c + (q.dir === "o" ? k : 0)).toBeLessThan(q.cols);
+          }
+        }
+        if (g.length > 1) expect(grila.size, "cuvintele trebuie să se încrucișeze").toBeLessThan(g.reduce((a, i) => a + (i.raspuns as { valoare: string }).valoare.length, 0));
+      }
+      const it = itemi.find((i) => /[ĂÂÎȘȚ]/.test((i.raspuns as { valoare: string }).valoare));
+      if (it) expect(verificaC2(it, (it.raspuns as { valoare: string }).valoare.normalize("NFD").replace(/[\u0300-\u036f]/g, ""))).toBe(nivel !== "provocare");
+    }
+    for (const nivel of NIVELURI) {
+      const p = genereazaC2(cfg({ joc: "provocare", notiuni: ["pb.una", "pb.doua"], nr: 30 }), nivel).itemi;
+      expect(p.length).toBe(30);
+      for (const it of p) {
+        expect(it.pasi!.length).toBeGreaterThanOrEqual(1);
+        expect(String(it.pasi![it.pasi!.length - 1].valoare)).toBe(it.afis);
+        if (it.notiune === "pb.doua") expect(it.pasi!.length).toBe(2);
+      }
+    }
+    const m = genereazaC2(cfg({ mix: true, notiuni: ["op.tabla", "op.adunare"], nr: 20 }), "mediu").itemi;
+    expect(m).toHaveLength(20);
+    const ordine = [...new Set(m.map((i) => i.joc))];
+    expect(ordine).toEqual(["perechi", "casute", "bule"]);
   });
 
   it("numerele cu litere și ora spusă românește", () => {

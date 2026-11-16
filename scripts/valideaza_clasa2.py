@@ -74,6 +74,9 @@ def verifica(v: dict) -> str | None:
         a, b = s(v["st"]), s(v["dr"])
         semn = "<" if a < b else ">" if a > b else "="
         return None if semn == v["semn"] else f"{v['st']} {semn} {v['dr']}, generator {v['semn']}"
+    if t == "integrama":
+        ok = s(v["expr"]) == v["valoare"] and litere(v["valoare"]) == v["text"] and " " not in v["text"]
+        return None if ok else f"integrama {v['expr']} → {v['text']}"
     if t == "bani":
         total = s(v["expr"])
         lei, bani = divmod(int(total), 100)

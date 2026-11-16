@@ -1,4 +1,4 @@
-# Clasa a II-a: mini-jocuri (etapele 1–4)
+# Clasa a II-a: mini-jocuri (etapele 1–5)
 
 Implementarea urmează specificația `mate-cu-sens-clasa-2-jocuri.md`. Profesorul configurează jocurile la `/profesor/clasa2`; elevul le găsește la `/elev/clasa2` (joc liber) și la „Temele mele”.
 
@@ -48,6 +48,9 @@ Implementarea urmează specificația `mate-cu-sens-clasa-2-jocuri.md`. Profesoru
 | 🃏 Memorie | Grilă 4×4 (8 perechi), 4×5 la Provocare; spatele cărților are logo-ul Fabrica de Inteligență. Joc de explorare: **fără inimi**. | Contur roșu 1 s, apoi cărțile se întorc. |
 | 🕒 Ceasul | **Potrivește**: citește ora de pe ceasul analogic și alege-o dintre 4–6 variante („ora 8”, „8 și jumătate”, „9 fără un sfert”). **Mută acele** (Mediu, Provocare): butoane ▲ ▼ mari pentru ora mică și pentru minutar (din 15 în 15 minute), apoi „Verifică”. Ora 20 e acceptată ca ora 8. | Acele revin, −1 inimă; după prima greșeală: „sus = fix, jos = jumătate”. |
 | 🛒 Magazinul | **Plătește exact**: produsul cu preț, portofelul cu bani desenați de noi (bancnote de 1, 5, 10, 50, 100 de lei; monede de 1, 5, 10, 50 de bani), tejgheaua cu suma pusă (se vede pe loc). **Câți bani sunt?**: numără și alege. **Cât rest primești?**: tastează restul, în lei (sau în bani, la Provocare). Ușor: doar lei, până la 20. | Banii se întorc în portofel, −1 inimă. Greșeli tipice: lei ↔ bani, operația inversă. |
+| 🧩 Provocarea în imagini | Problemă cu o operație sau cu două (atunci cu întrebarea ajutătoare ca pas intermediar): scena, bara-model parte–întreg, apoi pasul 1 – alege operația (+ − × :), pasul 2 – scrie rezultatul. | Greșeala la operație **nu** costă o inimă: bara-model se evidențiază ca indiciu. Greșeala la rezultat: −1 inimă. |
+| 🔤 Integrama numerelor | Integramă mică (Orizontal / Vertical) generată automat în română; indiciile sunt calcule, răspunsurile numerele scrise cu litere (0–20, 30–90). Tastatură cu Ă Â Î Ș Ț; cursorul sare peste literele deja fixate. Diacriticele sunt obligatorii doar la Provocare. Fără inimi. | Cuvântul tremură și se șterge; după 3 încercări se arată. |
+| 🎯 Ținte | Țintele cu numere trec prin fața copilului (Ușor 60, Mediu 90, Provocare 130 px/s); ținta corectă ratată revine. | Ținta greșită cade, −1 inimă. |
 | 🔲 Completează căsuțele | Completează una sau două căsuțe, cu tastatura de pe ecran. Pentru `□ × □ = 12` sunt acceptate toate soluțiile, iar la final apar celelalte („Mai erau: …”). | Abia după a doua greșeală se arată răspunsul. |
 
 Comun tuturor jocurilor:
@@ -91,7 +94,7 @@ npm run valideaza:sympy
 ```
 
 Testele verifică:
-- 11 640 de exerciții (joc × noțiune × nivel), cu rezultatul și ecuațiile căsuțelor;
+- 14 160 de exerciții (joc × noțiune × nivel), cu rezultatul și ecuațiile căsuțelor;
 - produsele ≤ 100 și împărțirile exacte;
 - regula „fără / cu trecere” 100%, la zeci și la sute;
 - soluția unică la căsuțe, sau toate soluțiile listate;
@@ -100,7 +103,12 @@ Testele verifică:
 
 `scripts/valideaza_clasa2.py` recalculează totul cu SymPy și verifică numerele scrise cu litere și ora cu implementări independente, scrise în Python.
 
-## Urmează (etapa 5)
+## Etapa 5 – recompense și profesorul
 
-- Provocarea în imagini, Integrama, Ținte, puzzle-ul de recompensă;
-- ecranul „Mix automat”, semaforul pe elevi, raportul pentru părinți și diploma.
+- **🧩 Puzzle-recompensă**: fiecare joc terminat cu ⭐⭐⭐ deblochează o piesă (12 piese dintr-o ilustrație proprie); copilul le așază pe pagina „Jocuri – clasa a II-a” (atinge piesa, apoi locul ei). Puzzle complet = insigna „Puzzle-ul matematicii”. Progresul stă în browserul copilului.
+- **🎲 Mix automat**: o temă cu mai multe jocuri la rând, alese după noțiuni: recunoaștere (Perechi / Memorie / Balanța…) → producere (Căsuțe / Scara / Provocarea…) → viteză (Bule / Ținte). Numărul de exerciții se împarte între jocuri.
+- **Semaforul pe elevi** (rezultatele temei): ⚪ nu a început · 🟠 are nevoie de sprijin (acuratețe sub 60%, de cel puțin 2 ori fără inimi sau aceeași greșeală tipică de cel puțin 3 ori) · 🔵 pe drumul cel bun · 🟢 se descurcă bine (acuratețe ≥ 80% și medalie). Se calculează din cea mai bună încercare.
+- **Recomandări automate**: la fiecare greșeală tipică din grupă, jocul și noțiunea de atribuit (ex. „trecere omisă → Scara cu Adunarea, cu trecere, Mediu”).
+- **Raport pentru părinți** (PDF, o pagină pe copil): medalia, stelele, ce știe bine, ce exersăm acasă, 3 exerciții recomandate din noțiunea cea mai slabă, cu răspunsuri.
+- **Diplomă** (PDF, A4 orizontal) pentru 🥇 Aur și 💎 Diamant.
+- **Export CSV** cu aceleași cifre ca pe ecran (stare, medalie, acuratețe, ce știe, de exersat, greșeli tipice).

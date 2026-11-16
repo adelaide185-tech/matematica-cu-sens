@@ -5,7 +5,8 @@ import { cuSubstantiv, numarInLitere } from "@/motor/limba";
 const lei = (n: number) => cuSubstantiv(n, "leu", "lei");
 const cu = cuSubstantiv;
 import type { ConfigC2, Distractor, ItemC2, JocC2, NivelC2, NotiuneC2, OptiuniC2, TipEroare, VerificareC2, VizualC2 } from "./tipuri";
-import { COMPATIBIL } from "./tipuri";
+import { COMPATIBIL, ORDINE_MIX } from "./tipuri";
+import { NUMERE_INTEGRAMA, construiesteIntegrama, diacriticeObligatorii, fara } from "./integrama";
 
 // ───────────────────────── limbă: ora și numerele ─────────────────────────
 
@@ -77,6 +78,9 @@ function distractori(rng: Rng, corect: string, cand: [string | number, TipEroare
 }
 
 interface Baza {
+  pasi?: ItemC2["pasi"];
+  model?: ItemC2["model"];
+  emoji?: string;
   cheie: string;
   text: string;
   st?: string;
@@ -327,16 +331,24 @@ function problema(rng: Rng, niv: NivelC2, doua: boolean): Baza | null {
   const max = niv === "usor" ? 100 : 1000;
   if (!doua) {
     const t = rng.int(0, 3);
-    if (t === 0) { const a = rng.int(10, max / 2), d = rng.int(2, max / 4); return { cheie: `pc${a}:${d}`, text: `${A} are ${cu(a, "timbru", "timbre")}. ${B} are cu ${d} mai multe. Câte are ${B}?`, valoare: s(a + d), distractori: distractori(rng, s(a + d), [[Math.abs(a - d), "operatie_inversa"]]), indiciu: "„Cu mai multe” → aduni.", verificare: egal(`${a} + ${d}`, a + d) }; }
-    if (t === 1) { const g = rng.int(2, 10), k = rng.int(2, 10); return { cheie: `pg${g}:${k}`, text: `Sunt ${g} cutii cu câte ${cu(k, "creion", "creioane")}. Câte creioane sunt?`, valoare: s(g * k), distractori: distractori(rng, s(g * k), [[g + k, "operatie_inversa"], [g * (k + 1), "tabel_vecin"]]), indiciu: `${g} grupe a câte ${k} → înmulțire.`, verificare: egal(`${g} * ${k}`, g * k) }; }
-    if (t === 2) { const c = rng.int(2, 10), k = rng.int(2, 10); return { cheie: `pi${c}:${k}`, text: `${cu(c * k, "măr", "mere")} se pun în ${c} coșuri, în mod egal. Câte mere sunt în fiecare coș?`, valoare: s(k), distractori: distractori(rng, s(k), [[c * k - c, "operatie_inversa"], [k + 1, "tabel_vecin"]]), indiciu: "Împărțim în mod egal → împărțire.", verificare: egal(`${c * k} / ${c}`, k) }; }
+    if (t === 0) { const a = rng.int(10, max / 2), d = rng.int(2, max / 4); return { cheie: `pc${a}:${d}`, text: `${A} are ${cu(a, "timbru", "timbre")}. ${B} are cu ${d} mai multe. Câte are ${B}?`, valoare: s(a + d), distractori: distractori(rng, s(a + d), [[Math.abs(a - d), "operatie_inversa"]]), indiciu: "„Cu mai multe” → aduni.", verificare: egal(`${a} + ${d}`, a + d), pasi: [{ intrebare: `Câte timbre are ${B}?`, op: "+", valoare: a + d }], model: { tip: "plus", a, b: d }, emoji: "✉️" }; }
+    if (t === 1) { const g = rng.int(2, 10), k = rng.int(2, 10); return { cheie: `pg${g}:${k}`, text: `Sunt ${g} cutii cu câte ${cu(k, "creion", "creioane")}. Câte creioane sunt?`, valoare: s(g * k), distractori: distractori(rng, s(g * k), [[g + k, "operatie_inversa"], [g * (k + 1), "tabel_vecin"]]), indiciu: `${g} grupe a câte ${k} → înmulțire.`, verificare: egal(`${g} * ${k}`, g * k), pasi: [{ intrebare: "Câte creioane sunt în total?", op: "×", valoare: g * k }], model: { tip: "grupe", a: g, b: k }, emoji: "✏️" }; }
+    if (t === 2) { const c = rng.int(2, 10), k = rng.int(2, 10); return { cheie: `pi${c}:${k}`, text: `${cu(c * k, "măr", "mere")} se pun în ${c} coșuri, în mod egal. Câte mere sunt în fiecare coș?`, valoare: s(k), distractori: distractori(rng, s(k), [[c * k - c, "operatie_inversa"], [k + 1, "tabel_vecin"]]), indiciu: "Împărțim în mod egal → împărțire.", verificare: egal(`${c * k} / ${c}`, k), pasi: [{ intrebare: "Câte mere sunt într-un coș?", op: ":", valoare: k }], model: { tip: "imparte", a: c * k, b: c }, emoji: "🍎" }; }
     const p = rng.int(1, 9), d = rng.pick([10, 20, 50].filter((x) => x > p));
-    return { cheie: `pr${p}:${d}`, text: `Un caiet costă ${lei(p)}. Plătești cu ${lei(d)}. Cât rest primești?`, valoare: s(d - p), distractori: distractori(rng, s(d - p), [[d + p, "operatie_inversa"]]), indiciu: "Restul = cât ai dat − cât costă.", verificare: egal(`${d} - ${p}`, d - p) };
+    return { cheie: `pr${p}:${d}`, text: `Un caiet costă ${lei(p)}. Plătești cu ${lei(d)}. Cât rest primești?`, valoare: s(d - p), distractori: distractori(rng, s(d - p), [[d + p, "operatie_inversa"]]), indiciu: "Restul = cât ai dat − cât costă.", verificare: egal(`${d} - ${p}`, d - p), pasi: [{ intrebare: "Cât rest primești?", op: "−", valoare: d - p }], model: { tip: "minus", a: d, b: p }, emoji: "📒" };
+  }
+  if (rng.bool()) {
+    // a doua formă: cumpărături (× apoi −)
+    const k = rng.int(2, 5), pret = rng.int(2, 9), avea = rng.int(k * pret + 1, Math.min(100, k * pret + 40));
+    const v2 = avea - k * pret;
+    return { cheie: `pc2${avea}:${k}:${pret}`, text: `${A} are ${lei(avea)}. Cumpără ${k} caiete a câte ${lei(pret)}. Câți lei îi rămân?`, valoare: s(v2), distractori: distractori(rng, s(v2), [[k * pret, "altele"], [avea - pret, "altele"], [avea + k * pret, "operatie_inversa"]]),
+      indiciu: `Întrebarea ajutătoare: cât costă cele ${k} caiete? (${k} × ${pret})`, verificare: egal(`${avea} - ${k} * ${pret}`, v2),
+      pasi: [{ intrebare: `Cât costă cele ${k} caiete?`, op: "×", valoare: k * pret }, { intrebare: "Câți lei îi rămân?", op: "−", valoare: v2 }], model: { tip: "minus", a: avea, b: k * pret }, emoji: "📓" };
   }
   const a = rng.int(15, Math.min(90, max)), b = rng.int(2, a - 1), c = rng.int(2, 40);
   const v = a - b + c;
   if (v > max) return null;
-  return { cheie: `p2${a}:${b}:${c}`, text: `În autobuz sunt ${cu(a, "copil", "copii")}. Coboară ${b}, apoi urcă ${c}. Câți copii sunt acum?`, valoare: s(v), distractori: distractori(rng, s(v), [[a - b, "altele"], [a + b + c, "operatie_inversa"], [a - b - c >= 0 ? a - b - c : v + 10, "operatie_inversa"]]), indiciu: `Întrebarea ajutătoare: câți au rămas după ce au coborât ${b}? (${a} − ${b})`, verificare: egal(`${a} - ${b} + ${c}`, v) };
+  return { cheie: `p2${a}:${b}:${c}`, text: `În autobuz sunt ${cu(a, "copil", "copii")}. Coboară ${b}, apoi urcă ${c}. Câți copii sunt acum?`, valoare: s(v), distractori: distractori(rng, s(v), [[a - b, "altele"], [a + b + c, "operatie_inversa"], [a - b - c >= 0 ? a - b - c : v + 10, "operatie_inversa"]]), indiciu: `Întrebarea ajutătoare: câți au rămas după ce au coborât ${b}? (${a} − ${b})`, verificare: egal(`${a} - ${b} + ${c}`, v), pasi: [{ intrebare: `Câți copii au rămas după ce au coborât ${b}?`, op: "−", valoare: a - b }, { intrebare: "Câți copii sunt acum?", op: "+", valoare: v }], model: { tip: "minus", a, b }, emoji: "🚌" };
 }
 
 function frParte(rng: Rng, o: OptiuniC2): Baza {
@@ -655,19 +667,71 @@ function itemNou(rng: Rng, n: NotiuneC2, joc: JocC2, niv: NivelC2, o: OptiuniC2)
   const b = exercitiu(n, rng, niv, o);
   if (!b) return null;
   if ((joc === "perechi" || joc === "memorie") && !b.st) return null;
-  if ((joc === "bule" || joc === "scara") && b.distractori.length < 1) return null;
+  if ((joc === "bule" || joc === "scara" || joc === "tinte") && b.distractori.length < 1) return null;
+  if (joc === "provocare" && !b.pasi) return null;
   return {
     cheie: `${joc === "perechi" || joc === "memorie" ? "p" : "e"}:${b.cheie}`, notiune: n, nivel: niv, text: b.text, st: b.st, vizual: b.vizual,
     raspuns: joc === "perechi" || joc === "memorie" ? { tip: "pereche" } : { tip: "valoare", valoare: b.valoare },
     afis: b.valoare, distractori: b.distractori.slice(0, 4), indiciu: b.indiciu, verificare: b.verificare,
+    ...(joc === "provocare" && { pasi: b.pasi, model: b.model, emoji: b.emoji }),
   };
 }
 
 export interface SesiuneC2 { itemi: ItemC2[]; avertismente: string[]; notiuni: NotiuneC2[] }
 
 /** Exercițiile unei sesiuni (joc sau fișă), deterministe: același cod + nivel → aceleași exerciții. */
+/** „Mix automat”: jocurile potrivite noțiunilor, câte unul din fiecare treaptă (recunoaștere → producere → viteză). */
+export function jocuriMix(notiuni: NotiuneC2[]): JocC2[] {
+  return ORDINE_MIX.map((grup) => grup.find((j) => notiuni.some((n) => COMPATIBIL[j].includes(n)))).filter((j): j is JocC2 => !!j);
+}
+
+function genereazaIntegrama(cfg: ConfigC2, niv: NivelC2): SesiuneC2 {
+  const notiuni = cfg.notiuni.filter((n) => COMPATIBIL.integrama.includes(n));
+  const N = Math.min(Math.max(1, Math.floor(cfg.nr)), NUMERE_INTEGRAMA.length);
+  let ramase = new Rng(hash(cfg.seed, 77)).shuffle(NUMERE_INTEGRAMA);
+  const itemi: ItemC2[] = [];
+  let grup = 0, incercari = 0;
+  while (itemi.length < N && ramase.length >= 2 && incercari < 60) {
+    incercari++;
+    const pe = Math.min(N - itemi.length, niv === "usor" ? 5 : 6);
+    // câteva în plus: nu toate cuvintele se încrucișează
+    const lot = new Rng(hash(cfg.seed, 300 + incercari)).shuffle(ramase).slice(0, pe + 2);
+    const g = construiesteIntegrama(new Rng(hash(cfg.seed, 900 + incercari)), lot, notiuni.length ? notiuni : ["num.litere"]);
+    if (!g) continue;
+    // păstrăm toată integrama (altfel s-ar rupe încrucișările și numerotarea)
+    for (const w of g.cuvinte) {
+      if (itemi.length >= N) break;
+      ramase = ramase.filter((v) => v !== w.valoare);
+      itemi.push({
+        id: `i${itemi.length}`, cheie: `ig:${w.valoare}`, notiune: notiuni[0] ?? "num.litere", nivel: niv,
+        text: `${w.nr}. ${w.dir === "o" ? "Orizontal" : "Vertical"}: ${w.indiciu}`, raspuns: { tip: "valoare", valoare: w.cuvant }, afis: w.cuvant.toLowerCase(), distractori: [],
+        indiciu: `Calculează ${w.indiciu}, apoi scrie rezultatul cu litere.`, verificare: { tip: "integrama", expr: w.expr, valoare: w.valoare, text: numarInLitere(w.valoare) },
+        integrama: { grup, dir: w.dir, r: w.r, c: w.c, nr: w.nr, rows: g.rows, cols: g.cols, diacritice: diacriticeObligatorii(niv) },
+      });
+    }
+    grup++;
+  }
+  const avertismente = itemi.length < cfg.nr ? [`Integrama are cel mult ${NUMERE_INTEGRAMA.length} de numere scrise într-un cuvânt; am pus ${itemi.length}.`] : [];
+  return { itemi, avertismente, notiuni };
+}
+
 export function genereazaC2(cfg: ConfigC2, nivel?: NivelC2): SesiuneC2 {
   const niv: NivelC2 = nivel ?? (cfg.nivel === "alege" ? "mediu" : cfg.nivel);
+  if (cfg.mix) {
+    const jocuri = jocuriMix(cfg.notiuni);
+    if (!jocuri.length) return { itemi: [], avertismente: ["Alege noțiuni pentru Mix automat."], notiuni: [] };
+    const N = Math.max(1, Math.min(100, Math.floor(cfg.nr)));
+    const itemi: ItemC2[] = [];
+    const avertismente: string[] = [];
+    jocuri.forEach((joc, k) => {
+      const n = Math.floor(N / jocuri.length) + (k < N % jocuri.length ? 1 : 0);
+      const r = genereazaC2({ ...cfg, mix: false, joc, nr: n, seed: hash(cfg.seed, 500 + k) % 2 ** 31, inlocuiri: {} }, niv);
+      avertismente.push(...r.avertismente.map((a) => `${a}`));
+      itemi.push(...r.itemi.map((it) => ({ ...it, id: `s${k}-${it.id}`, joc })));
+    });
+    return { itemi, avertismente: [...new Set(avertismente)], notiuni: cfg.notiuni };
+  }
+  if (cfg.joc === "integrama") return genereazaIntegrama(cfg, niv);
   const notiuni = cfg.notiuni.filter((n) => COMPATIBIL[cfg.joc].includes(n));
   const avertismente: string[] = [];
   const excluse = cfg.notiuni.filter((n) => !notiuni.includes(n));
@@ -707,8 +771,12 @@ export function genereazaC2(cfg: ConfigC2, nivel?: NivelC2): SesiuneC2 {
 const intreg = (t: string) => { const x = String(t ?? "").replace(/\s/g, ""); return /^\d+$/.test(x) ? Number(x) : NaN; };
 
 /** Răspunsul elevului: valoare („245”, „marți”, „1/2”), căsuțe „3|4”, pereche „ok”. */
-export function verificaC2(it: Pick<ItemC2, "raspuns">, dat: string): boolean {
+export function verificaC2(it: Pick<ItemC2, "raspuns" | "integrama">, dat: string): boolean {
   const r = it.raspuns;
+  if (it.integrama && r.tip === "valoare") {
+    const d = String(dat ?? "").trim().toUpperCase();
+    return it.integrama.diacritice ? d === r.valoare : fara(d) === fara(r.valoare);
+  }
   if (r.tip === "pereche") return dat === "ok";
   if (r.tip === "ordine") return String(dat) === r.corect.join("|");
   if (r.tip === "ora") { const [h, m] = String(dat).split(":").map(Number); return h % 12 === r.ore % 12 && m === r.minute; }

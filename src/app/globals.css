@@ -226,3 +226,17 @@ body {
 }
 .fc-c2 { font-size: 15pt; }
 .fc-c2.fc-col3 { font-size: 14pt; }
+@keyframes treceTinta { from { left: 100%; } to { left: -8rem; } }
+.tinta { left: 100%; animation-name: treceTinta; animation-timing-function: linear; animation-iteration-count: infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .tinta { animation: none; position: relative !important; left: auto; top: 2.5rem; margin: 0 0.5rem; display: inline-flex; }
+}
+
+/* diploma: A4 orizontal */
+@page diploma { size: A4 landscape; margin: 0; }
+.diploma { width: 297mm; height: 210mm; margin: 0 auto; padding: 10mm; background: #fffdf5; box-shadow: 0 4px 24px rgb(0 0 0 / 0.12); }
+.diploma-chenar { height: 100%; border: 6mm double #6a59a7; border-radius: 6mm; padding: 10mm; text-align: center; color: #2a2150; background: radial-gradient(circle at 50% 30%, #fff 0, #fff6d6 100%); }
+.diploma-titlu { margin-top: 6mm; font-size: 46pt; font-weight: 900; letter-spacing: 0.2em; color: #6a59a7; }
+.diploma-nume { margin: 4mm 0; font-size: 34pt; font-weight: 800; color: #4a3d80; border-bottom: 1px solid #c9b6f2; display: inline-block; padding: 0 12mm; }
+.diploma-medalie { margin: 3mm 0; font-size: 26pt; font-weight: 800; color: #b5541b; }
+@media print { .diploma { page: diploma; box-shadow: none; margin: 0; } }

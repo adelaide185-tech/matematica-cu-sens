@@ -3,7 +3,7 @@ import { hash } from "@/motor/calcul/generator";
 import { CAPITOLE_C2, type ConfigC2, type JocC2, type NotiuneC2, type OptiuniC2 } from "./tipuri";
 
 export const NOTIUNI_C2: NotiuneC2[] = CAPITOLE_C2.flatMap((c) => c.notiuni.map(([n]) => n));
-export const JOCURI_LISTA_C2: JocC2[] = ["perechi", "bule", "scara", "casute", "balanta", "ordonare", "memorie", "ceas", "magazin"];
+export const JOCURI_LISTA_C2: JocC2[] = ["perechi", "bule", "scara", "casute", "balanta", "ordonare", "memorie", "ceas", "magazin", "provocare", "integrama", "tinte"];
 
 export const optiuniC2Implicite = (): OptiuniC2 => ({
   trecere: "oricum", trecereLa: "zeci", forme: ["a+x=b", "x+a=b", "x-a=b", "a-x=b"], table: [2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -12,7 +12,7 @@ export const optiuniC2Implicite = (): OptiuniC2 => ({
 
 export function configC2Implicita(seed = 1): ConfigC2 {
   return {
-    seed, notiuni: ["op.tabla"], optiuni: optiuniC2Implicite(), joc: "perechi", nr: 10, nivel: "alege", vieti: 3, modScara: "variante",
+    seed, notiuni: ["op.tabla"], optiuni: optiuniC2Implicite(), joc: "perechi", nr: 10, nivel: "alege", mix: false, vieti: 3, modScara: "variante",
     inlocuiri: {}, coloane: "auto", antet: { ...antetImplicit(), titlu: "Matematică – clasa a II-a" },
   };
 }
@@ -53,6 +53,7 @@ export function curataC2(x: Record<string, unknown>): ConfigC2 {
     joc: unul(x.joc, JOCURI_LISTA_C2, "perechi"),
     nr: Number.isFinite(nr) ? Math.min(100, Math.max(5, nr)) : 10,
     nivel: unul(x.nivel, ["usor", "mediu", "provocare", "alege"] as const, "alege"),
+    mix: Boolean(x.mix),
     vieti: unul(Number(x.vieti), [0, 3, 5] as const, 3),
     modScara: unul(x.modScara, ["variante", "tastatura"] as const, "variante"),
     inlocuiri: inl,

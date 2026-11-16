@@ -93,8 +93,8 @@ export async function creeazaTemaJocC2(d: DateTemaNoua): Promise<StareTema> {
   const t = await tintaTema(s, d.tinta);
   if ("eroare" in t) return t;
   return salveazaTema({
-    titlu: d.titlu.trim().slice(0, 120) || `${JOCURI_C2[cfg.joc].nume} – clasa a II-a`, profesorId: s.id, ...t,
-    mecanica: `c2:${cfg.joc}`, generatoare: cfg.notiuni, nivel: d.test ? "EVALUARE" : "CONSOLIDARE",
+    titlu: d.titlu.trim().slice(0, 120) || `${cfg.mix ? "Mix automat" : JOCURI_C2[cfg.joc].nume} – clasa a II-a`, profesorId: s.id, ...t,
+    mecanica: cfg.mix ? "c2:mix" : `c2:${cfg.joc}`, generatoare: cfg.notiuni, nivel: d.test ? "EVALUARE" : "CONSOLIDARE",
     nrItemi: cfg.nr, seed: d.diferite ? null : cfg.seed,
     config: cfg as unknown as Prisma.InputJsonValue, ...limitaSiTermen(d), test: d.test,
   });

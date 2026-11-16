@@ -66,7 +66,7 @@ export default function ZonaElev() {
             <span className="text-5xl" aria-hidden>🎮</span>
             <span className="flex-1">
               <span className="block text-2xl font-bold">Jocuri de clasa a II-a</span>
-              <span className="block">Perechi, Bule, Scara, Căsuțe, Balanța, Ordonează, Memorie, Ceasul și Magazinul.</span>
+              <span className="block">12 jocuri: Perechi, Bule, Scara, Căsuțe, Balanța, Ceasul, Magazinul, Integrama… și un puzzle de câștigat!</span>
             </span>
           </Link>
         )}

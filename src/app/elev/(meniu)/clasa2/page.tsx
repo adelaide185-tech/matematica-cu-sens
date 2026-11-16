@@ -5,6 +5,7 @@ import Link from "next/link";
 import { JOCURI_LISTA_C2, codificaC2, configC2Implicita } from "@/motor/clasa2/config";
 import { CAPITOLE_C2, COMPATIBIL, JOCURI_C2, type NotiuneC2 } from "@/motor/clasa2/tipuri";
 import { seedNou } from "@/motor/rng";
+import { PuzzleC2 } from "@/jocuri/c2/Puzzle";
 
 /** Jocurile clasei a II-a, ca joc liber: copilul alege ce exersează și jocul. */
 export default function JocuriClasa2() {
@@ -27,6 +28,11 @@ export default function JocuriClasa2() {
           </div>
         ))}
       </section>
+      <Link href={`/elev/clasa2/joc?c=${codificaC2({ ...configC2Implicita(seedNou()), notiuni, nr: 15, nivel: "alege", vieti: 3, mix: true })}`}
+        className="mt-6 flex items-center gap-4 rounded-3xl bg-mov p-5 text-white shadow-lg transition hover:-translate-y-1">
+        <span className="text-5xl" aria-hidden>🎲</span>
+        <span className="flex-1"><span className="block text-2xl font-bold">Mix: mai multe jocuri la rând</span><span className="block text-white/90">Recunoaștere, apoi scriere, apoi viteză.</span></span>
+      </Link>
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
         {JOCURI_LISTA_C2.map((j) => {
           const ok = notiuni.some((n) => COMPATIBIL[j].includes(n));
@@ -40,6 +46,7 @@ export default function JocuriClasa2() {
           return ok ? <Link key={j} href={link(j)}>{card}</Link> : <div key={j} title="Alege altă noțiune pentru acest joc">{card}</div>;
         })}
       </div>
+      <PuzzleC2 />
     </main>
   );
 }

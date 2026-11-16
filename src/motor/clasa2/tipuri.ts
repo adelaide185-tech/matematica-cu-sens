@@ -21,7 +21,7 @@ export type TipEroare =
   | "trecere_omisa" | "imprumut_omis" | "ordin_gresit" | "tabel_vecin" | "operatie_inversa" | "necunoscuta_inversata"
   | "ceas_ace_inversate" | "ceas_fara_un_sfert" | "bani_lei_bani" | "unitate_m_cm" | "fractie_parti_inegale" | "timp_expirat" | "altele";
 
-export type JocC2 = "perechi" | "bule" | "scara" | "casute" | "balanta" | "ordonare" | "memorie" | "ceas" | "magazin";
+export type JocC2 = "perechi" | "bule" | "scara" | "casute" | "balanta" | "ordonare" | "memorie" | "ceas" | "magazin" | "provocare" | "integrama" | "tinte";
 export type FormaNecunoscuta = "a+x=b" | "x+a=b" | "x-a=b" | "a-x=b" | "xb=c" | "ax=c";
 
 export interface OptiuniC2 {
@@ -46,6 +46,8 @@ export interface ConfigC2 {
   nr: number;
   /** nivelul fixat de profesor sau „alege” (copilul alege înainte de joc) */
   nivel: NivelC2 | "alege";
+  /** „Mix automat”: recunoaștere → producere → viteză, din jocurile potrivite noțiunilor */
+  mix: boolean;
   vieti: 0 | 3 | 5;
   /** Scara: variante (butoane) sau tastatură */
   modScara: "variante" | "tastatura";
@@ -84,7 +86,9 @@ export type VerificareC2 =
   | { tip: "semn"; st: string; dr: string; semn: "<" | ">" | "=" }
   | { tip: "ordine"; valori: number[]; sens: "crescator" | "descrescator" }
   /** Magazinul: suma banilor (expresie în bani) și cum se spune */
-  | { tip: "bani"; expr: string; valoare: number; text: string };
+  | { tip: "bani"; expr: string; valoare: number; text: string }
+  /** Integrama: indiciul (calcul) dă numărul, iar cuvântul e numărul scris cu litere */
+  | { tip: "integrama"; expr: string; valoare: number; text: string };
 
 export interface ItemC2 {
   id: string;
@@ -106,6 +110,14 @@ export interface ItemC2 {
   modCeas?: "potriveste" | "muta";
   /** Magazinul: produsul, prețul și banii (în bani; 100 bani = 1 leu) */
   magazin?: { mod: "plateste" | "numara" | "rest"; produs?: string; emoji?: string; pret?: number; platit?: number; bani?: number[]; inBani?: boolean };
+  /** Provocarea în imagini: pașii (operația și rezultatul fiecăruia), bara-model și scena */
+  pasi?: { intrebare: string; op: "+" | "−" | "×" | ":"; valoare: number }[];
+  model?: { tip: "plus" | "minus" | "grupe" | "imparte"; a: number; b: number };
+  emoji?: string;
+  /** Integrama: poziția cuvântului în grila integramei `grup` */
+  integrama?: { grup: number; dir: "o" | "v"; r: number; c: number; nr: number; rows: number; cols: number; diacritice: boolean };
+  /** „Mix automat”: jocul din care face parte exercițiul */
+  joc?: JocC2;
   raspuns: RaspunsC2;
   /** răspunsul corect afișat (barem, Perechi, variante) */
   afis: string;
@@ -136,6 +148,9 @@ export const JOCURI_C2: Record<JocC2, { nume: string; icon: string; instructiune
   ordonare: { nume: "Ordonează", icon: "📶", instructiune: "Pune în ordine!", culoare: "#e0483e", descriere: "Atinge cartonașele în ordine, crescător sau descrescător." },
   ceas: { nume: "Ceasul", icon: "🕒", instructiune: "Cât arată ceasul?", culoare: "#2f6fd1", descriere: "Citește ora sau mută acele ceasului până arată ora cerută." },
   magazin: { nume: "Magazinul", icon: "🛒", instructiune: "Hai la cumpărături!", culoare: "#2e9e5b", descriere: "Plătește exact, numără banii și află restul." },
+  provocare: { nume: "Provocarea în imagini", icon: "🧩", instructiune: "Ce operație facem?", culoare: "#b5541b", descriere: "Alege operația, apoi află rezultatul. Bara-model te ajută." },
+  integrama: { nume: "Integrama numerelor", icon: "🔤", instructiune: "Scrie numerele cu litere!", culoare: "#4f4183", descriere: "Calculează și scrie rezultatul cu litere în integramă. Fără inimi." },
+  tinte: { nume: "Ținte", icon: "🎯", instructiune: "Atinge ținta corectă!", culoare: "#c62828", descriere: "Țintele trec prin fața ta: atinge-o pe cea cu răspunsul bun." },
   memorie: { nume: "Memorie", icon: "🃏", instructiune: "Găsește perechile!", culoare: "#0f8a8a", descriere: "Întoarce câte două cărți și găsește calculul și rezultatul lui. Fără inimi!" },
 };
 
@@ -161,6 +176,9 @@ export const COMPATIBIL: Record<JocC2, NotiuneC2[]> = {
   balanta: ["num.comparare", "op.adunare", "op.scadere", "op.termen", "op.tabla", "op.impartire", "op.dublu", "mas.transformari", "mas.masa-lichid", "bani.numara"],
   ordonare: ["num.ordonare", "num.extreme", "num.comparare", "timp.calendar"],
   ceas: ["timp.ceas"],
+  provocare: ["pb.una", "pb.doua"],
+  integrama: ["num.litere", "op.adunare", "op.scadere", "op.tabla", "op.impartire", "op.dublu"],
+  tinte: ["num.vecini", "num.comparare", "num.paritate", "num.rotunjire", "num.extreme", "num.sir", "op.adunare", "op.scadere", "op.tabla", "op.impartire", "op.dublu", "fr.din", "bani.numara"],
   magazin: ["bani.numara", "bani.rest"],
   memorie: ["num.formare", "num.litere", "num.descompunere", "op.adunare", "op.scadere", "op.tabla", "op.comutativ", "op.impartire", "op.dublu", "fr.parte", "fr.din", "mas.transformari", "timp.ceas", "timp.calendar", "bani.numara"],
 };
@@ -171,4 +189,8 @@ export const BANCNOTE = [100, 500, 1000, 5000, 10000];
 
 export const NR_RAPIDE_C2 = [10, 15, 20, 25, 50, 100] as const;
 /** Bule: secunde de sus până jos, pe nivel */
+/** Ținte: pixeli pe secundă, pe nivel */
+export const VITEZA_TINTE: Record<NivelC2, number> = { usor: 60, mediu: 90, provocare: 130 };
+/** „Mix automat”: ordinea pedagogică (recunoaștere → producere → viteză) */
+export const ORDINE_MIX: JocC2[][] = [["perechi", "memorie", "balanta", "ordonare", "ceas"], ["casute", "scara", "provocare", "magazin"], ["bule", "tinte"]];
 export const VITEZA_BULE: Record<NivelC2, number> = { usor: 8, mediu: 6, provocare: 4 };

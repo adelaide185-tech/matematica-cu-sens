@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { FisaC2 } from "@/componente/FisaC2";
 import { JOCURI_LISTA_C2, codificaC2, configC2Implicita, curataC2 } from "@/motor/clasa2/config";
-import { genereazaC2 } from "@/motor/clasa2/generator";
+import { genereazaC2, jocuriMix } from "@/motor/clasa2/generator";
 import { CAPITOLE_C2, COMPATIBIL, JOCURI_C2, NIVELURI_C2, NR_RAPIDE_C2, type ConfigC2, type NivelC2, type NotiuneC2, type OptiuniC2 } from "@/motor/clasa2/tipuri";
 import { seedNou } from "@/motor/rng";
 import { creeazaTemaJocC2 } from "@/lib/actiuni-teme";
@@ -87,18 +87,23 @@ export function GeneratorC2({ grupe, online }: { grupe: Grupa[]; online: boolean
             {JOCURI_LISTA_C2.map((j) => {
               const n = cfg.notiuni.filter((x) => COMPATIBIL[j].includes(x)).length;
               return (
-                <button key={j} type="button" onClick={() => set({ joc: j })} className={`rounded-2xl border-2 p-2.5 text-left ${cfg.joc === j ? "border-mov bg-mov text-white" : "border-mov/15 hover:bg-mov-deschis"} ${n ? "" : "opacity-50"}`}>
+                <button key={j} type="button" onClick={() => set({ joc: j, mix: false })} className={`rounded-2xl border-2 p-2.5 text-left ${cfg.joc === j && !cfg.mix ? "border-mov bg-mov text-white" : "border-mov/15 hover:bg-mov-deschis"} ${n ? "" : "opacity-50"}`}>
                   <span className="text-2xl" aria-hidden>{JOCURI_C2[j].icon}</span> <span className="font-bold">{JOCURI_C2[j].nume}</span>
-                  <span className={`block text-xs ${cfg.joc === j ? "text-white/90" : "text-gray-600"}`}>{n ? `${n} noțiuni potrivite` : "nicio noțiune potrivită"}</span>
+                  <span className={`block text-xs ${cfg.joc === j && !cfg.mix ? "text-white/90" : "text-gray-600"}`}>{n ? `${n} noțiuni potrivite` : "nicio noțiune potrivită"}</span>
                 </button>
               );
             })}
           </div>
-          <p className="mt-2 text-xs text-gray-500">În curând: Provocarea în imagini, Integrama, Ținte.</p>
+          <button type="button" onClick={() => set({ mix: !cfg.mix })} className={`mt-2 w-full rounded-2xl border-2 p-2.5 text-left ${cfg.mix ? "border-mov bg-mov text-white" : "border-dashed border-mov/40 hover:bg-mov-deschis"}`}>
+            <span className="text-2xl" aria-hidden>🎲</span> <span className="font-bold">Mix automat</span>
+            <span className={`block text-xs ${cfg.mix ? "text-white/90" : "text-gray-600"}`}>{cfg.mix ? `Jocurile, pe rând: ${jocuriMix(cfg.notiuni).map((j) => JOCURI_C2[j].nume).join(" → ") || "—"} (recunoaștere → producere → viteză)` : "Mai multe jocuri într-o temă, alese după noțiuni"}</span>
+          </button>
           {cfg.joc === "ordonare" && <div className="mt-2 flex flex-wrap items-center gap-1 text-sm">Sensul: {(["ambele", "crescator", "descrescator"] as const).map((x) => <Cip key={x} ales={o.sens === x} onClick={() => opt("sens", x)}>{x === "ambele" ? "amestecat" : x === "crescator" ? "crescător" : "descrescător"}</Cip>)}</div>}
           {cfg.joc === "balanta" && <p className="mt-2 text-xs text-gray-500">„Numărul care lipsește” (și adunarea la Provocare) apare ca „echilibrează balanța” cu greutăți.</p>}
           {cfg.joc === "ceas" && <p className="mt-2 text-xs text-gray-500">Ușor: citește ora (fix și jumătate). Mediu și Provocare: și „mută acele”; sferturile apar cu opțiunea „+ sferturi” de la Ceasul.</p>}
           {cfg.joc === "magazin" && <p className="mt-2 text-xs text-gray-500">Plătește exact, „Câți bani sunt?” și „Cât rest primești?”. Ușor: doar lei, până la 20; Provocare: și monede de 1, 5, 10, 50 de bani.</p>}
+          {cfg.joc === "integrama" && <p className="mt-2 text-xs text-gray-500">Integrama: rezultatele (0–20, 30–90) se scriu cu litere; diacriticele sunt obligatorii doar la Provocare. Fără inimi.</p>}
+          {cfg.joc === "provocare" && <p className="mt-2 text-xs text-gray-500">Provocarea: copilul alege operația (greșeala aici nu costă o inimă: bara-model se completează), apoi scrie rezultatul; la două operații, cu întrebarea ajutătoare.</p>}
           {cfg.joc === "memorie" && <p className="mt-2 text-xs text-gray-500">Memorie e joc de explorare: fără inimi; 8 perechi pe tablă (10 la Provocare).</p>}
           {cfg.joc === "scara" && <div className="mt-2 flex flex-wrap items-center gap-1 text-sm">Răspuns: <Cip ales={cfg.modScara === "variante"} onClick={() => set({ modScara: "variante" })}>variante (butoane)</Cip><Cip ales={cfg.modScara === "tastatura"} onClick={() => set({ modScara: "tastatura" })}>tastatură</Cip></div>}
         </Sectiune>
@@ -128,7 +133,7 @@ export function GeneratorC2({ grupe, online }: { grupe: Grupa[]; online: boolean
         </Sectiune>
 
         <Sectiune titlu="6. Trimite ca joc">
-          {online ? <PanouTema c={c} titluImplicit={`${JOCURI_C2[cfg.joc].nume} – clasa a II-a`} grupe={grupe} dezactivat={!compatibile || !itemi.length} actiune={creeazaTemaJocC2} etichetaTrimite="🎮 Trimite jocul elevilor" />
+          {online ? <PanouTema c={c} titluImplicit={`${cfg.mix ? "Mix automat" : JOCURI_C2[cfg.joc].nume} – clasa a II-a`} grupe={grupe} dezactivat={!compatibile || !itemi.length} actiune={creeazaTemaJocC2} etichetaTrimite="🎮 Trimite jocul elevilor" />
             : <p className="rounded-lg bg-galben-deschis p-3 text-sm">Jocurile ca temă funcționează când aplicația are conturi. Previzualizarea merge oricum.</p>}
         </Sectiune>
       </aside>

@@ -49,7 +49,7 @@ export default async function TemeProfesor() {
               <div className="flex-1">
                 <Link href={`/profesor/teme/${t.id}`} className="text-lg font-bold text-mov hover:underline">{t.titlu}</Link>
                 <div className="text-sm text-gray-600">
-                  {t.mecanica === "clasa1" ? "🚀 Jocuri Clasa I · " : ""}{t.mecanica.startsWith("c2:") ? `${JOCURI_C2[t.mecanica.slice(3) as JocC2]?.icon ?? "🎮"} ${JOCURI_C2[t.mecanica.slice(3) as JocC2]?.nume ?? "Joc"} (clasa a II-a) · ` : ""}{t.mecanica.startsWith("c3:") ? `${JOCURI_C3[t.mecanica.slice(3) as JocC3]?.icon ?? "🎮"} ${JOCURI_C3[t.mecanica.slice(3) as JocC3]?.nume ?? "Joc"} · ` : ""}{t.test ? "Test" : "Temă"} · {tinta} · {t.nrItemi} exerciții{t.limitaMinute ? ` · ${t.limitaMinute} min` : ""}
+                  {t.mecanica === "clasa1" ? "🚀 Jocuri Clasa I · " : ""}{t.mecanica.startsWith("c2:") ? `${JOCURI_C2[t.mecanica.slice(3) as JocC2]?.icon ?? "🎲"} ${JOCURI_C2[t.mecanica.slice(3) as JocC2]?.nume ?? "Mix automat"} (clasa a II-a) · ` : ""}{t.mecanica.startsWith("c3:") ? `${JOCURI_C3[t.mecanica.slice(3) as JocC3]?.icon ?? "🎮"} ${JOCURI_C3[t.mecanica.slice(3) as JocC3]?.nume ?? "Joc"} · ` : ""}{t.test ? "Test" : "Temă"} · {tinta} · {t.nrItemi} exerciții{t.limitaMinute ? ` · ${t.limitaMinute} min` : ""}
                   {t.termen ? ` · termen ${t.termen.toLocaleDateString("ro-RO")}` : ""}
                 </div>
               </div>
