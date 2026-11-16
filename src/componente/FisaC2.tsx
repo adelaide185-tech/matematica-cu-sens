@@ -34,7 +34,8 @@ export function FisaC2({ cfg, itemi, mod = "fisa", cuRaspunsuri = false, onRegen
               <span>Data: {a.data ? <b>{a.data}</b> : <span className="fc-linie" />}</span>
             </div>
             {cfg.joc === "casute" && <p className="fc-instructiune">Completează căsuțele.</p>}
-            {cfg.joc === "perechi" && <p className="fc-instructiune">Scrie rezultatul.</p>}
+            {(cfg.joc === "perechi" || cfg.joc === "memorie") && <p className="fc-instructiune">Scrie rezultatul.</p>}
+            {cfg.joc === "balanta" && <p className="fc-instructiune">Scrie semnul potrivit: &lt;, = sau &gt;. Unde e □, află numărul care echilibrează balanța.</p>}
           </header>
           <ol className="fc-itemi" style={{ gridTemplateColumns: `repeat(${col}, minmax(0, 1fr))` }}>
             {itemi.map((e, i) => (
@@ -43,7 +44,10 @@ export function FisaC2({ cfg, itemi, mod = "fisa", cuRaspunsuri = false, onRegen
                 <span className="fc-cu-desen">
                   {e.vizual && <VizualC2View v={e.vizual} marime={0.55} />}
                   <span className={`fc-text ${e.text.length > 30 ? "fc-wrap" : ""}`}>
-                    {e.raspuns.tip === "casute"
+                    {e.echilibru ? <TextMate text={`${e.st} = ${e.dr}${cuRaspunsuri ? `  (□ = ${e.afis})` : ""}`} />
+                      : e.raspuns.tip === "ordine" ? <><TextMate text={e.text} /><span className="fc-linie fc-linie-lunga" style={{ display: "block", marginTop: "3mm" }} />{cuRaspunsuri && <span className="fc-r">{e.afis}</span>}</>
+                      : e.text.includes("○") ? <TextMate text={cuRaspunsuri ? e.text.replace("○", `‹${e.afis}›`) : e.text} />
+                      : e.raspuns.tip === "casute"
                       ? <TextMate text={cuRaspunsuri ? e.text.replace(/□/g, "▢") + `  (${e.afis})` : e.text} />
                       : <><TextMate text={e.raspuns.tip === "pereche" && !e.vizual && !e.text.includes("…") ? `${e.st} =` : e.text.replace(/ …$/, "").replace(" … ", " ___ ")} /> {cuRaspunsuri ? <span className="fc-r"><TextMate text={e.afis} /></span> : <span className="fc-linie" />}</>}
                   </span>

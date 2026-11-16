@@ -71,7 +71,8 @@ export function JocC2({ cfg, itemiPentru, inapoi, titlu, onFinal, onReia, incerc
   const [nivel, setNivel] = useState<NivelC2 | null>(cfg.nivel === "alege" ? null : cfg.nivel);
   const itemi = useMemo(() => (nivel ? itemiPentru(nivel) : []), [nivel, itemiPentru]);
   const [rez, setRez] = useState<RaspunsJocC2[]>([]);
-  const [vieti, setVieti] = useState<number>(cfg.vieti);
+  const cuInimi = cfg.joc === "memorie" ? 0 : cfg.vieti;
+  const [vieti, setVieti] = useState<number>(cuInimi);
   const [final, setFinal] = useState<{ terminat: boolean; mesaj?: string } | null>(null);
   const [sunet, setSunet] = useState(false);
   const trimis = useRef(false);
@@ -101,13 +102,13 @@ export function JocC2({ cfg, itemiPentru, inapoi, titlu, onFinal, onReia, incerc
   /** o greșeală: −1 inimă (dacă jocul are inimi); la 0 inimi jocul se oprește, scorul rămâne */
   const greseala = useCallback(() => {
     sunetGresit();
-    if (!cfg.vieti) return;
+    if (!cuInimi) return;
     setVieti((v) => {
       const n = v - 1;
       if (n <= 0) setTimeout(() => setRez((r) => { termina(r, false); return r; }), 900);
       return n;
     });
-  }, [cfg.vieti, termina]);
+  }, [cuInimi, termina]);
   const corect = useCallback(() => sunetBland(), []);
 
   if (!nivel) return <AlegeNivel joc={cfg.joc} inapoi={inapoi} onAlege={setNivel} />;
@@ -120,7 +121,7 @@ export function JocC2({ cfg, itemiPentru, inapoi, titlu, onFinal, onReia, incerc
           <Link href={inapoi} className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-2xl text-mov shadow-sm" aria-label="Ieși din joc">✕</Link>
           <span className="text-3xl" aria-hidden>{joc.icon}</span>
           <h1 className="flex-1 truncate text-xl font-extrabold text-mov sm:text-2xl">{titlu ?? joc.nume}{eticheta && <span className="ml-2 rounded-full bg-galben px-2 py-0.5 text-xs text-mov-inchis">{eticheta}</span>}</h1>
-          {cfg.vieti > 0 && <span className="text-2xl" aria-label={`${vieti} inimi`}>{Array.from({ length: cfg.vieti }, (_, i) => <span key={i} className={i < vieti ? "" : "opacity-20 grayscale"}>❤️</span>)}</span>}
+          {cuInimi > 0 && <span className="text-2xl" aria-label={`${vieti} inimi`}>{Array.from({ length: cuInimi }, (_, i) => <span key={i} className={i < vieti ? "" : "opacity-20 grayscale"}>❤️</span>)}</span>}
           <span className="rounded-2xl bg-white px-3 py-1.5 text-lg font-extrabold text-mov shadow-sm" aria-label="Punctaj">⭐ {Math.round(puncte.scor * mult)}</span>
           {comboCurent >= 3 && <span className="animate-pulse rounded-2xl bg-galben px-3 py-1.5 text-lg font-extrabold text-mov-inchis motion-reduce:animate-none" aria-label={`Combo ${comboCurent}`}>🔥×{comboCurent}</span>}
           <button type="button" onClick={() => { const v = !sunet; setSunet(v); seteazaSunet(v); }} aria-pressed={sunet} aria-label={sunet ? "Oprește sunetul" : "Pornește sunetul"} className="h-12 w-12 rounded-2xl bg-white text-2xl shadow-sm">{sunet ? "🔔" : "🔕"}</button>
@@ -138,6 +139,9 @@ export function JocC2({ cfg, itemiPentru, inapoi, titlu, onFinal, onReia, incerc
       {cfg.joc === "bule" && <Bule itemi={itemi} rez={rez} nivel={nivel} onGata={gata} onGreseala={greseala} onCorect={corect} />}
       {cfg.joc === "scara" && <Scara itemi={itemi} rez={rez} mod={cfg.modScara} vieti={cfg.vieti} onGata={gata} onGreseala={greseala} onCorect={corect} />}
       {cfg.joc === "casute" && <Casute itemi={itemi} rez={rez} onGata={gata} onGreseala={greseala} onCorect={corect} />}
+      {cfg.joc === "balanta" && <Balanta itemi={itemi} rez={rez} vieti={cuInimi} onGata={gata} onGreseala={greseala} onCorect={corect} />}
+      {cfg.joc === "ordonare" && <Ordonare itemi={itemi} rez={rez} onGata={gata} onGreseala={greseala} onCorect={corect} />}
+      {cfg.joc === "memorie" && <Memorie itemi={itemi} rez={rez} nivel={nivel} onGata={gata} onGreseala={greseala} onCorect={corect} seed={cfg.seed} />}
     </main>
   );
 }
@@ -444,6 +448,199 @@ function Casute({ itemi, rez, onGata, onGreseala, onCorect }: PropsJoc) {
       {stare?.tip === "ok" && <p className="rounded-2xl bg-green-100 px-6 py-2 text-2xl font-extrabold text-green-800" role="status">✓{stare.alte && <span className="block text-lg font-semibold">Mai erau: {stare.alte}</span>}</p>}
       {gresite.length === 1 && !stare && <p className="max-w-xl rounded-2xl bg-galben-deschis px-4 py-2 text-lg text-mov-inchis" role="status">💡 {it.indiciu}</p>}
       {!stare && <Tastatura valoare={val[activ] ?? ""} onChange={(x) => setVal((v) => v.map((y, i) => (i === activ ? x.replace(/\D/g, "").slice(0, 4) : y)))} onTrimite={verifica} />}
+    </section>
+  );
+}
+
+// ───────────────────────── T7: Balanța ─────────────────────────
+
+const GREUTATI = [1, 2, 5, 10, 50, 100];
+
+function Taler({ text, jos, children }: { text?: string; jos: number; children?: React.ReactNode }) {
+  return (
+    <div className="flex w-[44%] flex-col items-center transition-transform duration-500 motion-reduce:transition-none" style={{ transform: `translateY(${jos}px)` }}>
+      <div className="h-10 w-0.5 bg-[#6b4426]" />
+      <div className="flex min-h-24 w-full flex-wrap items-center justify-center gap-1 rounded-b-[3rem] rounded-t-md border-4 border-[#6b4426] bg-white p-3 text-center text-3xl font-extrabold text-mov-inchis shadow sm:text-4xl">
+        {text && <TextMate text={text} />}{children}
+      </div>
+    </div>
+  );
+}
+
+function Balanta({ itemi, rez, vieti, onGata, onGreseala, onCorect }: PropsJoc & { vieti: number }) {
+  const it = itemi[rez.length];
+  const [gresite, setGresite] = useState<string[]>([]);
+  const [stare, setStare] = useState<"ok" | "arata" | null>(null);
+  const [puse, setPuse] = useState<number[]>([]);
+  const [clatina, setClatina] = useState(false);
+  const start = useRef(Date.now());
+  useEffect(() => { setGresite([]); setStare(null); setPuse([]); start.current = Date.now(); }, [it?.id]);
+  if (!it) return null;
+  const raspunde = (v: string) => {
+    if (stare) return;
+    if (verificaC2(it, v)) {
+      setStare("ok");
+      onCorect();
+      setTimeout(() => onGata({ id: it.id, dat: v, corect: true, incercari: gresite.length + 1, timpMs: Date.now() - start.current, greseli: gresite }), 900);
+      return;
+    }
+    const g = [...gresite, v];
+    setGresite(g);
+    setClatina(true);
+    setTimeout(() => setClatina(false), 500);
+    onGreseala();
+    if ((!vieti && g.length >= 2) || (it.echilibru && g.length >= 3)) {
+      setStare("arata");
+      setTimeout(() => onGata({ id: it.id, dat: v, corect: false, incercari: g.length, timpMs: Date.now() - start.current, greseli: g }), 1900);
+    }
+  };
+  const suma = puse.reduce((a, b) => a + b, 0);
+  const tinta = it.echilibru ? Number(it.afis) : 0;
+  // înclinarea: spre partea mai grea (la „echilibrează”, după greutățile puse)
+  const semn = it.echilibru ? (suma < tinta ? "<" : suma > tinta ? ">" : "=") : stare ? it.afis : null;
+  const unghi = semn === "<" ? 1 : semn === ">" ? -1 : 0;
+  return (
+    <section className="mt-3 flex flex-1 flex-col items-center gap-4">
+      {it.echilibru && <p className="rounded-2xl bg-white px-5 py-2 text-2xl font-extrabold text-mov-inchis shadow">⚖️ Echilibrează balanța! <button type="button" onClick={() => vorbeste("Echilibrează balanța! Pune greutăți pe talerul din stânga.")} className="ml-1 h-11 w-11 rounded-full bg-galben text-xl" aria-label="Ascultă">🔊</button></p>}
+      <div className={`relative w-full max-w-3xl pt-8 ${clatina ? "animate-[scutura_0.4s]" : ""}`} aria-label="Balanța">
+        <div className="mx-auto h-4 w-[88%] rounded-full bg-[#6b4426] transition-transform duration-500 motion-reduce:transition-none" style={{ transform: `rotate(${unghi * 6}deg)` }} />
+        <div className="flex justify-between px-[2%]">
+          <Taler jos={-unghi * 24} text={it.echilibru ? undefined : it.st}>
+            {it.echilibru && <><span>{it.st!.split(" + ")[0]} +</span>{puse.length ? puse.map((g, i) => (
+              <button key={i} type="button" onClick={() => !stare && setPuse((p) => p.filter((_, j) => j !== i))} className="rounded-lg bg-galben px-2 py-0.5 text-2xl shadow" aria-label={`Scoate greutatea ${g}`}>{g}</button>
+            )) : <span className="text-gray-300">□</span>}</>}
+          </Taler>
+          <div className="mt-2 flex flex-col items-center">
+            <span className="rounded-full bg-galben px-4 py-1 text-3xl font-extrabold text-mov-inchis shadow">{it.echilibru ? (suma === tinta && stare === "ok" ? "=" : "?") : stare ? it.afis : "?"}</span>
+            <div className="h-28 w-3 bg-[#8b5e3c]" /><div className="h-4 w-32 rounded-full bg-[#8b5e3c]" />
+          </div>
+          <Taler jos={unghi * 24} text={it.dr} />
+        </div>
+      </div>
+      {stare === "arata" && <p className="rounded-2xl bg-galben-deschis px-6 py-2 text-2xl font-bold text-mov-inchis" role="status">Răspunsul: {it.afis}</p>}
+      {gresite.length >= 1 && !stare && <p className="max-w-xl rounded-2xl bg-galben-deschis px-4 py-2 text-lg text-mov-inchis" role="status">💡 {it.indiciu}</p>}
+      {!stare && !it.echilibru && (
+        <div className="grid w-full max-w-xl grid-cols-3 gap-3">
+          {["<", "=", ">"].map((v) => (
+            <button key={v} type="button" disabled={gresite.includes(v)} onClick={() => raspunde(v)}
+              className={`h-24 rounded-3xl text-6xl font-extrabold shadow transition active:scale-95 ${gresite.includes(v) ? "bg-red-100 text-red-400" : "bg-white text-mov-inchis ring-4 ring-mov/20 hover:bg-mov-deschis"}`} aria-label={v === "<" ? "mai mic" : v === ">" ? "mai mare" : "egal"}>{v}</button>
+          ))}
+        </div>
+      )}
+      {!stare && it.echilibru && (
+        <div className="flex w-full max-w-2xl flex-col items-center gap-3">
+          <div className="flex flex-wrap justify-center gap-2">
+            {GREUTATI.map((g) => <button key={g} type="button" onClick={() => setPuse((p) => [...p, g].slice(0, 20))} className="h-16 min-w-16 rounded-2xl bg-galben px-3 text-2xl font-extrabold text-mov-inchis shadow active:scale-95" aria-label={`Pune greutatea ${g}`}>{g}</button>)}
+          </div>
+          <p className="text-lg text-gray-600">Pe taler: <b className="text-mov-inchis">{suma}</b></p>
+          <button type="button" disabled={!puse.length} onClick={() => raspunde(String(suma))} className="h-tinta w-full max-w-sm rounded-2xl bg-mov text-2xl font-extrabold text-white shadow disabled:opacity-40">Verifică ✓</button>
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ───────────────────────── T8: Ordonează ─────────────────────────
+
+function Ordonare({ itemi, rez, onGata, onGreseala, onCorect }: PropsJoc) {
+  const it = itemi[rez.length];
+  const [puse, setPuse] = useState<string[]>([]);
+  const [scutura, setScutura] = useState<string | null>(null);
+  const greseli = useRef<string[]>([]);
+  const start = useRef(Date.now());
+  useEffect(() => { setPuse([]); greseli.current = []; start.current = Date.now(); }, [it?.id]);
+  if (!it || it.raspuns.tip !== "ordine") return null;
+  const corect = it.raspuns.corect;
+  const atinge = (c: string) => {
+    if (puse.includes(c) || puse.length >= corect.length) return;
+    if (c === corect[puse.length]) {
+      const p = [...puse, c];
+      setPuse(p);
+      if (p.length === corect.length) {
+        onCorect();
+        setTimeout(() => onGata({ id: it.id, dat: p.join("|"), corect: true, incercari: 1 + greseli.current.length, timpMs: Date.now() - start.current, greseli: greseli.current }), 800);
+      }
+    } else {
+      greseli.current.push(c);
+      setScutura(c);
+      setTimeout(() => setScutura(null), 350);
+      onGreseala();
+    }
+  };
+  const cresc = it.sens === "crescator";
+  return (
+    <section className="mt-4 flex flex-1 flex-col items-center gap-5">
+      <div className="flex items-center gap-3 rounded-3xl bg-white px-6 py-3 shadow">
+        <span className="text-5xl" aria-hidden>{cresc ? "↗️" : "↘️"}</span>
+        <span className="text-3xl font-extrabold text-mov-inchis">{/^\d+$/.test(corect[0]) ? (cresc ? "De la mic la mare" : "De la mare la mic") : cresc ? "În ordinea din calendar" : "În ordine inversă"}</span>
+        <span className="text-4xl" aria-hidden>{cresc ? "📶" : "🪜"}</span>
+      </div>
+      <div className="flex flex-wrap justify-center gap-3">
+        {it.cartonase!.map((c) => {
+          const pus = puse.includes(c);
+          return (
+            <button key={c} type="button" onClick={() => atinge(c)} disabled={pus}
+              className={`h-24 min-w-28 rounded-3xl px-4 text-3xl font-extrabold shadow transition active:scale-95 ${pus ? "opacity-20" : scutura === c ? "animate-[scutura_0.3s] bg-red-100 text-red-700" : "bg-white text-mov-inchis ring-4 ring-mov/20 hover:bg-mov-deschis"}`}>
+              {c}
+            </button>
+          );
+        })}
+      </div>
+      <div className="flex min-h-28 w-full max-w-4xl flex-wrap items-center justify-center gap-2 rounded-3xl border-4 border-dashed border-mov/30 p-3">
+        {corect.map((_, i) => (
+          <span key={i} className={`flex h-20 min-w-24 flex-col items-center justify-center rounded-2xl px-3 text-2xl font-extrabold ${puse[i] ? "bg-green-100 text-green-800" : "bg-mov-deschis text-mov/40"}`}>
+            <span className="text-xs font-bold">{i + 1}</span>{puse[i] ?? "?"}
+          </span>
+        ))}
+      </div>
+      {greseli.current.length >= 2 && <p className="max-w-xl rounded-2xl bg-galben-deschis px-4 py-2 text-lg text-mov-inchis" role="status">💡 {it.indiciu}</p>}
+    </section>
+  );
+}
+
+// ───────────────────────── T2: Memorie ─────────────────────────
+
+/* eslint-disable @next/next/no-img-element */
+function Memorie({ itemi, rez, nivel, onGata, onGreseala, onCorect, seed }: PropsJoc & { nivel: NivelC2; seed: number }) {
+  const PE_TABLA = nivel === "provocare" ? 10 : 8;
+  const nrTabla = Math.floor(rez.length / PE_TABLA);
+  const carti = useMemo(() => new Rng(seed + nrTabla * 101).shuffle(itemi.slice(nrTabla * PE_TABLA, nrTabla * PE_TABLA + PE_TABLA).flatMap((it) => [
+    { cheie: `${it.id}-st`, it, fata: "st" as const }, { cheie: `${it.id}-dr`, it, fata: "dr" as const },
+  ])), [itemi, nrTabla, PE_TABLA, seed]);
+  const [intoarse, setIntoarse] = useState<string[]>([]);
+  const [rosii, setRosii] = useState<string[]>([]);
+  const mutari = useRef<Record<string, number>>({});
+  const start = useRef(Date.now());
+  useEffect(() => { setIntoarse([]); start.current = Date.now(); }, [nrTabla]);
+  const gasite = new Set(rez.map((r) => r.id));
+  const atinge = (c: (typeof carti)[number]) => {
+    if (gasite.has(c.it.id) || intoarse.includes(c.cheie) || intoarse.length >= 2) return;
+    const noi = [...intoarse, c.cheie];
+    setIntoarse(noi);
+    if (noi.length < 2) return;
+    const [a, b] = noi.map((k) => carti.find((x) => x.cheie === k)!);
+    if (a.it.id === b.it.id) {
+      onCorect();
+      setTimeout(() => { onGata({ id: a.it.id, dat: "ok", corect: true, incercari: 1 + (mutari.current[a.it.id] ?? 0), timpMs: Date.now() - start.current, greseli: [] }); setIntoarse([]); }, 400);
+    } else {
+      mutari.current[a.it.id] = (mutari.current[a.it.id] ?? 0) + 1;
+      mutari.current[b.it.id] = (mutari.current[b.it.id] ?? 0) + 1;
+      setRosii(noi);
+      onGreseala();
+      setTimeout(() => { setIntoarse([]); setRosii([]); }, 1000);
+    }
+  };
+  return (
+    <section className={`mx-auto mt-4 grid w-full max-w-3xl gap-3 ${PE_TABLA === 10 ? "grid-cols-4 sm:grid-cols-5" : "grid-cols-4"}`}>
+      {carti.map((c) => {
+        const gasit = gasite.has(c.it.id), vizibil = gasit || intoarse.includes(c.cheie);
+        return (
+          <button key={c.cheie} type="button" onClick={() => atinge(c)} aria-label={vizibil ? (c.fata === "st" ? c.it.st ?? c.it.text : c.it.afis) : "Carte întoarsă"}
+            className={`flex aspect-[4/3] items-center justify-center rounded-2xl p-1 text-center text-xl font-extrabold shadow transition sm:text-2xl ${gasit ? "bg-green-100 text-green-800 ring-4 ring-green-400" : rosii.includes(c.cheie) ? "bg-red-50 text-mov-inchis ring-4 ring-red-400" : vizibil ? "bg-white text-mov-inchis ring-2 ring-mov/30" : "bg-mov hover:brightness-110"}`}>
+            {vizibil ? (c.fata === "st" ? <FataSt it={c.it} marime={0.5} /> : <TextMate text={c.it.afis} />) : <img src="/brand/logo-mic.jpg" alt="" className="h-3/5 rounded-xl opacity-90" />}
+          </button>
+        );
+      })}
     </section>
   );
 }

@@ -3,11 +3,11 @@ import { hash } from "@/motor/calcul/generator";
 import { CAPITOLE_C2, type ConfigC2, type JocC2, type NotiuneC2, type OptiuniC2 } from "./tipuri";
 
 export const NOTIUNI_C2: NotiuneC2[] = CAPITOLE_C2.flatMap((c) => c.notiuni.map(([n]) => n));
-export const JOCURI_LISTA_C2: JocC2[] = ["perechi", "bule", "scara", "casute"];
+export const JOCURI_LISTA_C2: JocC2[] = ["perechi", "bule", "scara", "casute", "balanta", "ordonare", "memorie"];
 
 export const optiuniC2Implicite = (): OptiuniC2 => ({
   trecere: "oricum", trecereLa: "zeci", forme: ["a+x=b", "x+a=b", "x-a=b", "a-x=b"], table: [2, 3, 4, 5, 6, 7, 8, 9, 10],
-  dublu: ["dublul", "triplul", "jumatatea", "sfertul"], rotunjireLa: 0, fractii: ["1/2", "1/4"], timpPas: 30, baniMax: 100,
+  dublu: ["dublul", "triplul", "jumatatea", "sfertul"], rotunjireLa: 0, fractii: ["1/2", "1/4"], timpPas: 30, baniMax: 100, sens: "ambele",
 });
 
 export function configC2Implicita(seed = 1): ConfigC2 {
@@ -48,6 +48,7 @@ export function curataC2(x: Record<string, unknown>): ConfigC2 {
       fractii: lista(o.fractii, ["1/2", "1/4", "1/3"] as const, oi.fractii),
       timpPas: unul(Number(o.timpPas), [60, 30, 15] as const, 30),
       baniMax: Math.min(100, Math.max(5, Math.floor(Number(o.baniMax)) || 100)),
+      sens: unul(o.sens, ["crescator", "descrescator", "ambele"] as const, "ambele"),
     },
     joc: unul(x.joc, JOCURI_LISTA_C2, "perechi"),
     nr: Number.isFinite(nr) ? Math.min(100, Math.max(5, nr)) : 10,

@@ -1,4 +1,4 @@
-# Clasa a II-a: mini-jocuri (etapele 1 și 2)
+# Clasa a II-a: mini-jocuri (etapele 1–3)
 
 Implementarea urmează specificația `mate-cu-sens-clasa-2-jocuri.md`. Profesorul configurează jocurile la `/profesor/clasa2`; elevul le găsește la `/elev/clasa2` (joc liber) și la „Temele mele”.
 
@@ -43,6 +43,9 @@ Implementarea urmează specificația `mate-cu-sens-clasa-2-jocuri.md`. Profesoru
 | 🔗 Perechi rapide | Atinge o expresie, apoi rezultatul ei; în dreapta sunt și 2–3 cartonașe fără pereche. | Cartonașele tremură, −1 inimă. |
 | 🫧 Bule care cad | Atinge bula cu răspunsul corect. Bula corectă ratată reapare sus. Viteza: Ușor 8 s, Mediu 6 s, Provocare 4 s. | Bula greșită se sparge gri, −1 inimă. |
 | 🪜 Scara | Răspunde cu variante sau cu tastatura; urcă o treaptă la fiecare răspuns corect. | Itemul rămâne pe ecran; după a doua greșeală apare un indiciu. |
+| ⚖️ Balanța | Alege <, = sau >; balanța se înclină spre partea mai grea. La „Numărul care lipsește” (și la adunare, nivelul Provocare): **echilibrează balanța** punând greutăți (1, 2, 5, 10, 50, 100) pe taler; balanța se mișcă pe loc. Aproximativ o treime din comparații sunt egale. | Balanța se clatină, −1 inimă; după o greșeală apare un indiciu. |
+| 📶 Ordonează | Atinge cartonașele în ordine (crescător / descrescător sau zilele și lunile în ordinea din calendar); fiecare se mută în rândul numerotat. La Provocare, numerele au aceeași cifră a sutelor. | Cartonașul tremură, −1 inimă și rămâne pe loc. |
+| 🃏 Memorie | Grilă 4×4 (8 perechi), 4×5 la Provocare; spatele cărților are logo-ul Fabrica de Inteligență. Joc de explorare: **fără inimi**. | Contur roșu 1 s, apoi cărțile se întorc. |
 | 🔲 Completează căsuțele | Completează una sau două căsuțe, cu tastatura de pe ecran. Pentru `□ × □ = 12` sunt acceptate toate soluțiile, iar la final apar celelalte („Mai erau: …”). | Abia după a doua greșeală se arată răspunsul. |
 
 Comun tuturor jocurilor:
@@ -86,7 +89,7 @@ npm run valideaza:sympy
 ```
 
 Testele verifică:
-- 7 800 de exerciții (joc × noțiune × nivel), cu rezultatul și ecuațiile căsuțelor;
+- 11 280 de exerciții (joc × noțiune × nivel), cu rezultatul și ecuațiile căsuțelor;
 - produsele ≤ 100 și împărțirile exacte;
 - regula „fără / cu trecere” 100%, la zeci și la sute;
 - soluția unică la căsuțe, sau toate soluțiile listate;
@@ -95,9 +98,8 @@ Testele verifică:
 
 `scripts/valideaza_clasa2.py` recalculează totul cu SymPy și verifică numerele scrise cu litere și ora cu implementări independente, scrise în Python.
 
-## Urmează (etapele 3–5)
+## Urmează (etapele 4–5)
 
-- Balanța (cu „echilibrează”), Ordonează, Memorie;
 - Ceasul cu ace, Magazinul;
 - Provocarea în imagini, Integrama, Ținte, puzzle-ul de recompensă;
 - ecranul „Mix automat”, semaforul pe elevi, raportul pentru părinți și diploma.

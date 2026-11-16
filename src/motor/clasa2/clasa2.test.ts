@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { writeFileSync } from "node:fs";
 import { evalueaza } from "@/motor/calcul/generator";
 import { numarInLitere } from "@/motor/limba";
-import { clasificaEroare, genereazaC2, oraInLitere, trecereAdunare, trecereScadere, verificaC2 } from "./generator";
+import { LUNI, ZILE, clasificaEroare, genereazaC2, oraInLitere, trecereAdunare, trecereScadere, verificaC2 } from "./generator";
 import { JOCURI_LISTA_C2, NOTIUNI_C2, codificaC2, configC2Implicita, decodificaC2, optiuniC2Implicite } from "./config";
 import { COMPATIBIL, type ConfigC2, type ItemC2, type NivelC2, type NotiuneC2 } from "./tipuri";
 
@@ -31,6 +31,22 @@ function verifica(it: ItemC2): string | null {
     case "ora": return oraInLitere(v.ore, v.minute) === v.text ? null : "ora";
     case "text": return v.din.includes(v.corect) || ["iarna", "primăvara", "vara", "toamna"].includes(v.corect) ? null : "text";
     case "fractie": return v.num === 1 && [2, 3, 4].includes(v.den) ? null : "fracție în afara programei";
+    case "semn": {
+      const a = evalueaza(v.st, false), b = evalueaza(v.dr, false);
+      if (a === null || b === null) return "balanță neevaluabilă";
+      return (a < b ? "<" : a > b ? ">" : "=") === v.semn && (it.raspuns as { valoare: string }).valoare === v.semn ? null : `${v.st} ${v.semn} ${v.dr}`;
+    }
+    case "ordine": {
+      const corect = (it.raspuns as { corect: string[] }).corect;
+      if (corect.length !== it.cartonase!.length || [...corect].sort().join() !== [...it.cartonase!].sort().join()) return "cartonașe diferite";
+      if (corect.every((x) => /^\d+$/.test(x))) {
+        const n = corect.map(Number);
+        return n.every((x, i) => i === 0 || (v.sens === "crescator" ? n[i - 1] < x : n[i - 1] > x)) ? null : `ordine greșită ${corect}`;
+      }
+      const L = ZILE.includes(corect[0]) ? ZILE : LUNI;
+      const idx = corect.map((x) => L.indexOf(x));
+      return idx.every((x, i) => i === 0 || x === idx[i - 1] + (v.sens === "crescator" ? 1 : -1)) ? null : `ordine greșită ${corect}`;
+    }
     case "compara": {
       const r = v.numere.every((x) => (v.mare ? x <= v.valoare : x >= v.valoare)) || v.numere.some((x) => x % 2 !== v.valoare % 2);
       return r ? null : "comparare";
@@ -40,7 +56,7 @@ function verifica(it: ItemC2): string | null {
 
 function raspunsCorect(it: ItemC2): string {
   const r = it.raspuns;
-  return r.tip === "valoare" ? r.valoare : r.tip === "casute" ? r.solutii[0].join("|") : "ok";
+  return r.tip === "valoare" ? r.valoare : r.tip === "casute" ? r.solutii[0].join("|") : r.tip === "ordine" ? r.corect.join("|") : "ok";
 }
 
 describe("clasa a II-a: conținutul", () => {
@@ -144,11 +160,24 @@ describe("clasa a II-a: conținutul", () => {
         const { itemi } = genereazaC2(cfg({ joc, notiuni: COMPATIBIL[joc], nr, seed: nr }), "mediu");
         expect(itemi).toHaveLength(nr);
         expect(new Set(itemi.map((i) => i.cheie)).size, `${joc} ${nr}`).toBe(nr);
-        if (joc === "perechi") {
+        if (joc === "perechi" || joc === "memorie") {
           expect(new Set(itemi.map((i) => i.afis)).size).toBe(nr);
           expect(new Set(itemi.map((i) => `${i.st}${JSON.stringify(i.vizual ?? "")}`)).size).toBe(nr);
         }
       }
+  });
+
+  it("Balanța: semnul corect, ~o treime egale; „echilibrează” are soluție unică; Ordonează respectă sensul", () => {
+    const { itemi } = genereazaC2(cfg({ joc: "balanta", notiuni: COMPATIBIL.balanta, nr: 100, seed: 8 }), "mediu");
+    const egale = itemi.filter((i) => i.afis === "=").length;
+    expect(egale).toBeGreaterThan(10);
+    expect(egale).toBeLessThan(60);
+    const ech = genereazaC2(cfg({ joc: "balanta", notiuni: ["op.termen"], nr: 20 }), "provocare").itemi;
+    ech.forEach((i) => { expect(i.echilibru).toBe(true); expect(Number(i.dr)).toBe(Number(i.st!.split(" + ")[0]) + Number(i.afis)); });
+    for (const sens of ["crescator", "descrescator"] as const) {
+      const o = genereazaC2(cfg({ joc: "ordonare", notiuni: ["num.ordonare"], nr: 20, optiuni: { ...optiuniC2Implicite(), sens } }), "provocare").itemi;
+      o.forEach((i) => { expect(i.sens).toBe(sens); expect(i.cartonase).toHaveLength(6); expect(new Set(i.cartonase!.map((x) => x[0])).size).toBe(1); });
+    }
   });
 
   it("numerele cu litere și ora spusă românește", () => {

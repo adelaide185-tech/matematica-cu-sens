@@ -70,6 +70,12 @@ def verifica(v: dict) -> str | None:
         nums, val = v["numere"], v["valoare"]
         ok = (val == (max(nums) if v["mare"] else min(nums))) or sum(1 for n in nums if n % 2 == val % 2) == 1
         return None if ok else "comparare greșită"
+    if t == "semn":
+        a, b = s(v["st"]), s(v["dr"])
+        semn = "<" if a < b else ">" if a > b else "="
+        return None if semn == v["semn"] else f"{v['st']} {semn} {v['dr']}, generator {v['semn']}"
+    if t == "ordine":
+        return None if len(set(v["valori"])) == len(v["valori"]) else "valori repetate la ordonare"
     if t == "fractie":
         return None if v["num"] == 1 and v["den"] in (2, 3, 4) else "fracție în afara programei"
     return None

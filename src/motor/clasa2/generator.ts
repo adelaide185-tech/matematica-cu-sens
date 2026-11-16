@@ -1,5 +1,5 @@
 import { Rng } from "@/motor/rng";
-import { hash } from "@/motor/calcul/generator";
+import { evalueaza, hash } from "@/motor/calcul/generator";
 import { cuSubstantiv, numarInLitere } from "@/motor/limba";
 
 const lei = (n: number) => cuSubstantiv(n, "leu", "lei");
@@ -366,6 +366,7 @@ function exercitiu(n: NotiuneC2, rng: Rng, niv: NivelC2, o: OptiuniC2): Baza | n
     case "num.descompunere": return descompunere(rng, niv);
     case "num.vecini": return vecini(rng, niv);
     case "num.comparare": return comparare(rng, niv);
+    case "num.ordonare": return null; // doar în Ordonează
     case "num.paritate": return paritate(rng, niv);
     case "num.rotunjire": return rotunjire(rng, niv, o);
     case "num.sir": return sir(rng, niv);
@@ -445,6 +446,100 @@ function casute(n: NotiuneC2, rng: Rng, niv: NivelC2, o: OptiuniC2): BazaCasute 
   }
 }
 
+
+// ───────────────────────── Balanța și Ordonează ─────────────────────────
+
+interface BazaBalanta { cheie: string; st: string; dr: string; stExpr: string; drExpr: string; gresit?: TipEroare; indiciu: string }
+
+const semnDin = (a: number, b: number): "<" | ">" | "=" => (a < b ? "<" : a > b ? ">" : "=");
+
+/** Cele două talere; valorile sunt în aceeași unitate (cm, bani). Aproximativ o treime ies egale. */
+function balanta(n: NotiuneC2, rng: Rng, niv: NivelC2): BazaBalanta | null {
+  const max = niv === "usor" ? 100 : 1000;
+  const egal = rng.bool(0.3);
+  const aproape = (v: number) => (egal ? v : v + rng.pick([-1, 1]) * rng.pick(niv === "usor" ? [1, 2, 5, 10] : [1, 10, 100]));
+  switch (n) {
+    case "num.comparare": {
+      const a = rng.int(niv === "usor" ? 10 : 100, max - 1);
+      const b = egal ? a : rng.bool() ? inversat(a) : aproape(a);
+      if (b < 0 || b > max) return null;
+      if (egal) { const x = rng.int(1, a - 1); return { cheie: `bc${a}=`, st: s(a), dr: `${x} + ${a - x}`, stExpr: s(a), drExpr: `${x} + ${a - x}`, indiciu: "Calculează partea din dreapta, apoi compară." }; }
+      return { cheie: `bc${a}:${b}`, st: s(a), dr: s(b), stExpr: s(a), drExpr: s(b), gresit: b === inversat(a) ? "ordin_gresit" : "altele", indiciu: "Compară întâi sutele, apoi zecile, apoi unitățile." };
+    }
+    case "op.adunare":
+    case "op.scadere": {
+      const a = rng.int(10, max / 2), b = rng.int(1, max / 2);
+      const v = a + b, w = aproape(v);
+      if (w <= 0 || w > max) return null;
+      const d = rng.int(1, Math.max(1, max - w));
+      return n === "op.adunare"
+        ? { cheie: `ba${a}+${b}:${w}`, st: `${a} + ${b}`, dr: s(w), stExpr: `${a} + ${b}`, drExpr: s(w), indiciu: "Calculează suma, apoi compară." }
+        : { cheie: `bs${a}+${b}:${w}+${d}`, st: `${a} + ${b}`, dr: `${w + d} − ${d}`, stExpr: `${a} + ${b}`, drExpr: `${w + d} - ${d}`, indiciu: "Calculează fiecare taler, apoi compară." };
+    }
+    case "op.tabla": {
+      const a = rng.int(2, 10), b = rng.int(2, 10);
+      const w = aproape(a * b);
+      const div = [2, 3, 4, 5, 6, 7, 8, 9, 10].filter((x) => w % x === 0 && w / x <= 10 && x !== a && x !== b);
+      if (w <= 0 || w > 100) return null;
+      const dr = div.length && rng.bool() ? `${rng.pick(div)}` : null;
+      return dr ? { cheie: `bt${a}x${b}:${dr}x${w / Number(dr)}`, st: `${a} × ${b}`, dr: `${dr} × ${w / Number(dr)}`, stExpr: `${a} * ${b}`, drExpr: `${dr} * ${w / Number(dr)}`, indiciu: "Calculează ambele produse din tablă." }
+        : { cheie: `bt${a}x${b}:${w}`, st: `${a} × ${b}`, dr: s(w), stExpr: `${a} * ${b}`, drExpr: s(w), gresit: Math.abs(w - a * b) === a || Math.abs(w - a * b) === b ? "tabel_vecin" : "altele", indiciu: `${a} × ${b}: numără din ${b} în ${b} de ${a} ori.` };
+    }
+    case "op.impartire": {
+      const b = rng.int(2, 10), q = rng.int(1, 10), q2 = egal ? q : Math.max(1, q + rng.pick([-1, 1]));
+      return { cheie: `bi${b * q}:${b}:${q2}`, st: `${b * q} : ${b}`, dr: s(q2), stExpr: `${b * q} / ${b}`, drExpr: s(q2), indiciu: "Gândește-te la tablă: ce număr ori împărțitorul dă deîmpărțitul?" };
+    }
+    case "op.dublu": {
+      const x = rng.int(2, niv === "usor" ? 20 : 50), w = aproape(2 * x);
+      if (w <= 0) return null;
+      return { cheie: `bd${x}:${w}`, st: `dublul lui ${x}`, dr: s(w), stExpr: `2 * ${x}`, drExpr: s(w), indiciu: `Dublul lui ${x} = ${x} + ${x}.` };
+    }
+    case "mas.transformari": {
+      const m = rng.int(1, niv === "usor" ? 3 : 9), cm = rng.pick([0, 0, 10, 20, 50]);
+      const v = 100 * m + cm, w = egal ? v : rng.pick([10 * m + cm, v - 10, v + 10, 90 * m, 120 * m]);
+      return { cheie: `bm${m}:${cm}:${w}`, st: cm ? `${m} m ${cm} cm` : `${m} m`, dr: `${w} cm`, stExpr: `${m} * 100 + ${cm}`, drExpr: s(w), gresit: semnDin(10 * m + cm, w) !== semnDin(v, w) ? "unitate_m_cm" : "altele", indiciu: "1 m = 100 cm. Transformă, apoi compară." };
+    }
+    case "mas.masa-lichid": {
+      const u = rng.pick(["kg", "l"]);
+      const a = rng.int(1, 30), b = rng.int(1, 30), w = aproape(a + b);
+      if (w <= 0) return null;
+      return { cheie: `bk${u}${a}+${b}:${w}`, st: `${a} ${u} + ${b} ${u}`, dr: `${w} ${u}`, stExpr: `${a} + ${b}`, drExpr: s(w), indiciu: "Adună ce e pe talerul din stânga." };
+    }
+    case "bani.numara": {
+      const L = rng.int(1, niv === "usor" ? 5 : 9), v = 100 * L, w = egal ? v : rng.pick([v - 50, v + 50, 10 * L, 90 * L, v - 10]);
+      if (w <= 0) return null;
+      return { cheie: `bb${L}:${w}`, st: lei(L), dr: cu(w, "ban", "bani"), stExpr: `${L} * 100`, drExpr: s(w), gresit: semnDin(10 * L, w) !== semnDin(v, w) ? "bani_lei_bani" : "altele", indiciu: "1 leu = 100 de bani." };
+    }
+    default: return null;
+  }
+}
+
+/** „Echilibrează balanța”: în stânga a + □, în dreapta b; copilul pune greutăți până la echilibru. */
+function echilibru(rng: Rng, niv: NivelC2): BazaCasute & { dr: string; st: string } {
+  const max = niv === "usor" ? 100 : niv === "mediu" ? 200 : 500;
+  const a = rng.int(5, max / 2), x = rng.int(3, max / 2);
+  return { cheie: `ech${a}:${x}`, st: `${a} + □`, dr: s(a + x), text: `${a} + □ = ${a + x}`, solutii: [[x]], expr: `${a} + x = ${a + x}`, indiciu: `Cât trebuie pus lângă ${a} ca să ajungi la ${a + x}? ${a + x} − ${a}.` };
+}
+
+function ordonare(n: NotiuneC2, rng: Rng, niv: NivelC2, o: OptiuniC2): { cheie: string; cartonase: string[]; corect: string[]; sens: "crescator" | "descrescator"; valori: number[]; indiciu: string } | null {
+  const sens = o.sens === "ambele" ? rng.pick(["crescator", "descrescator"] as const) : o.sens;
+  if (n === "timp.calendar") {
+    const L = rng.bool() ? ZILE : LUNI;
+    const k = rng.int(4, 5), st = rng.int(0, L.length - k);
+    const corect = L.slice(st, st + k);
+    const cr = sens === "crescator" ? corect : [...corect].reverse();
+    return { cheie: `oc${L[0]}${st}:${k}:${sens}`, cartonase: rng.shuffle(corect), corect: cr, sens, valori: corect.map((x) => L.indexOf(x)), indiciu: L === ZILE ? "Luni, marți, miercuri, joi, vineri, sâmbătă, duminică." : "Ianuarie, februarie, martie, aprilie…" };
+  }
+  const k = niv === "usor" ? 4 : niv === "mediu" ? 5 : 6;
+  const max = niv === "usor" ? 99 : 999;
+  // la Provocare, numere cu aceeași cifră a sutelor (trebuie comparate zecile)
+  const sute = niv === "provocare" ? rng.int(1, 9) * 100 : 0;
+  const nums = rng.distinct(k, () => (sute ? sute + rng.int(0, 99) : rng.int(niv === "usor" ? 1 : 10, max)));
+  if (nums.length < k) return null;
+  const sortat = [...nums].sort((a, b) => (sens === "crescator" ? a - b : b - a));
+  return { cheie: `on${[...nums].sort((a, b) => a - b).join(",")}:${sens}`, cartonase: nums.map(s), corect: sortat.map(s), sens, valori: nums, indiciu: sute ? "Sutele sunt la fel: uită-te la zeci, apoi la unități." : "Caută întâi cel mai " + (sens === "crescator" ? "mic" : "mare") + " număr." };
+}
+
 // ───────────────────────── sesiunea ─────────────────────────
 
 const afisSolutii = (sol: number[][]) => sol.map((x) => x.join(" și ")).join(" / ");
@@ -458,13 +553,35 @@ function itemNou(rng: Rng, n: NotiuneC2, joc: JocC2, niv: NivelC2, o: OptiuniC2)
       afis: afisSolutii(c.solutii), distractori: [], indiciu: c.indiciu, verificare: { tip: "ecuatie", expr: c.expr, solutii: c.solutii }, vizual: c.vizual,
     };
   }
+  if (joc === "balanta") {
+    if (n === "op.termen" || (niv === "provocare" && n === "op.adunare" && rng.bool(0.4))) {
+      const e = echilibru(rng, niv);
+      return { cheie: `b:${e.cheie}`, notiune: n, nivel: niv, text: "Echilibrează balanța!", st: e.st, dr: e.dr, echilibru: true, raspuns: { tip: "valoare", valoare: s(e.solutii[0][0]) }, afis: s(e.solutii[0][0]), distractori: [], indiciu: e.indiciu, verificare: { tip: "ecuatie", expr: e.expr, solutii: e.solutii } };
+    }
+    const b = balanta(n, rng, niv);
+    if (!b) return null;
+    const v1 = evalueaza(b.stExpr), v2 = evalueaza(b.drExpr);
+    if (v1 === null || v2 === null) return null;
+    const semn = semnDin(v1, v2);
+    return {
+      cheie: `b:${b.cheie}`, notiune: n, nivel: niv, text: `${b.st} ○ ${b.dr}`, st: b.st, dr: b.dr, raspuns: { tip: "valoare", valoare: semn }, afis: semn,
+      distractori: (["<", "=", ">"] as const).filter((x) => x !== semn).map((x) => ({ v: x, eroare: b.gresit && (b.gresit !== "altele") ? b.gresit : "altele" as TipEroare })),
+      indiciu: b.indiciu, verificare: { tip: "semn", st: b.stExpr, dr: b.drExpr, semn },
+    };
+  }
+  if (joc === "ordonare") {
+    const r = ordonare(n, rng, niv, o);
+    if (!r) return null;
+    const cuv = r.sens === "crescator" ? "crescător" : "descrescător";
+    return { cheie: `o:${r.cheie}`, notiune: n, nivel: niv, text: `Ordonează ${cuv}: ${r.cartonase.join(", ")}`, cartonase: r.cartonase, sens: r.sens, raspuns: { tip: "ordine", corect: r.corect }, afis: r.corect.join(r.sens === "crescator" ? " < " : " > "), distractori: [], indiciu: r.indiciu, verificare: { tip: "ordine", valori: r.valori, sens: r.sens } };
+  }
   const b = exercitiu(n, rng, niv, o);
   if (!b) return null;
-  if (joc === "perechi" && !b.st) return null;
+  if ((joc === "perechi" || joc === "memorie") && !b.st) return null;
   if ((joc === "bule" || joc === "scara") && b.distractori.length < 1) return null;
   return {
-    cheie: `${joc === "perechi" ? "p" : "e"}:${b.cheie}`, notiune: n, nivel: niv, text: b.text, st: b.st, vizual: b.vizual,
-    raspuns: joc === "perechi" ? { tip: "pereche" } : { tip: "valoare", valoare: b.valoare },
+    cheie: `${joc === "perechi" || joc === "memorie" ? "p" : "e"}:${b.cheie}`, notiune: n, nivel: niv, text: b.text, st: b.st, vizual: b.vizual,
+    raspuns: joc === "perechi" || joc === "memorie" ? { tip: "pereche" } : { tip: "valoare", valoare: b.valoare },
     afis: b.valoare, distractori: b.distractori.slice(0, 4), indiciu: b.indiciu, verificare: b.verificare,
   };
 }
@@ -493,7 +610,7 @@ export function genereazaC2(cfg: ConfigC2, nivel?: NivelC2): SesiuneC2 {
       const e = itemNou(new Rng(hash(baza, k)), n, cfg.joc, niv, cfg.optiuni);
       if (!e) continue;
       // la Perechi, nici fețele nu se repetă (altfel un cartonaș s-ar potrivi cu două)
-      const chei = [e.cheie, ...(cfg.joc === "perechi" ? [`st:${e.st}${e.vizual ? JSON.stringify(e.vizual) : ""}`, `dr:${e.afis}`] : [])];
+      const chei = [e.cheie, ...(cfg.joc === "perechi" || cfg.joc === "memorie" ? [`st:${e.st}${e.vizual ? JSON.stringify(e.vizual) : ""}`, `dr:${e.afis}`] : [])];
       if (chei.every((c) => !vazute.has(c))) { ales = e; chei.forEach((c) => vazute.add(c)); }
       else rezerva ??= e;
     }
@@ -516,6 +633,7 @@ const intreg = (t: string) => { const x = String(t ?? "").replace(/\s/g, ""); re
 export function verificaC2(it: Pick<ItemC2, "raspuns">, dat: string): boolean {
   const r = it.raspuns;
   if (r.tip === "pereche") return dat === "ok";
+  if (r.tip === "ordine") return String(dat) === r.corect.join("|");
   if (r.tip === "valoare") return /^\d+$/.test(r.valoare) ? intreg(dat) === Number(r.valoare) : String(dat).trim() === r.valoare;
   const v = String(dat).split("|").map(intreg);
   return r.solutii.some((sol) => sol.length === v.length && sol.every((x, i) => x === v[i]));
