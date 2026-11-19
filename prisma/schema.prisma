@@ -178,6 +178,11 @@ model Incercare {
   corecte     Int        @default(0)
   total       Int        @default(0)
   stele       Int        @default(0)       // 0–3
+  /// jocurile de clasa a III-a: punctaj (cu combo și bonus de viteză), medalie, cel mai lung combo
+  scor        Int?
+  scorMax     Int?
+  medalie     String?                      // "bronz" | "argint" | "aur" | "diamant"
+  comboMax    Int?
   raspunsuri  RaspunsItem[]
 }
 

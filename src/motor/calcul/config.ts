@@ -30,13 +30,13 @@ export function configImplicita(seed = 1): ConfigCalcul {
 
 // ───── serializare în URL (base64url) și validare ─────
 
-function b64(s: string): string {
+export function b64(s: string): string {
   const bytes = new TextEncoder().encode(s);
   let bin = "";
   bytes.forEach((b) => (bin += String.fromCharCode(b)));
   return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
-function deb64(s: string): string {
+export function deb64(s: string): string {
   const bin = atob(s.replace(/-/g, "+").replace(/_/g, "/"));
   return new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)));
 }

@@ -303,7 +303,10 @@ function EditorBloc({ b, index, poateSterge, onChange, onTip, onSterge }: {
   );
 }
 
-function PanouTema({ c, titluImplicit, grupe, dezactivat }: { c: string; titluImplicit: string; grupe: Grupa[]; dezactivat: boolean }) {
+export function PanouTema({ c, titluImplicit, grupe, dezactivat, actiune = creeazaTemaCalcul, etichetaTrimite = "📤 Trimite elevilor" }: {
+  c: string; titluImplicit: string; grupe: Grupa[]; dezactivat: boolean;
+  actiune?: typeof creeazaTemaCalcul; etichetaTrimite?: string;
+}) {
   const [titlu, setTitlu] = useState("");
   const [tinta, setTinta] = useState("");
   const [limita, setLimita] = useState("");
@@ -312,13 +315,15 @@ function PanouTema({ c, titluImplicit, grupe, dezactivat }: { c: string; titluIm
   const [diferite, setDiferite] = useState(false);
   const [stare, setStare] = useState<{ eroare?: string; cod?: string; id?: string } | null>(null);
   const [trimite, setTrimite] = useState(false);
+  // altă fișă / alt joc → mesajul despre tema trimisă anterior nu mai e valabil
+  useEffect(() => setStare(null), [c]);
 
   if (!grupe.length) return <p className="rounded-lg bg-galben-deschis p-3 text-sm">Nu ai încă grupe. Administratorul școlii te poate adăuga la o clasă din panoul de administrare.</p>;
 
   const salveaza = async () => {
     setTrimite(true);
     try {
-      setStare(await creeazaTemaCalcul({ c, titlu: titlu || titluImplicit, tinta, limitaMinute: Number(limita) || null, termen: termen || null, test, diferite }));
+      setStare(await actiune({ c, titlu: titlu || titluImplicit, tinta, limitaMinute: Number(limita) || null, termen: termen || null, test, diferite }));
     } catch {
       setStare({ eroare: "Nu am putut salva tema. Încearcă din nou." });
     } finally {
@@ -352,7 +357,7 @@ function PanouTema({ c, titluImplicit, grupe, dezactivat }: { c: string; titluIm
       <label className="flex items-center gap-2"><input type="checkbox" className="accent-mov" checked={test} onChange={(e) => setTest(e.target.checked)} /> Test: o singură trimitere</label>
       <label className="flex items-center gap-2"><input type="checkbox" className="accent-mov" checked={diferite} onChange={(e) => setDiferite(e.target.checked)} /> Exerciții diferite pentru fiecare elev (aceleași condiții)</label>
       <button type="button" disabled={!tinta || trimite || dezactivat} onClick={salveaza}
-        className="rounded-xl bg-mov px-4 py-3 font-bold text-white hover:bg-mov-inchis disabled:opacity-40">{trimite ? "Se salvează…" : "📤 Trimite elevilor"}</button>
+        className="rounded-xl bg-mov px-4 py-3 font-bold text-white hover:bg-mov-inchis disabled:opacity-40">{trimite ? "Se salvează…" : etichetaTrimite}</button>
       {stare?.eroare && <p className="rounded-lg bg-red-50 p-2 text-red-700">{stare.eroare}</p>}
       {stare?.cod && (
         <div className="rounded-xl bg-green-50 p-3 text-green-900">
@@ -364,7 +369,7 @@ function PanouTema({ c, titluImplicit, grupe, dezactivat }: { c: string; titluIm
   );
 }
 
-function Sectiune({ titlu, children }: { titlu: string; children: React.ReactNode }) {
+export function Sectiune({ titlu, children }: { titlu: string; children: React.ReactNode }) {
   return (
     <section className="mt-5">
       <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-gray-500">{titlu}</h2>
@@ -373,7 +378,7 @@ function Sectiune({ titlu, children }: { titlu: string; children: React.ReactNod
   );
 }
 
-function Camp({ eticheta, valoare, onChange, sugestie }: { eticheta: string; valoare: string; onChange: (v: string) => void; sugestie?: string }) {
+export function Camp({ eticheta, valoare, onChange, sugestie }: { eticheta: string; valoare: string; onChange: (v: string) => void; sugestie?: string }) {
   return (
     <label className="mb-2 grid gap-1 text-sm">
       <span className="text-gray-600">{eticheta}</span>

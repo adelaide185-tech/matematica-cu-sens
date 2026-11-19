@@ -44,11 +44,38 @@ export default function PanouProfesor() {
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[400px_1fr]">
       <aside className="bg-white p-5 shadow-md lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
-        <Link href="/" className="text-sm font-semibold text-mov">← Acasă</Link>
+        <div className="flex items-center justify-between gap-2">
+          <Link href="/" className="text-sm font-semibold text-mov">← Acasă</Link>
+          <Link href="/profesor/lectii" className="rounded-lg bg-mov-deschis px-2.5 py-1 text-sm font-bold text-mov hover:bg-mov/20">🧱 Lecții cu materiale</Link>
+        </div>
         <h1 className="mt-2 text-2xl font-bold text-mov">Generator de fișe</h1>
         <Link href="/profesor/calcul" className="mt-3 flex items-center gap-3 rounded-2xl bg-galben-deschis p-3 text-sm hover:brightness-95">
           <span className="text-2xl" aria-hidden>🧮</span>
           <span><b className="text-mov">Generator de calcul</b> — 5–200 de exerciții, PDF cu barem, Word, teme online</span>
+        </Link>
+        <Link href="/profesor/arcade" className="mt-2 flex items-center gap-3 rounded-2xl p-3 text-sm text-white hover:brightness-95" style={{ background: "linear-gradient(120deg, #e0483e, #6a59a7)" }}>
+          <span className="text-2xl" aria-hidden>🕹️</span>
+          <span><b>Jocuri arcade (clasele I–V)</b> — Baloanele, Cursa cu porți, Racheta: previzualizare și trimitere ca temă</span>
+        </Link>
+        <Link href="/profesor/clasa2" className={`mt-2 flex items-center gap-3 rounded-2xl p-3 text-sm hover:brightness-95 ${p.clasa === 2 ? "bg-mov text-white" : "bg-mov-deschis"}`}>
+          <span className="text-2xl" aria-hidden>🎮</span>
+          <span><b className={p.clasa === 2 ? "" : "text-mov"}>Clasa a II-a: jocuri și fișe</b> — noțiuni la alegere, 3 niveluri, 12 mini-jocuri, Mix automat, rapoarte pentru părinți</span>
+        </Link>
+        <Link href="/profesor/clasa3" className={`mt-2 flex items-center gap-3 rounded-2xl p-3 text-sm hover:brightness-95 ${p.clasa === 3 ? "bg-mov text-white" : "bg-mov-deschis"}`}>
+          <span className="text-2xl" aria-hidden>🎮</span>
+          <span><b className={p.clasa === 3 ? "" : "text-mov"}>Clasa a III-a: teme și jocuri</b> — capitole la alegere, 5 mini-jocuri online, fișă PDF cu barem</span>
+        </Link>
+        <Link href="/profesor/clasa4" className={`mt-2 flex items-center gap-3 rounded-2xl p-3 text-sm hover:brightness-95 ${p.clasa === 4 ? "bg-mov text-white" : "bg-mov-deschis"}`}>
+          <span className="text-2xl" aria-hidden>📐</span>
+          <span><b className={p.clasa === 4 ? "" : "text-mov"}>Clasa a IV-a (semestrul II): fișe și jocuri</b> — 12 capitole, Nivel 1 / Nivel 2, exerciții rezolvate pas cu pas, 5 mini-jocuri</span>
+        </Link>
+        <Link href="/profesor/clasa5" className={`mt-2 flex items-center gap-3 rounded-2xl p-3 text-sm hover:brightness-95 ${p.clasa === 5 ? "bg-mov text-white" : "bg-mov-deschis"}`}>
+          <span className="text-2xl" aria-hidden>🚀</span>
+          <span><b className={p.clasa === 5 ? "" : "text-mov"}>Clasa a V-a: fișe și jocuri</b> — 10 capitole (puteri, divizibilitate, fracții, zecimale, geometrie…), Nivel 1 / Nivel 2, exerciții rezolvate, 5 mini-jocuri</span>
+        </Link>
+        <Link href="/profesor/clasa1" className={`mt-2 flex items-center gap-3 rounded-2xl p-3 text-sm hover:brightness-95 ${p.clasa === 1 ? "bg-mov text-white ring-4 ring-galben" : "bg-mov-deschis"}`}>
+          <span className="text-2xl" aria-hidden>🚀</span>
+          <span><b className={p.clasa === 1 ? "text-white" : "text-mov"}>Clasa I · jocuri și fișe pe capitole</b> — 5 mini-jocuri, 10–100 de exerciții, PDF cu barem, atribuire online</span>
         </Link>
 
         <Sectiune titlu="1. Clasa">
