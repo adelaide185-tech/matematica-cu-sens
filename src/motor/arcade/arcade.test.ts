@@ -50,3 +50,29 @@ describe("arcade: punctaj", () => {
     expect(rezultatArcade(Array(10).fill(2))).toMatchObject({ scor: 0, stele: 0, medalie: null });
   });
 });
+
+import { cfgIncercareArcade, codificaArcade, configArcadeImplicita, curataArcade, decodificaArcade, greseliDinAlegeri } from "./config";
+
+describe("arcade: temă (configurație și verificarea pe server)", () => {
+  const q = { corect: "42" };
+  it("greșelile se recalculează din alegeri", () => {
+    expect(greseliDinAlegeri(q, ["42"])).toBe(0);
+    expect(greseliDinAlegeri(q, ["41", "42"])).toBe(1);
+    expect(greseliDinAlegeri(q, [null, "42"])).toBe(1);
+    expect(greseliDinAlegeri(q, ["41", null])).toBe(2);
+    expect(greseliDinAlegeri(q, ["41", "40", "42"])).toBe(2); // după 2 greșeli, întrebarea e pierdută
+    expect(greseliDinAlegeri(q, [])).toBe(2); // nerăspunsă
+  });
+  it("configurația trece prin URL și e curățată", () => {
+    const c = { ...configArcadeImplicita(77), joc: "racheta" as const, clasa: 4 as const, viteza: 3 as const, n: 15, dif: "greu" as const };
+    expect(decodificaArcade(codificaArcade(c))).toEqual(c);
+    expect(curataArcade({ joc: "hack", clasa: 9, viteza: 7, n: 1000, dif: "x", seed: -5 })).toEqual({ seed: 5, joc: "baloane", clasa: 2, viteza: 1, n: 10, dif: "mediu" });
+    expect(decodificaArcade("gunoi")).toBeNull();
+  });
+  it("„Mai joc o dată” schimbă întrebările, la fel pe client și pe server", () => {
+    const c = configArcadeImplicita(5);
+    expect(cfgIncercareArcade(c, 0)).toEqual(c);
+    expect(cfgIncercareArcade(c, 1).seed).not.toBe(c.seed);
+    expect(cfgIncercareArcade(c, 1)).toEqual(cfgIncercareArcade(c, 1));
+  });
+});

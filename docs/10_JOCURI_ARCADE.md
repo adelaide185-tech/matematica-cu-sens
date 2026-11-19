@@ -14,6 +14,39 @@ Mecanicile pornesc de la analiza din `docs/08_ANALIZA_MECANICI.md`, dar jocurile
 | 🏎️ Cursa cu porți | porțile cu răspunsuri coboară spre mașină; trece prin poarta corectă | atingere pe bandă, săgeți ← →, Enter / „⚡ Accelerează” |
 | 🚀 Racheta | meteoriții coboară; racheta îl lovește cu laserul pe cel corect | atingere / clic, tastele 1–4 |
 
+## Pentru profesor: previzualizare și temă
+
+Pagina este `/profesor/arcade`, cu cardul „🕹️ Jocuri arcade” din panoul profesorului.
+
+**Ce alege profesorul:** clasa (I–V), jocul, viteza, dificultatea și numărul de întrebări (5–20). Pagina arată întrebările cu varianta corectă marcată. Mai are două butoane:
+- „🎲 Alte întrebări”;
+- „▶ Previzualizează jocul ca elev”: previzualizarea nu salvează nimic.
+
+**Trimiterea ca temă** folosește aceleași opțiuni ca la celelalte jocuri:
+- grupa sau un elev;
+- termen și limită de timp;
+- „Test: o singură trimitere”;
+- alte exerciții pentru fiecare elev.
+
+Tema are mecanica `arc:<joc>`, iar configurația ei este clasa, viteza, dificultatea, numărul de întrebări și codul.
+
+**La elev:**
+- tema se deschide din „Temele mele” sau cu codul primit;
+- la final, se trimit **alegerile** de la fiecare întrebare, nu punctajul;
+- „Mai joc o dată” aduce alte întrebări;
+- la test nu există „Mai joc o dată”, iar elevul vede rezultatul (medalia, exercițiile de exersat) până pleacă din pagină.
+
+**Serverul** (`trimiteJocArcade`):
+- regenerează întrebările din cod și numărul încercării;
+- recalculează greșelile din alegeri (`greseliDinAlegeri`), apoi punctajul, stelele și medalia;
+- nu are încredere în ce calculează browserul.
+
+**Raportul la profesor** este cel obișnuit:
+- semafor, medalie, scor, seria cea mai lungă;
+- exercițiile greșite (cu prima greșeală a elevului);
+- rezultatele pe capitole: la clasele III–V cu numele capitolelor, la I–II cu numele generatoarelor;
+- raportul pentru părinți și diploma.
+
 ## Reguli comune (`src/motor/arcade/scor.ts`)
 
 - **Punctajul:** 30 de puncte pe întrebare, cu 3 inimioare.

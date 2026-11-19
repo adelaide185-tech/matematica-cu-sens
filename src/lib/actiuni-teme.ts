@@ -8,6 +8,8 @@ import { decodifica } from "@/motor/calcul/config";
 import { decodificaC3 } from "@/motor/clasa3/config";
 import { decodificaC4 } from "@/motor/clasa4/config";
 import { decodificaC5 } from "@/motor/clasa5/config";
+import { JOCURI_ARCADE, NUME_CLASA_SCURT, decodificaArcade, greseliDinAlegeri } from "@/motor/arcade/config";
+import { GRESELI_MAX, rezultatArcade } from "@/motor/arcade/scor";
 import { puncteaza, verificaC3 } from "@/motor/clasa3/generator";
 import { JOCURI_C3, SECUNDE_VITEZA } from "@/motor/clasa3/tipuri";
 import { decodificaC2 } from "@/motor/clasa2/config";
@@ -15,7 +17,7 @@ import { clasificaEroare, verificaC2 } from "@/motor/clasa2/generator";
 import { JOCURI_C2, NIVELURI_C2, type NivelC2 } from "@/motor/clasa2/tipuri";
 import type { Sesiune } from "./sesiune-token";
 import { corect, textRaspuns, totalExercitii } from "@/motor/calcul/generator";
-import { exercitiiTema, filtruClaseProfesor, filtruTemeProfesor, itemiTemaC2, itemiTemaC3, itemiTemaC4, itemiTemaC5, steleDinProcent, temaPentruElev } from "./teme";
+import { exercitiiTema, filtruClaseProfesor, filtruTemeProfesor, itemiTemaC2, itemiTemaC3, itemiTemaC4, itemiTemaC5, intrebariTemaArcade, steleDinProcent, temaPentruElev } from "./teme";
 
 export interface DateTemaNoua {
   /** configurația codificată (aceeași ca în URL-ul fișei) */
@@ -147,6 +149,67 @@ export async function creeazaTemaJocC5(d: DateTemaNoua): Promise<StareTema> {
   });
 }
 
+/** Jocurile arcade (Baloanele, Cursa cu porți, Racheta) trimise ca temă: clasa, jocul, viteza, dificultatea, numărul. */
+export async function creeazaTemaArcade(d: DateTemaNoua): Promise<StareTema> {
+  const s = await cereRol("PROFESOR", "ADMIN_SCOALA");
+  const cfg = decodificaArcade(d.c);
+  if (!cfg) return { eroare: "Configurația jocului nu a putut fi citită." };
+  const t = await tintaTema(s, d.tinta);
+  if ("eroare" in t) return t;
+  return salveazaTema({
+    titlu: d.titlu.trim().slice(0, 120) || `${JOCURI_ARCADE[cfg.joc].nume} – clasa ${NUME_CLASA_SCURT[cfg.clasa - 1]}`, profesorId: s.id, ...t,
+    mecanica: `arc:${cfg.joc}`, generatoare: [`clasa${cfg.clasa}`], nivel: d.test ? "EVALUARE" : "CONSOLIDARE",
+    nrItemi: cfg.n, seed: d.diferite ? null : cfg.seed,
+    config: cfg as unknown as Prisma.InputJsonValue, ...limitaSiTermen(d), test: d.test,
+  });
+}
+
+export interface RaspunsArcadeTrimis { id: string; alegeri: (string | null)[]; timpMs: number }
+
+/**
+ * Elevul termină un joc arcade dat ca temă. Serverul regenerează întrebările (cod + încercare),
+ * recalculează greșelile din alegerile trimise (nu are încredere în punctajul calculat în browser)
+ * și salvează punctajul, medalia și răspunsurile pe capitole.
+ */
+export async function trimiteJocArcade(cod: string, raspunsuri: RaspunsArcadeTrimis[], incercare: number, terminat: boolean): Promise<RezultatJocC3> {
+  const s = await cereRol("ELEV");
+  const tema = await temaPentruElev(cod, s.id);
+  if (!tema || !tema.mecanica.startsWith("arc:")) return { eroare: "Tema nu există sau nu este pentru tine." };
+  if (tema.test) {
+    const deja = await db.incercare.count({ where: { temaId: tema.id, elevId: s.id, terminat: { not: null } } });
+    if (deja) return { eroare: "Ai trimis deja acest test." };
+  }
+  const nrInc = Math.max(0, Math.min(1000, Math.floor(Number(incercare) || 0)));
+  const { intrebari } = intrebariTemaArcade(tema, s.id, nrInc);
+  const dupaId = new Map((Array.isArray(raspunsuri) ? raspunsuri : []).slice(0, 50).map((r) => [String(r?.id), r]));
+  const rez = intrebari.map((q) => {
+    const r = dupaId.get(q.id);
+    const alegeri = Array.isArray(r?.alegeri) ? r!.alegeri.slice(0, 10).map((a) => (a === null ? null : String(a).slice(0, 60))) : [];
+    const greseli = greseliDinAlegeri(q, alegeri);
+    return { q, alegeri, greseli, timpMs: Math.max(0, Math.min(600000, Math.floor(Number(r?.timpMs) || 0))) };
+  });
+  const p = rezultatArcade(rez.map((r) => r.greseli));
+  const timp = rez.reduce((a, r) => a + r.timpMs, 0);
+  const acum = new Date();
+  await db.incercare.create({
+    data: {
+      elevId: s.id, temaId: tema.id, mecanica: tema.mecanica, inceput: new Date(acum.getTime() - timp), terminat: acum,
+      corecte: p.rezolvate, total: intrebari.length, stele: p.stele, scor: p.scor, scorMax: p.max, medalie: p.medalie, comboMax: p.serieMax,
+      raspunsuri: {
+        create: rez.map((r) => ({
+          generatorId: `arc.${r.q.sursa}`, competenta: r.q.sursa, dificultate: Math.max(1, r.alegeri.length),
+          item: { id: r.q.id, text: r.q.text, inainte: null, raspuns: r.q.corect },
+          // în raport apare prima alegere greșită (greșeala tipică), altfel răspunsul corect
+          raspunsElev: { valoare: r.alegeri.find((a) => a !== r.q.corect) === null ? "(a scăpat)" : r.alegeri.find((a) => a !== r.q.corect) ?? (r.alegeri.length ? r.q.corect : "(nerezolvat)"), incercari: r.alegeri.length, terminat, greseli: r.greseli },
+          corect: r.greseli < GRESELI_MAX, timpMs: r.timpMs,
+        })),
+      },
+    },
+  });
+  // fără revalidatePath: paginile elevului sunt dinamice, iar reîmprospătarea ar înlocui ecranul cu rezultatul (la test: „Ai trimis deja”)
+  return { scor: p.scor, medalie: p.medalie, procent: p.procent };
+}
+
 export async function stergeTema(id: string): Promise<void> {
   const s = await cereRol("PROFESOR", "ADMIN_SCOALA");
   const t = await db.tema.findFirst({ where: { id, ...filtruTemeProfesor(s) } });
@@ -194,7 +257,7 @@ export async function trimiteTema(cod: string, raspunsuri: RaspunsDat[], timpMs:
       },
     },
   });
-  revalidatePath("/elev/teme");
+  // fără revalidatePath: paginile elevului sunt dinamice, iar reîmprospătarea ar înlocui ecranul cu rezultatul (la test: „Ai trimis deja”)
   return { corecte, total: exercitii.length, stele, detalii: rez.map((r) => ({ corect: r.ok, raspuns: textRaspuns(r.e) })) };
 }
 
@@ -254,7 +317,7 @@ async function trimiteJocC34(clasa: "c3" | "c4" | "c5", cod: string, raspunsuri:
       },
     },
   });
-  revalidatePath("/elev/teme");
+  // fără revalidatePath: paginile elevului sunt dinamice, iar reîmprospătarea ar înlocui ecranul cu rezultatul (la test: „Ai trimis deja”)
   return { scor: p.scor, medalie: p.medalie, procent: p.procent };
 }
 
@@ -308,6 +371,6 @@ export async function trimiteJocC2(cod: string, raspunsuri: RaspunsJocC2Trimis[]
       },
     },
   });
-  revalidatePath("/elev/teme");
+  // fără revalidatePath: paginile elevului sunt dinamice, iar reîmprospătarea ar înlocui ecranul cu rezultatul (la test: „Ai trimis deja”)
   return { scor: Math.round(p.scor * mult), medalie: p.medalie, procent: p.procent };
 }

@@ -146,6 +146,7 @@ Clasa a V-a (`/profesor/clasa5`, detalii în `docs/09_CLASA5_JOCURI.md`):
 
 Jocuri arcade pentru clasele I–V (`/elev/arcade`, detalii în `docs/10_JOCURI_ARCADE.md`):
 - Baloanele, Cursa cu porți și Racheta: 30 de puncte pe întrebare, 3 inimioare care scad punctajul fără să oprească jocul, rezolvarea după a doua greșeală, 3 viteze, pauză, mouse + atingere + tastatură, progres salvat în cont
+- profesorul (`/profesor/arcade`) vede întrebările, previzualizează și trimite jocul ca temă sau test; serverul recalculează punctajul din alegerile elevului; rezultatele apar în rapoartele obișnuite
 
 Urmează:
 - rapoarte de progres pe noțiuni pentru profesor

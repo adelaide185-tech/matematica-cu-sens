@@ -8,16 +8,12 @@ import { DURATA_RUNDA, GRESELI_MAX, NUME_VITEZA, PUNCTE_INTREBARE, puncteIntreba
 import { useCelebrare } from "@/jocuri/miscare";
 import { sunetBland } from "@/antrenament/stare-client";
 import { TextMate } from "@/jocuri/c3/Vizuale";
+import { JOCURI_ARCADE, type JocArcadeId } from "@/motor/arcade/config";
 
-export type JocArcadeId = "baloane" | "cursa" | "racheta";
-export const JOCURI_ARCADE: Record<JocArcadeId, { nume: string; icon: string; descriere: string; culoare: string; cum: string }> = {
-  baloane: { nume: "Baloanele", icon: "🎈", culoare: "#e0483e", descriere: "Baloanele urcă spre cer. Spară balonul cu răspunsul corect înainte să zboare!", cum: "Atinge balonul corect (sau tastele 1–4)." },
-  cursa: { nume: "Cursa cu porți", icon: "🏎️", culoare: "#2f6fd1", descriere: "Condu mașina pe banda cu răspunsul corect și treci prin poartă.", cum: "Atinge banda sau folosește săgețile ← →. „Accelerează” trece imediat prin poartă." },
-  racheta: { nume: "Racheta", icon: "🚀", culoare: "#6a59a7", descriere: "Meteoriții coboară spre rachetă. Lovește-l pe cel cu răspunsul corect!", cum: "Atinge meteoritul corect (sau tastele 1–4)." },
-};
-
+export { JOCURI_ARCADE, type JocArcadeId } from "@/motor/arcade/config";
 type Faza = "joc" | "corect" | "gresit" | "arata";
-export interface FinalArcade { greseli: number[]; rezultat: ReturnType<typeof rezultatArcade> }
+/** greseli: pe întrebare; alegeri: ce a ales elevul, în ordine (null = au scăpat); timpi: ms pe întrebare */
+export interface FinalArcade { greseli: number[]; alegeri: (string | null)[][]; timpi: number[]; rezultat: ReturnType<typeof rezultatArcade> }
 
 function vorbeste(text: string) {
   try {
@@ -45,6 +41,9 @@ export function JocArcade({ joc, viteza, intrebari, seed, inapoi, titlu, onFinal
   const [pauza, setPauza] = useState(false);
   const [final, setFinal] = useState<FinalArcade | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const alegeri = useRef<(string | null)[][]>([]);
+  const timpi = useRef<number[]>([]);
+  const start = useRef(Date.now());
   const q = intrebari[idx];
   const durata = DURATA_RUNDA[joc][viteza];
   // la fiecare rundă (și după o greșeală) variantele se amestecă din nou
@@ -62,10 +61,12 @@ export function JocArcade({ joc, viteza, intrebari, seed, inapoi, titlu, onFinal
 
   const urmatoarea = useCallback((g: number) => {
     const r = [...rezultate, g];
+    timpi.current[idx] = Date.now() - start.current;
+    start.current = Date.now();
     setRezultate(r);
     setGreseli(0); setAles(null); setRunda(0); setFaza("joc");
     if (idx + 1 >= intrebari.length) {
-      const f = { greseli: r, rezultat: rezultatArcade(r) };
+      const f = { greseli: r, alegeri: intrebari.map((_, i) => alegeri.current[i] ?? []), timpi: intrebari.map((_, i) => timpi.current[i] ?? 0), rezultat: rezultatArcade(r) };
       setFinal(f);
       onFinal?.(f);
     } else setIdx(idx + 1);
@@ -75,6 +76,7 @@ export function JocArcade({ joc, viteza, intrebari, seed, inapoi, titlu, onFinal
   const raspunde = useCallback((v: string | null) => {
     if (!q || faza !== "joc" || pauza) return;
     setAles(v);
+    (alegeri.current[idx] ??= []).push(v);
     if (v === q.corect) {
       setFaza("corect");
       sunetBland();
@@ -86,7 +88,7 @@ export function JocArcade({ joc, viteza, intrebari, seed, inapoi, titlu, onFinal
     if (g >= GRESELI_MAX) { setFaza("arata"); return; }
     setFaza("gresit");
     timer.current = setTimeout(() => { setAles(null); setRunda((x) => x + 1); setFaza("joc"); }, 1100);
-  }, [q, faza, pauza, greseli, urmatoarea]);
+  }, [q, faza, pauza, greseli, urmatoarea, idx]);
 
   // tastatura: 1–4 alege varianta, P = pauză, Enter = mai departe după rezolvare
   useEffect(() => {

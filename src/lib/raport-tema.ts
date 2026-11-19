@@ -6,6 +6,9 @@ import { genereazaC4 } from "@/motor/clasa4/generator";
 import { NUME_CAPITOL_C4, type CapitolC4 } from "@/motor/clasa4/tipuri";
 import { genereazaC5 } from "@/motor/clasa5/generator";
 import { NUME_CAPITOL_C5, type CapitolC5 } from "@/motor/clasa5/tipuri";
+import { curataArcade } from "@/motor/arcade/config";
+import { intrebariArcade } from "@/motor/arcade/intrebari";
+import { exista, generator } from "@/motor/registru";
 import { genereazaC2 } from "@/motor/clasa2/generator";
 import { COMPATIBIL, NUME_EROARE, NUME_NOTIUNE, type NivelC2, type NotiuneC2, type TipEroare } from "@/motor/clasa2/tipuri";
 import { genereazaC3 } from "@/motor/clasa3/generator";
@@ -20,7 +23,17 @@ export const SEMAFOR: Record<Semafor, { icon: string; nume: string }> = {
   bine: { icon: "🟢", nume: "Se descurcă bine" },
 };
 
-export const numeCompetenta = (c: string) => NUME_CAPITOL[c as CapitolC3] ?? NUME_CAPITOL_C4[c as CapitolC4] ?? NUME_CAPITOL_C5[c as CapitolC5] ?? NUME_NOTIUNE[c as NotiuneC2] ?? c;
+/** Numele sursei unei întrebări arcade: capitolul clasei (III–V) sau generatorul general (I–II). */
+export function numeSursaArcade(c: string, clasa: number): string | undefined {
+  const cl = c.match(/^clasa([1-5])$/);
+  if (cl) return `clasa ${["I", "a II-a", "a III-a", "a IV-a", "a V-a"][Number(cl[1]) - 1]}`;
+  if (clasa === 3) return NUME_CAPITOL[c as CapitolC3];
+  if (clasa === 4) return NUME_CAPITOL_C4[c as CapitolC4];
+  if (clasa === 5) return NUME_CAPITOL_C5[c as CapitolC5];
+  return exista(c) ? generator(c).titlu : undefined;
+}
+
+export const numeCompetenta = (c: string) => (exista(c) ? generator(c).titlu : undefined) ?? NUME_CAPITOL[c as CapitolC3] ?? NUME_CAPITOL_C4[c as CapitolC4] ?? NUME_CAPITOL_C5[c as CapitolC5] ?? NUME_NOTIUNE[c as NotiuneC2] ?? c;
 
 type RaspunsElev = { valoare?: string; eroare?: TipEroare | null; terminat?: boolean; nivel?: NivelC2 };
 
@@ -74,6 +87,11 @@ export function exercitiiAcasa(t: TemaCuRezultate, elevId: string, competenta: s
   }
   if (t.mecanica.startsWith("c4:")) {
     return genereazaC4({ ...cfgTemaC4(t, elevId), joc: "sprint", capitole: [competenta as CapitolC4], nr: 3, seed }).itemi.map((i) => ({ text: i.text, raspuns: i.afis }));
+  }
+  if (t.mecanica.startsWith("arc:")) {
+    // 3 întrebări de același fel (aceeași sursă), din alt lot de exerciții
+    const cfg = curataArcade((t.config ?? {}) as Record<string, unknown>);
+    return intrebariArcade(cfg.clasa, seed, 30, cfg.dif).filter((q) => q.sursa === competenta).slice(0, 3).map((q) => ({ text: q.text, raspuns: q.corect }));
   }
   if (t.mecanica.startsWith("c5:")) {
     return genereazaC5({ ...cfgTemaC5(t, elevId), joc: "sprint", capitole: [competenta as CapitolC5], nr: 3, seed }).itemi.map((i) => ({ text: i.text, raspuns: i.afis }));

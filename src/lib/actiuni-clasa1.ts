@@ -129,6 +129,6 @@ export async function trimiteTemaClasa1(cod: string, raspunsuri: RaspunsElevC1[]
       },
     },
   });
-  revalidatePath("/elev/teme");
+  // fără revalidatePath: paginile elevului sunt dinamice, iar reîmprospătarea ar înlocui ecranul cu rezultatul (la test: „Ai trimis deja”)
   return { corecte: rez.corecte, total: rez.total, procent: rez.procent, medalie: rez.medalie, stele: rez.stele };
 }
