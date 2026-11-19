@@ -7,6 +7,7 @@ import { cereRol } from "./auth";
 import { decodifica } from "@/motor/calcul/config";
 import { decodificaC3 } from "@/motor/clasa3/config";
 import { decodificaC4 } from "@/motor/clasa4/config";
+import { decodificaC5 } from "@/motor/clasa5/config";
 import { puncteaza, verificaC3 } from "@/motor/clasa3/generator";
 import { JOCURI_C3, SECUNDE_VITEZA } from "@/motor/clasa3/tipuri";
 import { decodificaC2 } from "@/motor/clasa2/config";
@@ -14,7 +15,7 @@ import { clasificaEroare, verificaC2 } from "@/motor/clasa2/generator";
 import { JOCURI_C2, NIVELURI_C2, type NivelC2 } from "@/motor/clasa2/tipuri";
 import type { Sesiune } from "./sesiune-token";
 import { corect, textRaspuns, totalExercitii } from "@/motor/calcul/generator";
-import { exercitiiTema, filtruClaseProfesor, filtruTemeProfesor, itemiTemaC2, itemiTemaC3, itemiTemaC4, steleDinProcent, temaPentruElev } from "./teme";
+import { exercitiiTema, filtruClaseProfesor, filtruTemeProfesor, itemiTemaC2, itemiTemaC3, itemiTemaC4, itemiTemaC5, steleDinProcent, temaPentruElev } from "./teme";
 
 export interface DateTemaNoua {
   /** configurația codificată (aceeași ca în URL-ul fișei) */
@@ -131,6 +132,21 @@ export async function creeazaTemaJocC4(d: DateTemaNoua): Promise<StareTema> {
   });
 }
 
+/** Jocurile de clasa a V-a trimise ca temă. */
+export async function creeazaTemaJocC5(d: DateTemaNoua): Promise<StareTema> {
+  const s = await cereRol("PROFESOR", "ADMIN_SCOALA");
+  const cfg = decodificaC5(d.c);
+  if (!cfg) return { eroare: "Configurația jocului nu a putut fi citită." };
+  const t = await tintaTema(s, d.tinta);
+  if ("eroare" in t) return t;
+  return salveazaTema({
+    titlu: d.titlu.trim().slice(0, 120) || `${JOCURI_C3[cfg.joc].nume} – clasa a V-a`, profesorId: s.id, ...t,
+    mecanica: `c5:${cfg.joc}`, generatoare: cfg.capitole, nivel: d.test ? "EVALUARE" : "CONSOLIDARE",
+    nrItemi: cfg.nr, seed: d.diferite ? null : cfg.seed,
+    config: cfg as unknown as Prisma.InputJsonValue, ...limitaSiTermen(d), test: d.test,
+  });
+}
+
 export async function stergeTema(id: string): Promise<void> {
   const s = await cereRol("PROFESOR", "ADMIN_SCOALA");
   const t = await db.tema.findFirst({ where: { id, ...filtruTemeProfesor(s) } });
@@ -198,7 +214,12 @@ export async function trimiteJocC4(cod: string, raspunsuri: RaspunsJocTrimis[], 
   return trimiteJocC34("c4", cod, raspunsuri, incercare, terminat);
 }
 
-async function trimiteJocC34(clasa: "c3" | "c4", cod: string, raspunsuri: RaspunsJocTrimis[], incercare: number, terminat: boolean): Promise<RezultatJocC3> {
+/** Jocurile de clasa a V-a: același traseu. */
+export async function trimiteJocC5(cod: string, raspunsuri: RaspunsJocTrimis[], incercare: number, terminat: boolean): Promise<RezultatJocC3> {
+  return trimiteJocC34("c5", cod, raspunsuri, incercare, terminat);
+}
+
+async function trimiteJocC34(clasa: "c3" | "c4" | "c5", cod: string, raspunsuri: RaspunsJocTrimis[], incercare: number, terminat: boolean): Promise<RezultatJocC3> {
   const s = await cereRol("ELEV");
   const tema = await temaPentruElev(cod, s.id);
   if (!tema || !tema.mecanica.startsWith(`${clasa}:`)) return { eroare: "Tema nu există sau nu este pentru tine." };
@@ -207,7 +228,7 @@ async function trimiteJocC34(clasa: "c3" | "c4", cod: string, raspunsuri: Raspun
     if (deja) return { eroare: "Ai trimis deja acest test." };
   }
   const nrInc = Math.max(0, Math.min(1000, Math.floor(Number(incercare) || 0)));
-  const { cfg, itemi } = clasa === "c3" ? itemiTemaC3(tema, s.id, nrInc) : itemiTemaC4(tema, s.id, nrInc);
+  const { cfg, itemi } = clasa === "c3" ? itemiTemaC3(tema, s.id, nrInc) : clasa === "c4" ? itemiTemaC4(tema, s.id, nrInc) : itemiTemaC5(tema, s.id, nrInc);
   const dupaId = new Map(raspunsuri.slice(0, 200).map((r) => [String(r.id), r]));
   const rez = (itemi as { id: string; capitol: string; text: string; afis: string; raspuns: Parameters<typeof verificaC3>[0]["raspuns"] }[]).map((it) => {
     const r = dupaId.get(it.id);

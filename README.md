@@ -140,5 +140,9 @@ Clasa a IV-a, semestrul al II-lea (`/profesor/clasa4`, detalii în `docs/07_CLAS
 - aceleași 5 jocuri ca la clasa a III-a, trimise ca temă, cu rezolvarea arătată după greșeală și rapoarte la profesor
 - verificare independentă cu SymPy (`scripts/valideaza_clasa4.py`, parte din `npm run valideaza:sympy`)
 
+Clasa a V-a (`/profesor/clasa5`, detalii în `docs/09_CLASA5_JOCURI.md`):
+- 10 capitole pe Nivel 1 / Nivel 2: puteri, ordinea operațiilor, factor comun, divizibilitate, numere prime, metode de rezolvare, fracții ordinare, fracții zecimale, segmente și unghiuri, arii și volume
+- fișă PDF cu barem și exerciții rezolvate; aceleași 5 jocuri; teme verificate pe server; validare SymPy (`scripts/valideaza_clasa5.py`)
+
 Urmează:
 - rapoarte de progres pe noțiuni pentru profesor

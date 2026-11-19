@@ -15,7 +15,7 @@ export default async function TemeProfesor() {
   if (!dbConfigurata) return <p className="p-8 text-center">Temele online funcționează când aplicația are conturi.</p>;
   const s = await cereRol("PROFESOR", "ADMIN_SCOALA");
   const teme = await db.tema.findMany({
-    where: { ...filtruTemeProfesor(s), OR: [{ mecanica: { in: [...MECANICI_TEME] } }, { mecanica: { startsWith: "c3:" } }, { mecanica: { startsWith: "c2:" } }, { mecanica: { startsWith: "c4:" } }] },
+    where: { ...filtruTemeProfesor(s), OR: [{ mecanica: { in: [...MECANICI_TEME] } }, { mecanica: { startsWith: "c3:" } }, { mecanica: { startsWith: "c2:" } }, { mecanica: { startsWith: "c4:" } }, { mecanica: { startsWith: "c5:" } }] },
     orderBy: { creatLa: "desc" },
     include: {
       clasa: { select: { nume: true, _count: { select: { elevi: true } } } },
@@ -50,14 +50,14 @@ export default async function TemeProfesor() {
               <div className="flex-1">
                 <Link href={`/profesor/teme/${t.id}`} className="text-lg font-bold text-mov hover:underline">{t.titlu}</Link>
                 <div className="text-sm text-gray-600">
-                  {t.mecanica === "clasa1" ? "🚀 Jocuri Clasa I · " : ""}{t.mecanica.startsWith("c2:") ? `${JOCURI_C2[t.mecanica.slice(3) as JocC2]?.icon ?? "🎲"} ${JOCURI_C2[t.mecanica.slice(3) as JocC2]?.nume ?? "Mix automat"} (clasa a II-a) · ` : ""}{t.mecanica.startsWith("c3:") || t.mecanica.startsWith("c4:") ? `${JOCURI_C3[t.mecanica.slice(3) as JocC3]?.icon ?? "🎮"} ${JOCURI_C3[t.mecanica.slice(3) as JocC3]?.nume ?? "Joc"}${t.mecanica.startsWith("c4:") ? " (clasa a IV-a)" : ""} · ` : ""}{t.test ? "Test" : "Temă"} · {tinta} · {t.nrItemi} exerciții{t.limitaMinute ? ` · ${t.limitaMinute} min` : ""}
+                  {t.mecanica === "clasa1" ? "🚀 Jocuri Clasa I · " : ""}{t.mecanica.startsWith("c2:") ? `${JOCURI_C2[t.mecanica.slice(3) as JocC2]?.icon ?? "🎲"} ${JOCURI_C2[t.mecanica.slice(3) as JocC2]?.nume ?? "Mix automat"} (clasa a II-a) · ` : ""}{/^c[345]:/.test(t.mecanica) ? `${JOCURI_C3[t.mecanica.slice(3) as JocC3]?.icon ?? "🎮"} ${JOCURI_C3[t.mecanica.slice(3) as JocC3]?.nume ?? "Joc"}${t.mecanica.startsWith("c4:") ? " (clasa a IV-a)" : t.mecanica.startsWith("c5:") ? " (clasa a V-a)" : ""} · ` : ""}{t.test ? "Test" : "Temă"} · {tinta} · {t.nrItemi} exerciții{t.limitaMinute ? ` · ${t.limitaMinute} min` : ""}
                   {t.termen ? ` · termen ${t.termen.toLocaleDateString("ro-RO")}` : ""}
                 </div>
               </div>
               <div className="text-center"><div className="text-xs text-gray-500">Cod</div><div className="font-mono text-lg font-bold tracking-widest">{t.cod}</div></div>
               <div className="text-center"><div className="text-xs text-gray-500">Au trimis</div><div className="text-lg font-bold">{elevi}/{din}</div></div>
               <div className="text-center"><div className="text-xs text-gray-500">Media</div><div className="text-lg font-bold">{medie === null ? "—" : `${medie}%`}</div></div>
-              {(t.mecanica.startsWith("c3:") || t.mecanica.startsWith("c2:") || t.mecanica.startsWith("c4:")) && (
+              {/^c[2345]:/.test(t.mecanica) && (
                 <div className="text-center"><div className="text-xs text-gray-500">Medalii</div><div className="text-lg">{(["diamant", "aur", "argint", "bronz"] as const).map((m) => { const n = t.incercari.filter((i) => i.medalie === m).length; return n ? <span key={m} title={MEDALII[m].nume}>{MEDALII[m].icon}{n > 1 ? `×${n}` : ""} </span> : null; })}{!t.incercari.some((i) => i.medalie) && "—"}</div></div>
               )}
               <FormActiune actiune={async () => { "use server"; await stergeTema(t.id); }} confirmare={`Ștergi tema „${t.titlu}” și rezultatele ei?`}>

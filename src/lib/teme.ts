@@ -7,6 +7,8 @@ import { cfgIncercare, curataC3 } from "@/motor/clasa3/config";
 import { genereazaC3 } from "@/motor/clasa3/generator";
 import { cfgIncercareC4, curataC4 } from "@/motor/clasa4/config";
 import { genereazaC4 } from "@/motor/clasa4/generator";
+import { cfgIncercareC5, curataC5 } from "@/motor/clasa5/config";
+import { genereazaC5 } from "@/motor/clasa5/generator";
 import { genereazaCalcul, hash } from "@/motor/calcul/generator";
 import type { ConfigCalcul, ExCalcul } from "@/motor/calcul/tipuri";
 import { curataC1 } from "@/motor/clasa1/config";
@@ -42,7 +44,7 @@ export function exercitiiTemaClasa1(tema: Pick<Tema, "config" | "seed">, elevId:
 
 /** Temele pe care le vede un elev: ale claselor în care e înscris și cele primite personal. */
 export function filtruTemeElev(elevId: string): Prisma.TemaWhereInput {
-  return { OR: [{ mecanica: { in: [...MECANICI_TEME] } }, { mecanica: { startsWith: "c3:" } }, { mecanica: { startsWith: "c2:" } }, { mecanica: { startsWith: "c4:" } }], AND: { OR: [{ elevId }, { elevId: null, clasa: { elevi: { some: { elevId } } } }] } };
+  return { OR: [{ mecanica: { in: [...MECANICI_TEME] } }, { mecanica: { startsWith: "c3:" } }, { mecanica: { startsWith: "c2:" } }, { mecanica: { startsWith: "c4:" } }, { mecanica: { startsWith: "c5:" } }], AND: { OR: [{ elevId }, { elevId: null, clasa: { elevi: { some: { elevId } } } }] } };
 }
 
 /**
@@ -70,6 +72,18 @@ export function cfgTemaC4(tema: Pick<Tema, "config" | "seed">, elevId: string) {
 export function itemiTemaC4(tema: Pick<Tema, "config" | "seed">, elevId: string, incercare = 0) {
   const c = cfgIncercareC4(cfgTemaC4(tema, elevId), incercare);
   return { cfg: c, itemi: genereazaC4(c).itemi };
+}
+
+/** Configurația de bază a unui joc de clasa a V-a pentru un elev (încercarea 0). */
+export function cfgTemaC5(tema: Pick<Tema, "config" | "seed">, elevId: string) {
+  const cfg = curataC5((tema.config ?? {}) as Record<string, unknown>);
+  return tema.seed === null ? { ...cfg, seed: hash(cfg.seed, hashText(elevId)) % 2 ** 31, inlocuiri: {} } : cfg;
+}
+
+/** Exercițiile jocului de clasa a V-a pentru încercarea n. */
+export function itemiTemaC5(tema: Pick<Tema, "config" | "seed">, elevId: string, incercare = 0) {
+  const c = cfgIncercareC5(cfgTemaC5(tema, elevId), incercare);
+  return { cfg: c, itemi: genereazaC5(c).itemi };
 }
 
 /** Configurația de bază a unui joc de clasa a II-a pentru un elev (încercarea 0). */

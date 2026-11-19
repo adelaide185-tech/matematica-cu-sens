@@ -65,6 +65,10 @@ export default function PanouProfesor() {
           <span className="text-2xl" aria-hidden>📐</span>
           <span><b className={p.clasa === 4 ? "" : "text-mov"}>Clasa a IV-a (semestrul II): fișe și jocuri</b> — 12 capitole, Nivel 1 / Nivel 2, exerciții rezolvate pas cu pas, 5 mini-jocuri</span>
         </Link>
+        <Link href="/profesor/clasa5" className={`mt-2 flex items-center gap-3 rounded-2xl p-3 text-sm hover:brightness-95 ${p.clasa === 5 ? "bg-mov text-white" : "bg-mov-deschis"}`}>
+          <span className="text-2xl" aria-hidden>🚀</span>
+          <span><b className={p.clasa === 5 ? "" : "text-mov"}>Clasa a V-a: fișe și jocuri</b> — 10 capitole (puteri, divizibilitate, fracții, zecimale, geometrie…), Nivel 1 / Nivel 2, exerciții rezolvate, 5 mini-jocuri</span>
+        </Link>
         <Link href="/profesor/clasa1" className={`mt-2 flex items-center gap-3 rounded-2xl p-3 text-sm hover:brightness-95 ${p.clasa === 1 ? "bg-mov text-white ring-4 ring-galben" : "bg-mov-deschis"}`}>
           <span className="text-2xl" aria-hidden>🚀</span>
           <span><b className={p.clasa === 1 ? "text-white" : "text-mov"}>Clasa I · jocuri și fișe pe capitole</b> — 5 mini-jocuri, 10–100 de exerciții, PDF cu barem, atribuire online</span>
