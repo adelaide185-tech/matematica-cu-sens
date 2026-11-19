@@ -144,5 +144,8 @@ Clasa a V-a (`/profesor/clasa5`, detalii în `docs/09_CLASA5_JOCURI.md`):
 - 10 capitole pe Nivel 1 / Nivel 2: puteri, ordinea operațiilor, factor comun, divizibilitate, numere prime, metode de rezolvare, fracții ordinare, fracții zecimale, segmente și unghiuri, arii și volume
 - fișă PDF cu barem și exerciții rezolvate; aceleași 5 jocuri; teme verificate pe server; validare SymPy (`scripts/valideaza_clasa5.py`)
 
+Jocuri arcade pentru clasele I–V (`/elev/arcade`, detalii în `docs/10_JOCURI_ARCADE.md`):
+- Baloanele, Cursa cu porți și Racheta: 30 de puncte pe întrebare, 3 inimioare care scad punctajul fără să oprească jocul, rezolvarea după a doua greșeală, 3 viteze, pauză, mouse + atingere + tastatură, progres salvat în cont
+
 Urmează:
 - rapoarte de progres pe noțiuni pentru profesor

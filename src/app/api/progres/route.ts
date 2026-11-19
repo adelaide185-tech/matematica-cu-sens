@@ -6,9 +6,9 @@ export const dynamic = "force-dynamic";
 
 /**
  * Jocurile care salvează progresul: cele 3 jocuri generale, jocurile pe clase (c1-…, c2-…, c3-…, c4-…)
- * și lecțiile cu materiale (lectie-…). Înainte erau acceptate doar primele 3, iar restul primeau 400.
+ * jocurile arcade (arc-…) și lecțiile cu materiale (lectie-…). Înainte erau acceptate doar primele 3, iar restul primeau 400.
  */
-const JOC_VALID = /^(scara|numaratoare|fractii|c[1-5]-[a-z0-9]{2,20}|lectie-[a-z0-9-]{1,60})$/;
+const JOC_VALID = /^(scara|numaratoare|fractii|c[1-5]-[a-z0-9]{2,20}|arc-[a-z]{2,20}|lectie-[a-z0-9-]{1,60})$/;
 
 /** Progresul elevului din baza de date: cele mai bune stele pe joc×clasă și punctele. */
 export async function GET() {

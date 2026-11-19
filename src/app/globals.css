@@ -249,3 +249,24 @@ body {
 .diploma-nume { margin: 4mm 0; font-size: 34pt; font-weight: 800; color: #4a3d80; border-bottom: 1px solid #c9b6f2; display: inline-block; padding: 0 12mm; }
 .diploma-medalie { margin: 3mm 0; font-size: 26pt; font-weight: 800; color: #b5541b; }
 @media print { .diploma { page: diploma; box-shadow: none; margin: 0; } }
+
+/* jocurile arcade (Baloanele, Cursa cu porți, Racheta) */
+@keyframes urcaBalon { from { top: 100%; } to { top: -45%; } }
+@keyframes legana { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+@keyframes coboaraPoarta { from { top: -22%; } to { top: 68%; } }
+@keyframes coboaraMeteorit { from { top: -28%; } to { top: 70%; } }
+@keyframes soseaCurge { from { background-position-y: 0; } to { background-position-y: 80px; } }
+@keyframes salt { 0% { transform: scale(0.6); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+@keyframes laser { from { opacity: 1; transform: translateX(-50%) scaleY(0.2); transform-origin: bottom; } to { opacity: 0.2; transform: translateX(-50%) scaleY(1); } }
+.arcade-urca { top: 100%; transform: translateX(-50%); animation-name: urcaBalon; animation-timing-function: linear; animation-fill-mode: forwards; }
+.arcade-balon { animation: legana 2.4s ease-in-out infinite; }
+.arcade-coboara { top: -22%; animation-name: coboaraPoarta; animation-timing-function: linear; animation-fill-mode: forwards; }
+.arcade-meteorit { top: -28%; animation-name: coboaraMeteorit; animation-timing-function: linear; animation-fill-mode: forwards; }
+.arcade-sosea { background-image: repeating-linear-gradient(to bottom, transparent 0 40px, rgb(255 255 255 / 0.12) 40px 80px); animation: soseaCurge 0.6s linear infinite; }
+/* fără mișcare: variantele stau pe loc, fără timp (jocul rămâne jucabil) */
+@media (prefers-reduced-motion: reduce) {
+  .arcade-urca { animation: none; top: 30%; }
+  .arcade-balon, .arcade-sosea { animation: none; }
+  .arcade-coboara { animation: none; top: 35%; }
+  .arcade-meteorit { animation: none; top: 30%; }
+}

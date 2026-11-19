@@ -112,6 +112,15 @@ export default function ZonaElev() {
           </Link>
         )}
 
+        <Link href={`/elev/arcade?clasa=${clasa}`}
+          className="mt-4 flex flex-wrap items-center gap-5 rounded-3xl p-5 text-white shadow-md transition hover:-translate-y-1 hover:shadow-xl" style={{ background: "linear-gradient(120deg, #e0483e, #6a59a7)" }}>
+          <span className="text-5xl" aria-hidden>🕹️</span>
+          <span className="flex-1">
+            <span className="block text-2xl font-bold">Jocuri arcade</span>
+            <span className="block text-white/90">Baloanele, Cursa cu porți și Racheta: răspunsuri rapide, 3 viteze, medalii.</span>
+          </span>
+        </Link>
+
         <Link href="/elev/teme"
           className="mt-4 flex flex-wrap items-center gap-5 rounded-3xl bg-hartie p-5 shadow-md transition hover:-translate-y-1 hover:shadow-xl">
           <span className="text-5xl" aria-hidden>✏️</span>
