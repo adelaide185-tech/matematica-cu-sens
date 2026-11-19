@@ -5,7 +5,8 @@ import Link from "next/link";
 import { Tastatura } from "@/jocuri/componente";
 import { useCelebrare } from "@/jocuri/miscare";
 import { Fractie } from "@/componente/svg/Vizual";
-import { MEDALII, puncteaza, verificaC3, type Medalie } from "@/motor/clasa3/generator";
+import { MEDALII, cateBuneC3, puncteaza, verificaC3, type Medalie } from "@/motor/clasa3/generator";
+import { mesajCateBune } from "@/motor/cateBune";
 import { JOCURI_C3, SECUNDE_VITEZA, type ConfigC3, type ItemC3 as ItemC3Strict } from "@/motor/clasa3/tipuri";
 import type { Desen } from "@/motor/clasa4/tipuri";
 import { DesenC4 } from "@/jocuri/c4/DesenC4";
@@ -102,7 +103,8 @@ export function JocC3({ cfg, itemi, titlu, inapoi, onFinal, onReia, incercare = 
       setTimeout(() => urmator(r, v), it.rezolvare?.length && cfg.joc !== "sprint" ? 5000 : 1900);
     } else {
       setIncercari(1);
-      setStare({ tip: "gresit", mesaj: "Mai încearcă! 💡 " + it.indiciu });
+      const bune = dat === null ? null : mesajCateBune(cateBuneC3(it, dat), "căsuțe");
+      setStare({ tip: "gresit", mesaj: `Mai încearcă! ${bune ? bune + " " : ""}💡 ${it.indiciu}` });
     }
   }, [it, stare, final, rez, incercari, vieti, cfg.vieti, cfg.joc, urmator]);
 

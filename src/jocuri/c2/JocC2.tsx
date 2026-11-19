@@ -7,7 +7,8 @@ import { useCelebrare } from "@/jocuri/miscare";
 import { Ceas, Fractie, Grupe, Numaratoare } from "@/componente/svg/Vizual";
 import { TextMate } from "@/jocuri/c3/Vizuale";
 import { MEDALII, puncteaza, type Medalie } from "@/motor/clasa3/generator";
-import { verificaC2 } from "@/motor/clasa2/generator";
+import { cateBuneC2, verificaC2 } from "@/motor/clasa2/generator";
+import { mesajCateBune } from "@/motor/cateBune";
 import { JOCURI_C2, NIVELURI_C2, VITEZA_BULE, VITEZA_TINTE, type ConfigC2, type ItemC2, type JocC2, type NivelC2, type VizualC2 } from "@/motor/clasa2/tipuri";
 import { deblocheazaPiesa } from "./Puzzle";
 import { Rng } from "@/motor/rng";
@@ -472,7 +473,7 @@ function Casute({ itemi, rez, onGata, onGreseala, onCorect }: PropsJoc) {
         {montat && <button type="button" onClick={() => vorbeste(it.text)} className="h-12 w-12 rounded-full bg-galben text-2xl" aria-label="Ascultă cerința">🔊</button>}
       </div>
       {stare?.tip === "ok" && <p className="rounded-2xl bg-green-100 px-6 py-2 text-2xl font-extrabold text-green-800" role="status">✓{stare.alte && <span className="block text-lg font-semibold">Mai erau: {stare.alte}</span>}</p>}
-      {gresite.length === 1 && !stare && <p className="max-w-xl rounded-2xl bg-galben-deschis px-4 py-2 text-lg text-mov-inchis" role="status">💡 {it.indiciu}</p>}
+      {gresite.length === 1 && !stare && <p className="max-w-xl rounded-2xl bg-galben-deschis px-4 py-2 text-lg text-mov-inchis" role="status">{mesajCateBune(cateBuneC2(it, gresite[0]), "căsuțe")} 💡 {it.indiciu}</p>}
       {!stare && <Tastatura valoare={val[activ] ?? ""} onChange={(x) => setVal((v) => v.map((y, i) => (i === activ ? x.replace(/\D/g, "").slice(0, 4) : y)))} onTrimite={verifica} />}
     </section>
   );
@@ -977,7 +978,7 @@ function IntegramaJoc({ itemi, rez, onGata, onGreseala, onCorect }: PropsJoc) {
             </ul>
           </div>
         ))}
-        {ales && gresite[ales.id]?.length ? <p className="rounded-2xl bg-galben-deschis px-4 py-2 text-lg text-mov-inchis">💡 {ales.indiciu}</p> : null}
+        {ales && gresite[ales.id]?.length ? <p className="rounded-2xl bg-galben-deschis px-4 py-2 text-lg text-mov-inchis" role="status">{mesajCateBune(cateBuneC2(ales, gresite[ales.id].at(-1)!), "litere")} 💡 {ales.indiciu}</p> : null}
       </div>
     </section>
   );

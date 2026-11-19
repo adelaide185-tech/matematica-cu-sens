@@ -7,6 +7,7 @@ const cu = cuSubstantiv;
 import type { ConfigC2, Distractor, ItemC2, JocC2, NivelC2, NotiuneC2, OptiuniC2, TipEroare, VerificareC2, VizualC2 } from "./tipuri";
 import { COMPATIBIL, ORDINE_MIX } from "./tipuri";
 import { NUMERE_INTEGRAMA, construiesteIntegrama, diacriticeObligatorii, fara } from "./integrama";
+import { cateBune, type CateBune } from "@/motor/cateBune";
 
 // ───────────────────────── limbă: ora și numerele ─────────────────────────
 
@@ -783,6 +784,20 @@ export function verificaC2(it: Pick<ItemC2, "raspuns" | "integrama">, dat: strin
   if (r.tip === "valoare") return /^\d+$/.test(r.valoare) ? intreg(dat) === Number(r.valoare) : String(dat).trim() === r.valoare;
   const v = String(dat).split("|").map(intreg);
   return r.solutii.some((sol) => sol.length === v.length && sol.every((x, i) => x === v[i]));
+}
+
+/**
+ * Câte elemente bune a pus elevul: literele la integramă, căsuțele când există o singură soluție.
+ * La căsuțele cu mai multe soluții (ex. □ × □ = 12) pozițiile nu au un singur răspuns, deci nu numărăm.
+ */
+export function cateBuneC2(it: Pick<ItemC2, "raspuns" | "integrama">, dat: string): CateBune | null {
+  const r = it.raspuns;
+  if (it.integrama && r.tip === "valoare") {
+    const norm = (s: string) => (it.integrama!.diacritice ? s : fara(s));
+    return cateBune([...String(dat ?? "").trim().toUpperCase()].map(norm), [...r.valoare].map(norm));
+  }
+  if (r.tip === "casute" && r.solutii.length === 1) return cateBune(String(dat).split("|").map(intreg), r.solutii[0]);
+  return null;
 }
 
 /** Ce greșeală tipică a făcut elevul (după variantele etichetate ale itemului). */

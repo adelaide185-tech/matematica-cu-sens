@@ -91,7 +91,7 @@ Comparat cu ce avem deja (`docs/05`–`07`: Cursa contra cronometrului, Perechi,
 
 1. **Punctaj fix pe exercițiu** (de exemplu 30), cu mai multe runde. Scorurile se pot compara ușor între jocuri.
 2. **3 vieți pe exercițiu**, care scad scorul, dar nu opresc jocul. Se potrivește cu regula noastră „după a doua greșeală arătăm rezolvarea”.
-3. **Indiciu numeric la exercițiile cu mai multe elemente** („ai pus bine 4 din 6”). Pentru Perechi și Clasificare e mai ieftin decât o rezolvare completă.
+3. **Indiciu numeric la exercițiile cu mai multe elemente** („ai pus bine 4 din 6”). ✅ *Făcut:* apare la integramă (litere), la căsuțele de clasa a II-a cu o singură soluție și la împărțirea cu rest (clasele III–IV), după prima greșeală, înaintea indiciului obișnuit (`src/motor/cateBune.ts`). Perechi și Ordonare verifică fiecare element pe loc, așa că acolo nu se aplică.
 4. **Etichete de dificultate vizibile** (Ușor / Moderat / Dificil) și o lecție ordonată în trepte. Se potrivește cu Nivel 1 / Nivel 2 / Amestecat de la noi.
 5. **Nivel de provocare doar pentru viteză** la jocurile cu timp (Cursa contra cronometrului). Conținutul rămâne același.
 6. **Buton „Ascultă”** la clasele I–II.

@@ -3,6 +3,7 @@ import { evalueaza, exercitiuBloc, fmt, hash, type Partial as PartialCalcul } fr
 import type { Bloc } from "@/motor/calcul/tipuri";
 import { cuSubstantiv, numarInLitere } from "@/motor/limba";
 import { roman } from "@/motor/generatoare/fractii-masuri";
+import { cateBune, type CateBune } from "@/motor/cateBune";
 import type { CapitolC3, ConfigC3, Fata, FelItem, ItemC3, JocC3, RaspunsC3, Verificare } from "./tipuri";
 
 type Nou = Omit<ItemC3, "id">;
@@ -654,6 +655,13 @@ const intreg = (s: string) => {
   const t = String(s ?? "").replace(/[\s.]/g, "");
   return /^\d+$/.test(t) ? Number(t) : NaN;
 };
+
+/** Câte căsuțe bune: doar la împărțirea cu rest (cât și rest). La celelalte tipuri răspunsul e un singur element. */
+export function cateBuneC3(item: Pick<ItemC3, "raspuns">, dat: string): CateBune | null {
+  const r = item.raspuns;
+  if (r.tip !== "rest") return null;
+  return cateBune(String(dat).split("|").map(intreg), [r.cat, r.rest]);
+}
 
 /** Verifică un răspuns (în joc și pe server). Formate: număr „245”, rest „12|3”, variantă (textul), construit „5x3”, colorare „3”. */
 export function verificaC3(item: Pick<ItemC3, "raspuns">, dat: string): boolean {
