@@ -1,7 +1,9 @@
 import "server-only";
 import { db } from "./db";
 import type { Sesiune } from "./sesiune-token";
-import { cfgTemaC2, cfgTemaC3, filtruTemeProfesor } from "./teme";
+import { cfgTemaC2, cfgTemaC3, cfgTemaC4, filtruTemeProfesor } from "./teme";
+import { genereazaC4 } from "@/motor/clasa4/generator";
+import { NUME_CAPITOL_C4, type CapitolC4 } from "@/motor/clasa4/tipuri";
 import { genereazaC2 } from "@/motor/clasa2/generator";
 import { COMPATIBIL, NUME_EROARE, NUME_NOTIUNE, type NivelC2, type NotiuneC2, type TipEroare } from "@/motor/clasa2/tipuri";
 import { genereazaC3 } from "@/motor/clasa3/generator";
@@ -16,7 +18,7 @@ export const SEMAFOR: Record<Semafor, { icon: string; nume: string }> = {
   bine: { icon: "🟢", nume: "Se descurcă bine" },
 };
 
-export const numeCompetenta = (c: string) => NUME_CAPITOL[c as CapitolC3] ?? NUME_NOTIUNE[c as NotiuneC2] ?? c;
+export const numeCompetenta = (c: string) => NUME_CAPITOL[c as CapitolC3] ?? NUME_CAPITOL_C4[c as CapitolC4] ?? NUME_NOTIUNE[c as NotiuneC2] ?? c;
 
 type RaspunsElev = { valoare?: string; eroare?: TipEroare | null; terminat?: boolean; nivel?: NivelC2 };
 
@@ -67,6 +69,9 @@ export function exercitiiAcasa(t: TemaCuRezultate, elevId: string, competenta: s
   }
   if (t.mecanica.startsWith("c3:")) {
     return genereazaC3({ ...cfgTemaC3(t, elevId), joc: "sprint", capitole: [competenta as CapitolC3], nr: 3, seed }).itemi.map((i) => ({ text: i.text, raspuns: i.afis }));
+  }
+  if (t.mecanica.startsWith("c4:")) {
+    return genereazaC4({ ...cfgTemaC4(t, elevId), joc: "sprint", capitole: [competenta as CapitolC4], nr: 3, seed }).itemi.map((i) => ({ text: i.text, raspuns: i.afis }));
   }
   return [];
 }

@@ -6,9 +6,17 @@ import { Tastatura } from "@/jocuri/componente";
 import { useCelebrare } from "@/jocuri/miscare";
 import { Fractie } from "@/componente/svg/Vizual";
 import { MEDALII, puncteaza, verificaC3, type Medalie } from "@/motor/clasa3/generator";
-import { JOCURI_C3, SECUNDE_VITEZA, type ConfigC3, type ItemC3 } from "@/motor/clasa3/tipuri";
+import { JOCURI_C3, SECUNDE_VITEZA, type ConfigC3, type ItemC3 as ItemC3Strict } from "@/motor/clasa3/tipuri";
+import type { Desen } from "@/motor/clasa4/tipuri";
+import { DesenC4 } from "@/jocuri/c4/DesenC4";
 import { Rng } from "@/motor/rng";
 import { FataC3, FiguraC3, TextMate } from "./Vizuale";
+
+/** Itemul unui joc: de clasa a III-a sau a IV-a (care adaugă desene și rezolvări). */
+export type ItemJoc = Omit<ItemC3Strict, "capitol" | "verificare"> & { capitol: string; desen?: Desen; rezolvare?: string[] };
+type ItemC3 = ItemJoc;
+/** Ce folosește jocul din configurație (clasa a III-a și a IV-a au aceleași câmpuri) */
+export type CfgJoc = Pick<ConfigC3, "joc" | "seed" | "vieti" | "viteza">;
 
 export interface RaspunsJoc { id: string; dat: string | null; corect: boolean; incercari: number; timpMs: number }
 export interface FinalJoc { raspunsuri: RaspunsJoc[]; vietiRamase: number; terminat: boolean; incercare: number }
@@ -16,8 +24,8 @@ export interface FinalJoc { raspunsuri: RaspunsJoc[]; vietiRamase: number; termi
 type Stare = { tip: "corect" } | { tip: "gresit"; mesaj: string; arata?: string } | null;
 
 /** Timpul de lucru la Sprint pentru un item (problemele și împărțirile cu rest primesc mai mult). */
-export function timpItem(cfg: ConfigC3, it: ItemC3, combo: number): number {
-  const baza = SECUNDE_VITEZA[cfg.viteza] * 1000 * (it.capitol === "probleme" || it.text.length > 40 ? 2.5 : it.raspuns.tip === "rest" ? 1.6 : 1);
+export function timpItem(cfg: CfgJoc, it: ItemC3, combo: number): number {
+  const baza = SECUNDE_VITEZA[cfg.viteza] * 1000 * (it.capitol === "probleme" || it.desen || it.text.length > 40 ? 2.5 : it.raspuns.tip === "rest" ? 1.6 : 1);
   return Math.max(4000, baza * Math.pow(0.9, Math.floor(combo / 3)));
 }
 
@@ -35,7 +43,7 @@ function vorbeste(text: string) {
  * `onFinal` primește răspunsurile (tema le trimite pe server, unde se verifică din nou).
  */
 export function JocC3({ cfg, itemi, titlu, inapoi, onFinal, onReia, incercare = 0, eticheta }: {
-  cfg: ConfigC3; itemi: ItemC3[]; titlu?: string; inapoi: string;
+  cfg: CfgJoc; itemi: ItemC3[]; titlu?: string; inapoi: string;
   onFinal?: (f: FinalJoc) => Promise<string | void> | string | void;
   onReia?: () => void; incercare?: number; eticheta?: string;
 }) {
@@ -91,7 +99,7 @@ export function JocC3({ cfg, itemi, titlu, inapoi, onFinal, onReia, incercare = 
       const r = [...rez, { id: it.id, dat, corect: false, incercari: incercari + 1, timpMs }];
       setRez(r);
       setStare({ tip: "gresit", mesaj: dat === null ? "Timpul a expirat!" : "Nu e corect.", arata: it.afis });
-      setTimeout(() => urmator(r, v), 1900);
+      setTimeout(() => urmator(r, v), it.rezolvare?.length && cfg.joc !== "sprint" ? 5000 : 1900);
     } else {
       setIncercari(1);
       setStare({ tip: "gresit", mesaj: "Mai încearcă! 💡 " + it.indiciu });
@@ -138,7 +146,7 @@ export function JocC3({ cfg, itemi, titlu, inapoi, onFinal, onReia, incercare = 
         <section key={it.id} className="mt-4 flex flex-1 flex-col items-center gap-4">
           {cfg.joc === "sprint" && <BaraTimp cheie={it.id} ms={timpItem(cfg, it, comboCurent)} oprit={!!stare} onExpirat={() => raspunde(null)} />}
           <Enunt it={it} joc={cfg.joc} stare={stare} />
-          <Feedback stare={stare} onReincearca={reincearca} />
+          <Feedback stare={stare} onReincearca={reincearca} rezolvare={it.rezolvare} />
           {!(stare && (stare.tip === "corect" || stare.arata)) && <Intrare key={`${it.id}-${incercari}`} it={it} onRaspuns={raspunde} blocat={false} />}
         </section>
       ) : null}
@@ -148,7 +156,7 @@ export function JocC3({ cfg, itemi, titlu, inapoi, onFinal, onReia, incercare = 
 
 // ───────────────────────── enunțul, după joc ─────────────────────────
 
-function Enunt({ it, joc, stare }: { it: ItemC3; joc: ConfigC3["joc"]; stare: Stare }) {
+function Enunt({ it, joc, stare }: { it: ItemC3; joc: CfgJoc["joc"]; stare: Stare }) {
   const asculta = <button type="button" onClick={() => vorbeste(it.text)} className="ml-2 rounded-full bg-white px-2 py-1 text-lg shadow-sm" aria-label="Ascultă enunțul">🔊</button>;
   if (joc === "balanta" && it.st && it.dr) {
     const s = stare?.tip === "corect" || stare?.arata ? it.afis : null;
@@ -178,6 +186,7 @@ function Enunt({ it, joc, stare }: { it: ItemC3; joc: ConfigC3["joc"]; stare: St
     <div className="flex w-full max-w-2xl flex-col items-center gap-3 rounded-3xl bg-white p-5 text-center shadow-md">
       {joc === "detectiv" && <span className="text-4xl" aria-hidden>🔍</span>}
       {it.figura && <FiguraC3 f={it.figura} marime={1.1} />}
+      {it.desen && <div className="max-w-full overflow-x-auto"><DesenC4 d={it.desen} marime={it.desen.tip === "segmente" ? 1.3 : 1.15} /></div>}
       {it.fractie && it.raspuns.tip !== "colorare" && <Fractie forma={it.fractie.forma} parti={it.fractie.parti} colorate={it.fractie.colorate} marime={1.1} />}
       <p className={`font-extrabold text-mov-inchis ${it.text.length > 60 ? "text-xl" : it.text.length > 30 ? "text-2xl" : "text-4xl"}`}>
         <TextMate text={it.text.replace("○", "?")} />{asculta}
@@ -186,7 +195,7 @@ function Enunt({ it, joc, stare }: { it: ItemC3; joc: ConfigC3["joc"]; stare: St
   );
 }
 
-function Feedback({ stare, onReincearca }: { stare: Stare; onReincearca: () => void }) {
+function Feedback({ stare, onReincearca, rezolvare }: { stare: Stare; onReincearca: () => void; rezolvare?: string[] }) {
   if (!stare) return null;
   if (stare.tip === "corect") return <p className="rounded-2xl bg-green-100 px-5 py-2 text-2xl font-extrabold text-green-800" role="status">✓ Corect!</p>;
   return (
@@ -194,6 +203,9 @@ function Feedback({ stare, onReincearca }: { stare: Stare; onReincearca: () => v
       <p className="text-xl font-bold">✗ {stare.mesaj.split(" 💡 ")[0]}</p>
       {stare.mesaj.includes("💡") && <p className="mt-1 text-base text-gray-700">💡 {stare.mesaj.split(" 💡 ")[1]}</p>}
       {stare.arata && <p className="mt-1 text-lg">Răspunsul corect: <b><TextMate text={stare.arata} /></b></p>}
+      {stare.arata && rezolvare && rezolvare.length > 0 && (
+        <ol className="mt-2 list-decimal rounded-xl bg-white px-8 py-2 text-left text-base text-gray-800">{rezolvare.map((p) => <li key={p}>{p}</li>)}</ol>
+      )}
       {!stare.arata && <button type="button" onClick={onReincearca} className="mt-2 rounded-xl bg-mov px-5 py-2 font-bold text-white">Încerc din nou</button>}
     </div>
   );
@@ -341,7 +353,7 @@ function Colorare({ it, onRaspuns }: { it: ItemC3; onRaspuns: (d: string) => voi
 interface Carte { cheie: string; id: string; f: ItemC3["st"]; parte: "st" | "dr" }
 
 function Memory({ cfg, itemi, rez, onPereche, onGreseala, onGata }: {
-  cfg: ConfigC3; itemi: ItemC3[]; vieti: number; rez: RaspunsJoc[];
+  cfg: CfgJoc; itemi: ItemC3[]; vieti: number; rez: RaspunsJoc[];
   onPereche: (id: string, incercari: number, timpMs: number) => void; onGreseala: () => void; onGata: (r: RaspunsJoc[]) => void;
 }) {
   const PE_TABLA = 6;
@@ -405,7 +417,7 @@ function Memory({ cfg, itemi, rez, onPereche, onGreseala, onGata }: {
 // ───────────────────────── ecranul final ─────────────────────────
 
 function Final({ cfg, puncte, rez, itemi, terminat, mesaj, inapoi, onReia }: {
-  cfg: ConfigC3; puncte: ReturnType<typeof puncteaza>; rez: RaspunsJoc[]; itemi: ItemC3[]; terminat: boolean; mesaj?: string; inapoi: string; onReia?: () => void;
+  cfg: CfgJoc; puncte: ReturnType<typeof puncteaza>; rez: RaspunsJoc[]; itemi: ItemC3[]; terminat: boolean; mesaj?: string; inapoi: string; onReia?: () => void;
 }) {
   useCelebrare(puncte.stele >= 2, puncte.stele === 3 ? "mare" : "mica");
   const gresite = itemi.filter((it) => rez.find((r) => r.id === it.id && !r.corect) || !rez.find((r) => r.id === it.id));
@@ -428,7 +440,7 @@ function Final({ cfg, puncte, rez, itemi, terminat, mesaj, inapoi, onReia }: {
           <div className="mt-4 text-left">
             <h2 className="font-bold text-mov">De exersat:</h2>
             <ul className="mt-1 grid gap-1">
-              {gresite.slice(0, 10).map((it) => <li key={it.id} className="rounded-lg bg-red-50 px-3 py-1.5"><TextMate text={it.text} /> → <b><TextMate text={it.afis} /></b></li>)}
+              {gresite.slice(0, 10).map((it) => <li key={it.id} className="rounded-lg bg-red-50 px-3 py-1.5"><TextMate text={it.text} /> → <b><TextMate text={it.afis} /></b>{it.rezolvare && <span className="block text-sm text-gray-600">{it.rezolvare.join(" · ")}</span>}</li>)}
             </ul>
           </div>
         )}

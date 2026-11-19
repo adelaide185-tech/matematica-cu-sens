@@ -80,6 +80,16 @@ export default function ZonaElev() {
             </span>
           </Link>
         )}
+        {clasa === 4 && (
+          <Link href="/elev/clasa4"
+            className="mt-4 flex flex-wrap items-center gap-5 rounded-3xl bg-galben p-5 text-mov-inchis shadow-md transition hover:-translate-y-1 hover:shadow-xl">
+            <span className="text-5xl" aria-hidden>📐</span>
+            <span className="flex-1">
+              <span className="block text-2xl font-bold">Jocuri de clasa a IV-a</span>
+              <span className="block">Unități de măsură, geometrie, probleme, logică și tabele: Cursa, Perechi, Balanța, Detectivul și Constructorul.</span>
+            </span>
+          </Link>
+        )}
         {clasa === 1 && (
           <Link href="/elev/clasa1"
             className="mt-4 flex flex-wrap items-center gap-5 rounded-3xl bg-galben p-6 shadow-lg transition hover:-translate-y-1 hover:shadow-xl">

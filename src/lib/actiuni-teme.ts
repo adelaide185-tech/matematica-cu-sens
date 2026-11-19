@@ -6,6 +6,7 @@ import { db } from "./db";
 import { cereRol } from "./auth";
 import { decodifica } from "@/motor/calcul/config";
 import { decodificaC3 } from "@/motor/clasa3/config";
+import { decodificaC4 } from "@/motor/clasa4/config";
 import { puncteaza, verificaC3 } from "@/motor/clasa3/generator";
 import { JOCURI_C3, SECUNDE_VITEZA } from "@/motor/clasa3/tipuri";
 import { decodificaC2 } from "@/motor/clasa2/config";
@@ -13,7 +14,7 @@ import { clasificaEroare, verificaC2 } from "@/motor/clasa2/generator";
 import { JOCURI_C2, NIVELURI_C2, type NivelC2 } from "@/motor/clasa2/tipuri";
 import type { Sesiune } from "./sesiune-token";
 import { corect, textRaspuns, totalExercitii } from "@/motor/calcul/generator";
-import { exercitiiTema, filtruClaseProfesor, filtruTemeProfesor, itemiTemaC2, itemiTemaC3, steleDinProcent, temaPentruElev } from "./teme";
+import { exercitiiTema, filtruClaseProfesor, filtruTemeProfesor, itemiTemaC2, itemiTemaC3, itemiTemaC4, steleDinProcent, temaPentruElev } from "./teme";
 
 export interface DateTemaNoua {
   /** configurația codificată (aceeași ca în URL-ul fișei) */
@@ -115,6 +116,21 @@ export async function creeazaTemaJocC3(d: DateTemaNoua): Promise<StareTema> {
   });
 }
 
+/** Jocurile de clasa a IV-a trimise ca temă. */
+export async function creeazaTemaJocC4(d: DateTemaNoua): Promise<StareTema> {
+  const s = await cereRol("PROFESOR", "ADMIN_SCOALA");
+  const cfg = decodificaC4(d.c);
+  if (!cfg) return { eroare: "Configurația jocului nu a putut fi citită." };
+  const t = await tintaTema(s, d.tinta);
+  if ("eroare" in t) return t;
+  return salveazaTema({
+    titlu: d.titlu.trim().slice(0, 120) || `${JOCURI_C3[cfg.joc].nume} – clasa a IV-a`, profesorId: s.id, ...t,
+    mecanica: `c4:${cfg.joc}`, generatoare: cfg.capitole, nivel: d.test ? "EVALUARE" : "CONSOLIDARE",
+    nrItemi: cfg.nr, seed: d.diferite ? null : cfg.seed,
+    config: cfg as unknown as Prisma.InputJsonValue, ...limitaSiTermen(d), test: d.test,
+  });
+}
+
 export async function stergeTema(id: string): Promise<void> {
   const s = await cereRol("PROFESOR", "ADMIN_SCOALA");
   const t = await db.tema.findFirst({ where: { id, ...filtruTemeProfesor(s) } });
@@ -174,17 +190,26 @@ export interface RezultatJocC3 { eroare?: string; scor?: number; medalie?: strin
  * verifică din nou fiecare răspuns și calculează punctajul și medalia.
  */
 export async function trimiteJocC3(cod: string, raspunsuri: RaspunsJocTrimis[], incercare: number, terminat: boolean): Promise<RezultatJocC3> {
+  return trimiteJocC34("c3", cod, raspunsuri, incercare, terminat);
+}
+
+/** Același traseu pentru jocurile de clasa a IV-a (aceleași 5 jocuri, alt conținut). */
+export async function trimiteJocC4(cod: string, raspunsuri: RaspunsJocTrimis[], incercare: number, terminat: boolean): Promise<RezultatJocC3> {
+  return trimiteJocC34("c4", cod, raspunsuri, incercare, terminat);
+}
+
+async function trimiteJocC34(clasa: "c3" | "c4", cod: string, raspunsuri: RaspunsJocTrimis[], incercare: number, terminat: boolean): Promise<RezultatJocC3> {
   const s = await cereRol("ELEV");
   const tema = await temaPentruElev(cod, s.id);
-  if (!tema || !tema.mecanica.startsWith("c3:")) return { eroare: "Tema nu există sau nu este pentru tine." };
+  if (!tema || !tema.mecanica.startsWith(`${clasa}:`)) return { eroare: "Tema nu există sau nu este pentru tine." };
   if (tema.test) {
     const deja = await db.incercare.count({ where: { temaId: tema.id, elevId: s.id, terminat: { not: null } } });
     if (deja) return { eroare: "Ai trimis deja acest test." };
   }
   const nrInc = Math.max(0, Math.min(1000, Math.floor(Number(incercare) || 0)));
-  const { cfg, itemi } = itemiTemaC3(tema, s.id, nrInc);
+  const { cfg, itemi } = clasa === "c3" ? itemiTemaC3(tema, s.id, nrInc) : itemiTemaC4(tema, s.id, nrInc);
   const dupaId = new Map(raspunsuri.slice(0, 200).map((r) => [String(r.id), r]));
-  const rez = itemi.map((it) => {
+  const rez = (itemi as { id: string; capitol: string; text: string; afis: string; raspuns: Parameters<typeof verificaC3>[0]["raspuns"] }[]).map((it) => {
     const r = dupaId.get(it.id);
     const dat = r?.dat === null || r?.dat === undefined ? null : String(r.dat).slice(0, 40);
     // la Memory, perechea e găsită în joc; la celelalte jocuri, răspunsul se verifică aici
@@ -200,7 +225,7 @@ export async function trimiteJocC3(cod: string, raspunsuri: RaspunsJocTrimis[], 
       corecte: p.corecte, total: itemi.length, stele: p.stele, scor: p.scor, scorMax: p.scorMax, medalie: p.medalie, comboMax: p.comboMax,
       raspunsuri: {
         create: rez.map((r) => ({
-          generatorId: `c3.${r.it.capitol}`, competenta: r.it.capitol, dificultate: r.incercari,
+          generatorId: `${clasa}.${r.it.capitol}`, competenta: r.it.capitol, dificultate: r.incercari,
           item: { id: r.it.id, text: r.it.text, inainte: null, raspuns: r.it.afis },
           raspunsElev: { valoare: r.dat ?? (r.raspuns ? "(timp expirat)" : "(nerezolvat)"), incercari: r.incercari, terminat },
           corect: r.corect, timpMs: r.timpMs,

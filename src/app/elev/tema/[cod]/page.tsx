@@ -2,8 +2,9 @@ import Link from "next/link";
 import { db, dbConfigurata } from "@/lib/db";
 import { cereRol } from "@/lib/auth";
 import { JocTema } from "@/jocuri/c3/JocTema";
-import { cfgTemaC2, cfgTemaC3, exercitiiTema, exercitiiTemaClasa1, temaPentruElev } from "@/lib/teme";
+import { cfgTemaC2, cfgTemaC3, cfgTemaC4, exercitiiTema, exercitiiTemaClasa1, temaPentruElev } from "@/lib/teme";
 import { JocTemaC2 } from "@/jocuri/c2/JocuriC2";
+import { JocTemaC4 } from "@/jocuri/c4/JocuriC4";
 import { dreaptaTable, pentruElev } from "@/motor/clasa1/sesiune";
 import { RezolvaTema, type ExercitiuElev } from "./RezolvaTema";
 import { TemaClasa1 } from "./TemaClasa1";
@@ -20,6 +21,7 @@ export default async function PaginaTema({ params }: { params: Promise<{ cod: st
   if (tema.test && trimis) return <Mesaj text={`Ai trimis deja testul „${tema.titlu}”: ${trimis.corecte} din ${trimis.total} corecte.`} />;
   if (tema.mecanica.startsWith("c2:")) return <JocTemaC2 cod={tema.cod} titlu={tema.titlu} baza={cfgTemaC2(tema, s.id)} test={tema.test} />;
   if (tema.mecanica.startsWith("c3:")) return <JocTema cod={tema.cod} titlu={tema.titlu} baza={cfgTemaC3(tema, s.id)} test={tema.test} />;
+  if (tema.mecanica.startsWith("c4:")) return <JocTemaC4 cod={tema.cod} titlu={tema.titlu} baza={cfgTemaC4(tema, s.id)} test={tema.test} />;
   if (tema.mecanica === "clasa1") {
     // jocurile clasei I: la elev ajung enunțurile și desenele, fără răspunsuri
     const { cfg, exercitii } = exercitiiTemaClasa1(tema, s.id);

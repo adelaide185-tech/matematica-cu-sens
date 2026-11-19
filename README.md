@@ -134,5 +134,11 @@ Clasa a II-a: mini-jocuri (`/profesor/clasa2`, detalii în `docs/06_CLASA2_JOCUR
 - conținut pe noțiunile din antrenament, 3 niveluri, greșeli tipice etichetate, numere cu litere și ora spusă românește
 - Perechi rapide, Bule care cad, Scara, Completează căsuțele, Balanța (și „echilibrează”), Ordonează, Memorie, Ceasul (citește ora / mută acele), Magazinul (plătește exact, câți bani sunt, rest), Provocarea în imagini, Integrama numerelor, Ținte, Mix automat și puzzle-ul de recompensă; semafor pe elevi, raport pentru părinți, diplomă, CSV; fișă PDF cu barem; trimitere ca joc; raport cu greșeli tipice
 
+Clasa a IV-a, semestrul al II-lea (`/profesor/clasa4`, detalii în `docs/07_CLASA4_JOCURI.md`):
+- cele 12 capitole din cuprins, fiecare pe Nivel 1 / Nivel 2: geometrie, corpuri, metoda figurativă, încercări, estimare, logică și probabilități, tabele, etaloane, capacitate, lungime, masă, timp
+- desene SVG (drepte, figuri, corpuri, tabele, bile, segmente), fișă PDF cu barem și fișă „Exerciții rezolvate” pas cu pas
+- aceleași 5 jocuri ca la clasa a III-a, trimise ca temă, cu rezolvarea arătată după greșeală și rapoarte la profesor
+- verificare independentă cu SymPy (`scripts/valideaza_clasa4.py`, parte din `npm run valideaza:sympy`)
+
 Urmează:
 - rapoarte de progres pe noțiuni pentru profesor
