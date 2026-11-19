@@ -5,7 +5,7 @@ import { cfgIncercareC4, decodificaC4 } from "@/motor/clasa4/config";
 import { genereazaC4 } from "@/motor/clasa4/generator";
 import type { ConfigC4 } from "@/motor/clasa4/tipuri";
 import { MEDALII } from "@/motor/clasa3/generator";
-import { inregistreaza } from "@/jocuri/progres";
+import { inregistreaza, seteazaRezultat } from "@/jocuri/progres";
 import { trimiteJocC4 } from "@/lib/actiuni-teme";
 import { JocC3 } from "@/jocuri/c3/JocC3";
 
@@ -29,6 +29,7 @@ export function JocLiberC4() {
         if (preview) return "Previzualizare: rezultatul nu se salvează.";
         const corecte = f.raspunsuri.filter((r) => r.corect).length;
         const p = corecte / Math.max(1, itemi.length);
+        seteazaRezultat(corecte, itemi.length);
         inregistreaza(`c4-${baza.joc}`, 4, p >= 0.9 ? 3 : p >= 0.75 ? 2 : p >= 0.5 ? 1 : 0, { logica: corecte }, []);
       }}
       onReia={() => setIncercare((n) => n + 1)} />

@@ -10,6 +10,7 @@ import { dreaptaTable, genereazaClasa1, pasC1, pentruElev, rezultatC1 } from "@/
 import type { CapitolC1, ConfigClasa1, RaspunsElevC1 } from "@/motor/clasa1/tipuri";
 import { seedNou } from "@/motor/rng";
 import { JocClasa1 } from "@/jocuri/clasa1/JocClasa1";
+import { inregistreaza, seteazaRezultat } from "@/jocuri/progres";
 
 /** Jocul liber al clasei I (fără cont) și previzualizarea profesorului (?c=configurație). */
 export default function PaginaClasa1() {
@@ -38,8 +39,13 @@ function Sesiune({ cfg, previzualizare, onReia }: { cfg: ConfigClasa1; previzual
   const verifica = useCallback(async (i: number, dat: unknown, inc: number) => pasC1(exercitii[i], dat, inc), [exercitii]);
   const termina = useCallback(async (r: RaspunsElevC1[]) => {
     const x = rezultatC1(exercitii, r);
+    // jocul liber salvează stelele în progresul elevului (previzualizarea profesorului nu)
+    if (!previzualizare) {
+      seteazaRezultat(x.corecte, x.total);
+      inregistreaza("c1-joc", 1, x.stele, { logica: x.corecte }, []);
+    }
     return { corecte: x.corecte, total: x.total, procent: x.procent, medalie: x.medalie, stele: x.stele };
-  }, [exercitii]);
+  }, [exercitii, previzualizare]);
   if (!exercitii.length) return <main className="p-8 text-center">Nu am putut pregăti exercițiile. <Link href="/elev/clasa1" className="text-mov underline">Înapoi</Link></main>;
   return (
     <JocClasa1 titlu={previzualizare ? `Previzualizare · ${cfg.antet.titlu}` : "Jocurile clasei I"} exercitii={elev} dreapta={dreapta}

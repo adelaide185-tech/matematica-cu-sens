@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { cfgIncercare, decodificaC3 } from "@/motor/clasa3/config";
 import { genereazaC3 } from "@/motor/clasa3/generator";
 import type { ConfigC3 } from "@/motor/clasa3/tipuri";
-import { inregistreaza } from "@/jocuri/progres";
+import { inregistreaza, seteazaRezultat } from "@/jocuri/progres";
 import { JocC3 } from "./JocC3";
 
 /** Joc liber (din meniul elevului) sau previzualizarea profesorului: fără salvare pe server. */
@@ -27,6 +27,7 @@ export function JocLiber() {
         if (preview) return "Previzualizare: rezultatul nu se salvează.";
         const corecte = f.raspunsuri.filter((r) => r.corect).length;
         const p = corecte / Math.max(1, itemi.length);
+        seteazaRezultat(corecte, itemi.length);
         inregistreaza(`c3-${baza.joc}`, 3, p >= 0.9 ? 3 : p >= 0.75 ? 2 : p >= 0.5 ? 1 : 0, { logica: corecte }, []);
       }}
       onReia={() => setIncercare((n) => n + 1)} />
