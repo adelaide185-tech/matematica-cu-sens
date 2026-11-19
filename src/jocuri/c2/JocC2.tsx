@@ -9,6 +9,7 @@ import { TextMate } from "@/jocuri/c3/Vizuale";
 import { MEDALII, puncteaza, type Medalie } from "@/motor/clasa3/generator";
 import { cateBuneC2, verificaC2 } from "@/motor/clasa2/generator";
 import { mesajCateBune } from "@/motor/cateBune";
+import { ScaraMedalii } from "@/componente/ScaraMedalii";
 import { JOCURI_C2, NIVELURI_C2, VITEZA_BULE, VITEZA_TINTE, type ConfigC2, type ItemC2, type JocC2, type NivelC2, type VizualC2 } from "@/motor/clasa2/tipuri";
 import { deblocheazaPiesa } from "./Puzzle";
 import { Rng } from "@/motor/rng";
@@ -1095,6 +1096,7 @@ function Final({ puncte, mult, rez, itemi, terminat, mesaj, inapoi, onReia }: {
         <div className="text-8xl" aria-hidden>{m ? MEDALII[m].icon : "💪"}</div>
         <h1 className="mt-2 text-3xl font-extrabold text-mov">{m ? MEDALII[m].nume : terminat ? "Bravo!" : "Mai încercăm o dată? 💪"}</h1>
         <div className="mt-1 text-5xl">{[1, 2, 3].map((s) => <span key={s} className={s <= puncte.stele ? "" : "opacity-20 grayscale"}>⭐</span>)}</div>
+        <ScaraMedalii puncte={puncte} />
         <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[["⭐", `${Math.round(puncte.scor * mult)}`], ["✓", `${puncte.corecte}/${itemi.length}`], ["🎯", `${puncte.acuratete}%`], ["⏱", `${timpMediu} s`]].map(([a, b]) => (
             <div key={a} className="rounded-2xl bg-mov-deschis p-3"><dt className="text-2xl" aria-hidden>{a}</dt><dd className="text-2xl font-extrabold text-mov-inchis">{b}</dd></div>

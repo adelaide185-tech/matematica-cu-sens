@@ -7,7 +7,7 @@ import { FormActiune } from "@/componente/FormActiune";
 import { Reimprospatare } from "@/componente/Reimprospatare";
 import { JOCURI_C3, type JocC3 } from "@/motor/clasa3/tipuri";
 import { JOCURI_C2, type JocC2 } from "@/motor/clasa2/tipuri";
-import { MEDALII } from "@/motor/clasa3/generator";
+import { MEDALII, ORDINE_MEDALII, trofeeClasa } from "@/motor/clasa3/generator";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +37,7 @@ export default async function TemeProfesor() {
           <Link href="/profesor/clasa1" className="rounded-xl bg-galben px-4 py-2 font-bold text-mov-inchis hover:brightness-95">+ Jocuri Clasa I</Link>
         </div>
       </div>
+      <TrofeeClase teme={teme} />
       {!teme.length && <p className="mt-6 rounded-2xl bg-white p-6 shadow">Nu ai trimis încă nicio temă. Generează o fișă și apasă „Trimite elevilor”.</p>}
       <div className="mt-6 grid gap-3">
         {teme.map((t) => {
@@ -67,5 +68,40 @@ export default async function TemeProfesor() {
         })}
       </div>
     </main>
+  );
+}
+
+const ESTE_JOC = (m: string) => m.startsWith("c2:") || m.startsWith("c3:") || m.startsWith("c4:");
+
+/** Trofeele fiecărei clase: cea mai bună medalie a fiecărui elev la fiecare joc trimis clasei. */
+function TrofeeClase({ teme }: { teme: { id: string; clasaId: string | null; mecanica: string; clasa: { nume: string } | null; incercari: { elevId: string; medalie: string | null }[] }[] }) {
+  const clase = new Map<string, { nume: string; incercari: { elevId: string; temaId: string; medalie: string | null }[] }>();
+  for (const t of teme) {
+    if (!t.clasaId || !t.clasa || !ESTE_JOC(t.mecanica)) continue;
+    const c = clase.get(t.clasaId) ?? { nume: t.clasa.nume, incercari: [] };
+    c.incercari.push(...t.incercari.map((i) => ({ ...i, temaId: t.id })));
+    clase.set(t.clasaId, c);
+  }
+  if (!clase.size) return null;
+  return (
+    <section className="mt-6 rounded-2xl bg-white p-4 shadow">
+      <h2 className="text-xl font-bold text-mov">🏆 Trofeele claselor</h2>
+      <p className="text-sm text-gray-600">Cea mai bună medalie a fiecărui elev la fiecare joc (reluările nu se adună). Bronz {"≥"} 50%, argint {"≥"} 75%, aur {"≥"} 90% din puncte, diamant = toate corecte din prima.</p>
+      <ul className="mt-3 grid gap-2">
+        {[...clase.entries()].map(([id, c]) => {
+          const t = trofeeClasa(c.incercari);
+          return (
+            <li key={id} className="flex flex-wrap items-center gap-4 rounded-xl bg-mov-deschis/50 px-3 py-2">
+              <span className="min-w-32 font-bold text-mov-inchis">{c.nume}</span>
+              {ORDINE_MEDALII.map((m) => (
+                <span key={m} title={MEDALII[m].nume} className={`text-lg font-bold ${t[m] ? "text-mov-inchis" : "text-gray-400"}`}>
+                  <span className={t[m] ? "" : "opacity-30 grayscale"} aria-hidden>{MEDALII[m].icon}</span> {t[m]}<span className="sr-only"> {MEDALII[m].nume}</span>
+                </span>
+              ))}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }

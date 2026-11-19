@@ -687,6 +687,47 @@ export const MEDALII: Record<Exclude<Medalie, null>, { nume: string; icon: strin
 
 export interface RezultatItem { corect: boolean; incercari: number; timpMs: number }
 
+/** Pragurile medaliilor (procent din punctajul de bază: 10 puncte din prima, 5 din a doua). Diamant = toate din prima. */
+export const PRAGURI_MEDALII = { bronz: 50, argint: 75, aur: 90 } as const;
+export const ORDINE_MEDALII = ["bronz", "argint", "aur", "diamant"] as const;
+
+/** Ce i-a cerut fiecare medalie, în cuvinte pentru elev. */
+export const CERINTE_MEDALII: Record<Exclude<Medalie, null>, string> = {
+  bronz: `${PRAGURI_MEDALII.bronz}% din puncte`,
+  argint: `${PRAGURI_MEDALII.argint}% din puncte`,
+  aur: `${PRAGURI_MEDALII.aur}% din puncte`,
+  diamant: "toate corecte din prima",
+};
+
+/**
+ * Următoarea medalie și de câte răspunsuri corecte din prima (în plus) mai era nevoie pentru ea.
+ * Un răspuns corect din prima valorează 10 puncte, deci numărul e minimul necesar.
+ */
+export function urmatoareaMedalie(p: { medalie: Medalie; procent: number; scorMax: number }): { medalie: Exclude<Medalie, null>; lipsa: number | null } | null {
+  const i = p.medalie ? ORDINE_MEDALII.indexOf(p.medalie) : -1;
+  const urm = ORDINE_MEDALII[i + 1];
+  if (!urm) return null;
+  if (urm === "diamant") return { medalie: urm, lipsa: null };
+  const lipsaPuncte = (PRAGURI_MEDALII[urm] * p.scorMax) / 100 - (p.procent * p.scorMax) / 100;
+  return { medalie: urm, lipsa: Math.max(1, Math.ceil(lipsaPuncte / 10)) };
+}
+
+/**
+ * Trofeele clasei: cea mai bună medalie a fiecărui elev la fiecare temă (reluările nu se adună).
+ */
+export function trofeeClasa(incercari: { elevId: string; temaId: string | null; medalie: string | null }[]): Record<Exclude<Medalie, null>, number> {
+  const cea = new Map<string, number>();
+  for (const i of incercari) {
+    const r = ORDINE_MEDALII.indexOf(i.medalie as Exclude<Medalie, null>);
+    if (r < 0) continue;
+    const k = `${i.elevId}|${i.temaId ?? ""}`;
+    cea.set(k, Math.max(cea.get(k) ?? -1, r));
+  }
+  const t = { bronz: 0, argint: 0, aur: 0, diamant: 0 };
+  for (const r of cea.values()) t[ORDINE_MEDALII[r]]++;
+  return t;
+}
+
 /**
  * Punctaj: 10 la prima încercare, 5 după o greșeală; +2 la răspuns rapid (sub jumătate din timp, la Sprint);
  * combo: +1 de la 3 corecte la rând, +2 de la 5, +3 de la 10.
@@ -708,7 +749,7 @@ export function puncteaza(rez: RezultatItem[], total: number, timpPermisMs?: num
   const procent = Math.round((100 * baza) / max);
   const corecte = rez.filter((r) => r.corect).length;
   const toatePrimaData = rez.length === total && rez.every((r) => r.corect && r.incercari <= 1);
-  const medalie: Medalie = toatePrimaData ? "diamant" : procent >= 90 ? "aur" : procent >= 75 ? "argint" : procent >= 50 ? "bronz" : null;
+  const medalie: Medalie = toatePrimaData ? "diamant" : procent >= PRAGURI_MEDALII.aur ? "aur" : procent >= PRAGURI_MEDALII.argint ? "argint" : procent >= PRAGURI_MEDALII.bronz ? "bronz" : null;
   const stele = procent >= 90 ? 3 : procent >= 75 ? 2 : procent >= 50 ? 1 : 0;
   return { scor, scorMax: max, procent, corecte, comboMax, medalie, stele, acuratete: Math.round((100 * corecte) / Math.max(1, total)) };
 }

@@ -7,6 +7,7 @@ import { useCelebrare } from "@/jocuri/miscare";
 import { Fractie } from "@/componente/svg/Vizual";
 import { MEDALII, cateBuneC3, puncteaza, verificaC3, type Medalie } from "@/motor/clasa3/generator";
 import { mesajCateBune } from "@/motor/cateBune";
+import { ScaraMedalii } from "@/componente/ScaraMedalii";
 import { JOCURI_C3, SECUNDE_VITEZA, type ConfigC3, type ItemC3 as ItemC3Strict } from "@/motor/clasa3/tipuri";
 import type { Desen } from "@/motor/clasa4/tipuri";
 import { DesenC4 } from "@/jocuri/c4/DesenC4";
@@ -431,6 +432,7 @@ function Final({ cfg, puncte, rez, itemi, terminat, mesaj, inapoi, onReia }: {
         <div className="text-7xl" aria-hidden>{m ? MEDALII[m].icon : "💪"}</div>
         <h1 className="mt-2 text-3xl font-extrabold text-mov">{m ? `Medalia de ${MEDALII[m].nume}!` : terminat ? "Bravo că ai terminat!" : "Ai rămas fără vieți"}</h1>
         <div className="mt-1 text-4xl">{[1, 2, 3].map((s) => <span key={s} className={s <= puncte.stele ? "" : "opacity-20 grayscale"}>⭐</span>)}</div>
+        <ScaraMedalii puncte={puncte} />
         <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[["Punctaj", `${puncte.scor}`], ["Corecte", `${puncte.corecte}/${itemi.length}`], ["Acuratețe", `${puncte.acuratete}%`], ["Timp mediu", `${timpMediu} s`]].map(([a, b]) => (
             <div key={a} className="rounded-2xl bg-mov-deschis p-3"><dt className="text-sm text-gray-600">{a}</dt><dd className="text-2xl font-extrabold text-mov-inchis">{b}</dd></div>
