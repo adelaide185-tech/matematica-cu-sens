@@ -9,6 +9,13 @@
   --color-verde: #2e9e5b;
   --color-albastru: #2f6fd1;
   --color-portocaliu: #e07a1f;
+  /* ── Paleta Fabricii de Inteligență (din ilustrația cu mascota) ── */
+  --color-violet: #5b3fb8;
+  --color-violet-inchis: #3d2689;
+  --color-lavanda: #f2c5f9;
+  --color-lavanda-deschis: #fbf0fd;
+  --color-cyan: #8be6f2;
+  --color-cyan-inchis: #1fa9bd;
   --font-sans: var(--font-quicksand), ui-sans-serif, system-ui, sans-serif;
 
   /* ── Zona elev (jocuri): tabletă și tablă interactivă ── */
@@ -325,3 +332,9 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .mascota-plutire, .mascota-salt, .mascota-flutura, .mascota-raze, .mascota-clipire { animation: none; }
 }
+
+/* fundalul „Fabrica de Inteligență”: lavandă → cyan, ca în ilustrația cu mascota */
+.fundal-fabrica { background: radial-gradient(circle at 12% 8%, #f7d6fb 0, transparent 38%), radial-gradient(circle at 90% 20%, #c9f3f9 0, transparent 40%), linear-gradient(160deg, #fbf0fd 0%, #f1ecff 50%, #e8f9fc 100%); }
+.card-curs-mate { background: linear-gradient(135deg, #6b4fc4, #3d2689); }
+.card-curs-engleza { background: linear-gradient(135deg, #1fa9bd, #5b3fb8); }
+.portret-mascota { box-shadow: 0 0 0 6px #fff, 0 0 40px 6px rgb(139 230 242 / 0.55), 0 12px 30px rgb(61 38 137 / 0.35); }

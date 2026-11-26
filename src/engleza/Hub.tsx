@@ -26,7 +26,7 @@ export function HubEngleza() {
   }, []);
   const alege = (v: Varsta) => { setVarsta(v); salveazaVarsta(v); };
   return (
-    <main className="min-h-screen px-4 pb-12">
+    <main className="fundal-fabrica min-h-screen px-4 pb-12">
       <header className="mx-auto flex max-w-5xl items-center justify-between py-4">
         <Link href="/"><Image src="/brand/logo-mic.jpg" alt="Fabrica de Inteligență" width={56} height={56} className="h-14 w-14 rounded-xl" /></Link>
         <MeniuCursuri />

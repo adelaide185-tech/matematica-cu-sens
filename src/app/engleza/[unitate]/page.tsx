@@ -16,7 +16,7 @@ export default function PaginaUnitate() {
   useEffect(() => setStele(citesteProgres().stele), []);
   if (!u) return <main className="p-8 text-center">Unitatea nu există. <Link href="/engleza" className="text-mov underline">Înapoi</Link></main>;
   return (
-    <main className="mx-auto min-h-screen max-w-5xl px-4 pb-12">
+    <main className="fundal-fabrica min-h-screen"><div className="mx-auto min-h-screen max-w-5xl px-4 pb-12">
       <header className="flex items-center gap-3 py-4">
         <Link href="/engleza" className="rounded-2xl bg-white px-4 py-2 text-2xl font-bold text-mov shadow" aria-label="Înapoi la unități">←</Link>
         <span className="text-5xl" aria-hidden>{u.icon}</span>
@@ -45,6 +45,6 @@ export default function PaginaUnitate() {
           </button>
         ))}
       </div>
-    </main>
+    </div></main>
   );
 }

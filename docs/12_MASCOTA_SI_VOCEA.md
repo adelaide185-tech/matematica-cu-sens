@@ -1,30 +1,47 @@
-# Sclipici (mascota) și vocea jucăușă
+# Sclipici (mascota), culorile și vocea jucăușă
 
 ## Mascota: Sclipici
 
-Sclipici este un beculeț galben, desenat original în SVG (`src/componente/Mascota.tsx`). Are:
-- „creierul” și razele mov din logo-ul Fabricii de Inteligență;
-- ochi mari care clipesc, obraji rozalii, brațe;
-- un soclu mov pe post de corp.
+**Ilustrația oficială** este imaginea primită de la Fabrica de Inteligență: robot-copil mov cu smoc de păr, vizor cyan, căști, antenă cu beculeț, vestă galbenă cu glugă mov, mănuși mov și adidași argintii. Apare în două variante:
+- `public/brand/mascota-scena.jpg`: scena întreagă, pe pagina `/mascota`;
+- `public/brand/mascota-portret.jpg`: portretul, pe prima pagină.
 
-Pagina de prezentare este `/mascota`.
+**Varianta animată** este un SVG redesenat după ilustrație (`src/componente/Mascota.tsx`), folosit în jocuri. Beculețul din antenă pulsează, ochii clipesc, mascota plutește. Are 4 stări:
 
 | Stare | Când apare |
 |---|---|
-| `salut` (flutură din mână) | prima pagină, meniul elevului, pagina cursului, la începutul activităților |
+| `salut` (flutură din mână) | meniul elevului, pagina cursului, la începutul activităților |
 | `ganditor` (se uită în sus) | cât timp copilul alege răspunsul |
-| `bucuros` (sare, ochii zâmbesc) | răspuns corect, perechi găsite, ecranul final cu 2–3 stele |
+| `bucuros` (sare, brațele sus) | răspuns corect, perechi găsite, ecranul final cu 2–3 stele |
 | `incurajare` (zâmbet blând) | după o greșeală, ecranul final cu puține stele |
 
 **Folosire:**
-- `<Mascota stare="bucuros" marime={120} spune="Well done!" />`, unde `spune` adaugă un balon de vorbire;
+- `<Mascota stare="bucuros" marime={120} spune="Well done!" />`;
 - dacă dispozitivul are reducerea mișcării activată, mascota stă nemișcată.
 
-**Unde apare acum:**
+## Culorile (`src/app/globals.css`, în `@theme`)
+
+Paleta este luată din ilustrație:
+
+| Token | Culoare | Folosire |
+|---|---|---|
+| `violet` / `violet-inchis` | #5b3fb8 / #3d2689 | titluri, cardul „Mate cu SENS” |
+| `lavanda` / `lavanda-deschis` | #f2c5f9 / #fbf0fd | fundaluri |
+| `cyan` / `cyan-inchis` | #8be6f2 / #1fa9bd | accente, cardul „Engleză”, strălucirea mascotei |
+| `galben` (existent) | #f9c50f | butoane, stele |
+
+**Clase gata făcute:**
+- `fundal-fabrica`: gradient lavandă → cyan, ca în ilustrație;
+- `card-curs-mate` și `card-curs-engleza`: cardurile cursurilor;
+- `portret-mascota`: ramă albă și strălucire cyan.
+
+**Unde se văd:**
 - prima pagină;
-- meniul elevului;
-- cursul de engleză (pagina cursului, Cartonașe, Ascultă și atinge, Perechi, ecranul final);
-- finalul jocurilor de clasele III–V și al jocurilor arcade.
+- pagina mascotei;
+- tot cursul de engleză;
+- toate meniurile elevului (fundalul e pus în `src/app/elev/(meniu)/layout.tsx`).
+
+Panourile profesorului și fișele tipărite rămân pe alb.
 
 ## Vocea (`src/lib/voce.ts`)
 

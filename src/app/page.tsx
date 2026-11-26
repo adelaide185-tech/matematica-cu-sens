@@ -1,22 +1,29 @@
 import Link from "next/link";
 import Image from "next/image";
 import { CURSURI, MeniuCursuri, linkCurs } from "@/componente/MeniuCursuri";
-import { Mascota } from "@/componente/Mascota";
+import { MASCOTA_PORTRET } from "@/componente/Mascota";
 
 export default function Acasa() {
   return (
-    <main className="min-h-screen flex flex-col items-center px-4 pb-10">
+    <main className="fundal-fabrica min-h-screen flex flex-col items-center px-4 pb-10">
       <header className="flex w-full max-w-5xl justify-end py-3">
         <MeniuCursuri />
       </header>
-      <Image src="/brand/logo-orizontal.jpg" alt="Fabrica de Inteligență" width={420} height={142} priority className="h-auto w-[300px] sm:w-[420px]" />
-      <Link href="/mascota" className="mt-2" aria-label="Fă cunoștință cu Sclipici, mascota noastră"><Mascota stare="salut" marime={120} spune="Bună! Eu sunt Sclipici!" /></Link>
+      <section className="flex w-full max-w-5xl flex-col items-center gap-6 md:flex-row md:justify-center">
+        <Link href="/mascota" aria-label="Fă cunoștință cu Sclipici, mascota noastră" className="shrink-0">
+          <Image src={MASCOTA_PORTRET} alt="Sclipici, mascota Fabricii de Inteligență" width={315} height={428} priority className="portret-mascota h-auto w-[220px] rounded-[2.5rem] sm:w-[260px]" />
+        </Link>
+        <div className="flex flex-col items-center text-center md:items-start md:text-left">
+          <Image src="/brand/logo-orizontal.jpg" alt="Fabrica de Inteligență" width={420} height={142} priority className="h-auto w-[280px] rounded-2xl mix-blend-multiply sm:w-[400px]" />
+          <p className="mt-3 max-w-md text-xl font-semibold text-violet-inchis">Bună! Eu sunt <span className="text-violet">Sclipici</span>. Hai să descoperim împreună matematica și engleza! 🚀</p>
+        </div>
+      </section>
 
       <section className="mt-6 w-full max-w-3xl" aria-labelledby="cursuri">
-        <h2 id="cursuri" className="text-center text-2xl font-bold text-mov">Cursuri</h2>
+        <h2 id="cursuri" className="text-center text-2xl font-bold text-violet-inchis">Cursuri</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           {CURSURI.map((c) => (
-            <Link key={c.id} href={linkCurs(c.id)} className={`flex items-center gap-4 rounded-3xl p-5 shadow-md ring-2 transition hover:-translate-y-0.5 ${c.gata ? "bg-mov text-white ring-mov" : "bg-white text-mov ring-mov/10 hover:ring-mov"}`}>
+            <Link key={c.id} href={linkCurs(c.id)} className={`flex items-center gap-4 rounded-3xl p-5 shadow-lg ring-4 ring-white/70 transition hover:-translate-y-0.5 hover:shadow-xl ${c.gata ? `${c.id === "engleza" ? "card-curs-engleza" : "card-curs-mate"} text-white` : "bg-white text-mov"}`}>
               <span className="text-5xl" aria-hidden>{c.icon}</span>
               <span>
                 <span className="block text-2xl font-bold">{c.nume}{!c.gata && <span className="ml-2 rounded-full bg-galben px-2 py-0.5 align-middle text-xs text-mov-inchis">în curând</span>}</span>

@@ -47,7 +47,7 @@ export function Cartonase({ u, inapoi }: { u: Unitate; inapoi: string }) {
   const terminat = i === u.cuvinte.length - 1;
   useEffect(() => { if (terminat) inregistreaza(`en-${u.id}-cartonase`, 0, 3, { logica: 1 }, []); }, [terminat, u.id]);
   return (
-    <main className="mx-auto flex min-h-screen max-w-4xl flex-col px-4 pb-6">
+    <main className="fundal-fabrica"><div className="mx-auto flex min-h-screen max-w-4xl flex-col px-4 pb-6">
       <Antet u={u} titlu="Cartonașe" inapoi={inapoi} pas={i + 1} total={u.cuvinte.length} />
       <div className="flex justify-center"><Mascota marime={80} stare={terminat ? "bucuros" : "salut"} spune={terminat ? "Well done!" : "Say it with me!"} /></div>
       <button type="button" onClick={asculta} aria-label={`Ascultă: ${c.en}`}
@@ -64,7 +64,7 @@ export function Cartonase({ u, inapoi }: { u: Unitate; inapoi: string }) {
           : <button type="button" onClick={() => setI((x) => x + 1)} className="h-16 w-24 rounded-2xl bg-mov text-3xl font-bold text-white shadow" aria-label="Cartonașul următor">▶</button>}
       </div>
       <p className="mt-3 text-center text-sm text-gray-500">Pentru adult: spuneți cuvântul împreună cu copilul de 2–3 ori, arătând imaginea.</p>
-    </main>
+    </div></main>
   );
 }
 
@@ -106,7 +106,7 @@ export function Asculta({ u, varsta, seed, inapoi, onReia }: { u: Unitate; varst
   if (gata !== null) return <FinalEn u={u} stele={gata} inapoi={inapoi} onReia={onReia} />;
   if (!runda) return null;
   return (
-    <main className="mx-auto flex min-h-screen max-w-5xl flex-col px-4 pb-6">
+    <main className="fundal-fabrica"><div className="mx-auto flex min-h-screen max-w-5xl flex-col px-4 pb-6">
       <Antet u={u} titlu="Ascultă și atinge" inapoi={inapoi} pas={r + 1} total={runde.length} />
       <div className="flex items-center justify-center gap-3">
         <Mascota marime={90} stare={stare ? (stare.ok ? "bucuros" : "incurajare") : "ganditor"} key={stare ? `${r}-${stare.ok}-${stare.en}` : `g${r}`} />
@@ -128,7 +128,7 @@ export function Asculta({ u, varsta, seed, inapoi, onReia }: { u: Unitate; varst
         })}
       </div>
       <div className="mt-4 flex justify-center gap-1 text-2xl" aria-hidden>{runde.map((_, i) => <span key={i} className={i < r || (i === r && stare?.ok) ? "" : "opacity-20 grayscale"}>⭐</span>)}</div>
-    </main>
+    </div></main>
   );
 }
 
@@ -164,7 +164,7 @@ export function Perechi({ u, varsta, seed, inapoi, onReia }: { u: Unitate; varst
   };
   if (gata !== null) return <FinalEn u={u} stele={gata} inapoi={inapoi} onReia={onReia} />;
   return (
-    <main className="mx-auto flex min-h-screen max-w-4xl flex-col px-4 pb-6">
+    <main className="fundal-fabrica"><div className="mx-auto flex min-h-screen max-w-4xl flex-col px-4 pb-6">
       <Antet u={u} titlu="Perechi" inapoi={inapoi} pas={gasite.length} total={perechi} />
       <div className="flex justify-center"><Mascota key={gasite.length} marime={80} stare={gasite.length ? "bucuros" : "salut"} spune={gasite.length ? `${LAUDE[gasite.length % LAUDE.length]}` : "Find the pairs!"} /></div>
       <div className={`mt-2 grid flex-1 content-center gap-3 ${carti.length <= 6 ? "grid-cols-3" : "grid-cols-4"}`}>
@@ -179,7 +179,7 @@ export function Perechi({ u, varsta, seed, inapoi, onReia }: { u: Unitate; varst
           );
         })}
       </div>
-    </main>
+    </div></main>
   );
 }
 
@@ -187,7 +187,7 @@ function FinalEn({ u, stele, inapoi, onReia }: { u: Unitate; stele: number; inap
   useCelebrare(true, stele === 3 ? "mare" : "mica");
   useEffect(() => { spune(stele === 3 ? "Fantastic! Well done!" : "Well done!"); }, [stele]);
   return (
-    <main className="mx-auto flex min-h-screen max-w-xl flex-col items-center justify-center px-4 text-center">
+    <main className="fundal-fabrica"><div className="mx-auto flex min-h-screen max-w-xl flex-col items-center justify-center px-4 text-center">
       <div className="rounded-[2.5rem] bg-white p-8 shadow-xl">
         <Mascota stare="bucuros" marime={150} />
         <p className="mt-2 text-4xl font-extrabold text-mov">Well done!</p>
@@ -198,6 +198,6 @@ function FinalEn({ u, stele, inapoi, onReia }: { u: Unitate; stele: number; inap
           <Link href={inapoi} className="flex h-16 items-center rounded-2xl bg-mov px-6 text-xl font-extrabold text-white shadow">🏠 Înapoi</Link>
         </div>
       </div>
-    </main>
+    </div></main>
   );
 }
