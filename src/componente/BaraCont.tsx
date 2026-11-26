@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { sesiuneCurenta, ROL_NUME } from "@/lib/auth";
 import { deconectare } from "@/lib/actiuni-cont";
+import { MeniuCursuri } from "./MeniuCursuri";
 
 /** Bara de sus cu numele utilizatorului și ieșirea din cont (doar când există conturi). */
 export async function BaraCont() {
@@ -14,6 +15,7 @@ export async function BaraCont() {
         <span className="hidden sm:inline">Matematică cu Sens</span>
       </Link>
       <nav className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1">
+        <MeniuCursuri rol={s.rol} />
         {s.rol === "ADMIN_SCOALA" && <Link href="/admin" className="font-semibold text-mov hover:underline">Administrare</Link>}
         {s.rol !== "ELEV" && <Link href="/profesor" className="font-semibold text-mov hover:underline">Fișe</Link>}
         {s.rol !== "ELEV" && <Link href="/profesor/lectii" className="font-semibold text-mov hover:underline">Lecții</Link>}
