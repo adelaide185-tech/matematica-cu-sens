@@ -6,9 +6,9 @@ export const dynamic = "force-dynamic";
 
 /**
  * Jocurile care salvează progresul: cele 3 jocuri generale, jocurile pe clase (c1-…, c2-…, c3-…, c4-…)
- * jocurile arcade (arc-…) și lecțiile cu materiale (lectie-…). Înainte erau acceptate doar primele 3, iar restul primeau 400.
+ * jocurile arcade (arc-…), cursul de engleză (en-<unitate>-<activitate>, cu „clasa” 0) și lecțiile cu materiale (lectie-…). Înainte erau acceptate doar primele 3, iar restul primeau 400.
  */
-const JOC_VALID = /^(scara|numaratoare|fractii|c[1-5]-[a-z0-9]{2,20}|arc-[a-z]{2,20}|lectie-[a-z0-9-]{1,60})$/;
+const JOC_VALID = /^(scara|numaratoare|fractii|c[1-5]-[a-z0-9]{2,20}|arc-[a-z]{2,20}|en-[a-z]{2,20}-[a-z]{2,20}|lectie-[a-z0-9-]{1,60})$/;
 
 /** Progresul elevului din baza de date: cele mai bune stele pe joc×clasă și punctele. */
 export async function GET() {
@@ -38,7 +38,8 @@ export async function POST(req: NextRequest) {
   const joc = String(b?.joc ?? "");
   const clasa = Number(b?.clasa);
   const nr = (x: unknown, max: number) => Math.max(0, Math.min(max, Math.round(Number(x) || 0)));
-  if (!JOC_VALID.test(joc) || ![1, 2, 3, 4, 5].includes(clasa)) return NextResponse.json({ eroare: "date invalide" }, { status: 400 });
+  // engleza (en-…) e pentru preșcolari: „clasa” 0
+  if (!JOC_VALID.test(joc) || !(joc.startsWith("en-") ? clasa === 0 : [1, 2, 3, 4, 5].includes(clasa))) return NextResponse.json({ eroare: "date invalide" }, { status: 400 });
 
   const logica = nr(b.logica, 50);
   const viteza = nr(b.viteza, 50);

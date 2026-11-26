@@ -148,5 +148,9 @@ Jocuri arcade pentru clasele I–V (`/elev/arcade`, detalii în `docs/10_JOCURI_
 - Baloanele, Cursa cu porți și Racheta: 30 de puncte pe întrebare, 3 inimioare care scad punctajul fără să oprească jocul, rezolvarea după a doua greșeală, 3 viteze, pauză, mouse + atingere + tastatură, progres salvat în cont
 - profesorul (`/profesor/arcade`) vede întrebările, previzualizează și trimite jocul ca temă sau test; serverul recalculează punctajul din alegerile elevului; rezultatele apar în rapoartele obișnuite
 
+Engleză 4–6 ani (`/engleza`, din meniul „Cursuri”, detalii în `docs/11_ENGLEZA_4_6.md`):
+- 9 unități (Colours, Numbers, Animals, Family, Body, Food, Toys, Clothes, Weather), conținut original, totul pe ascultare (copiii nu citesc încă)
+- Cartonașe, Ascultă și atinge, Perechi; dificultatea după vârstă (4, 5 sau 6 ani); stele salvate și în cont
+
 Urmează:
 - rapoarte de progres pe noțiuni pentru profesor

@@ -3,7 +3,7 @@ import Link from "next/link";
 /** Cursurile platformei. Pentru un curs nou se adaugă o intrare aici (și pagina lui). */
 export const CURSURI = [
   { id: "mate", nume: "Mate cu SENS", icon: "🔢", descriere: "Matematică pentru clasele I–V: fișe, lecții, jocuri și teme", gata: true },
-  { id: "engleza", nume: "Engleză", icon: "🇬🇧", descriere: "Cursul de limba engleză", gata: false },
+  { id: "engleza", nume: "Engleză", icon: "🇬🇧", descriere: "English 4–6 ani: cuvinte ascultate, imagini și jocuri", gata: true },
 ] as const;
 
 /** Unde duce fiecare curs, după rolul celui conectat (fără cont: pagina de prezentare). */
