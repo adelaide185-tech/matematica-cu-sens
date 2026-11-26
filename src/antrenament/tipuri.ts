@@ -78,7 +78,14 @@ export type Mecanica =
   | { tip: "coordonate"; max: number; punct?: [number, number]; interactiv?: boolean }
   | { tip: "tabel"; titlu: string; coloane: [string, string]; randuri: [string, number][] }
   /** grafic cu bare sau pictogramă (un simbol = `pictograma.valoare`) */
-  | { tip: "grafic"; titlu: string; bare: { eticheta: string; valoare: number }[]; pas: number; pictograma?: { simbol: string; valoare: number } };
+  | { tip: "grafic"; titlu: string; bare: { eticheta: string; valoare: number }[]; pas: number; pictograma?: { simbol: string; valoare: number } }
+  // ── clasa I ──
+  /** mănunchiuri de câte 10 bețișoare + bețișoare libere (zeci și unități, fără cifre) */
+  | { tip: "betisoare"; zeci: number; unitati: number }
+  /** orientare spațială: un obiect așezat față de un reper (sau în interiorul / exteriorul unui chenar) */
+  | { tip: "pozitie"; reper: string; obiect: string; relatie: RelatieSpatiala };
+
+export type RelatieSpatiala = "stanga" | "dreapta" | "sus" | "jos" | "interior" | "exterior";
 
 export type FormaPlana = "triunghi" | "patrat" | "dreptunghi" | "cerc" | "pentagon" | "hexagon" | "romb" | "trapez" | "oval";
 export type Corp = "cub" | "sfera" | "cilindru" | "con" | "paralelipiped" | "piramida";

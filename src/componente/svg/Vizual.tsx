@@ -102,7 +102,7 @@ export function Fractie({
   );
 }
 
-export function Ceas({ ore, minute, marime = 1 }: { ore: number; minute: number; marime?: number }) {
+export function Ceas({ ore, minute, marime = 1, ace = true }: { ore: number; minute: number; marime?: number; ace?: boolean }) {
   const unghiM = (minute / 60) * 360;
   const unghiO = ((ore % 12) / 12) * 360 + (minute / 60) * 30;
   const s = 120 * marime;
@@ -118,8 +118,8 @@ export function Ceas({ ore, minute, marime = 1 }: { ore: number; minute: number;
         const a = ((i + 1) / 12) * 2 * Math.PI;
         return <text key={i} x={60 + 37 * Math.sin(a)} y={60 - 37 * Math.cos(a) + 4.5} textAnchor="middle" fontSize="12" fontWeight="700" fill="#222">{i + 1}</text>;
       })}
-      <line x1="60" y1="60" x2={60 + 26 * Math.sin((unghiO * Math.PI) / 180)} y2={60 - 26 * Math.cos((unghiO * Math.PI) / 180)} stroke="#222" strokeWidth="5" strokeLinecap="round" />
-      <line x1="60" y1="60" x2={60 + 42 * Math.sin((unghiM * Math.PI) / 180)} y2={60 - 42 * Math.cos((unghiM * Math.PI) / 180)} stroke="#6a59a7" strokeWidth="3" strokeLinecap="round" />
+      {ace && <line x1="60" y1="60" x2={60 + 26 * Math.sin((unghiO * Math.PI) / 180)} y2={60 - 26 * Math.cos((unghiO * Math.PI) / 180)} stroke="#222" strokeWidth="5" strokeLinecap="round" />}
+      {ace && <line x1="60" y1="60" x2={60 + 42 * Math.sin((unghiM * Math.PI) / 180)} y2={60 - 42 * Math.cos((unghiM * Math.PI) / 180)} stroke="#6a59a7" strokeWidth="3" strokeLinecap="round" />}
       <circle cx="60" cy="60" r="4" fill="#222" />
     </svg>
   );

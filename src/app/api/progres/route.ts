@@ -4,7 +4,11 @@ import { sesiuneCurenta } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-const JOCURI = ["scara", "numaratoare", "fractii"];
+/**
+ * Jocurile care salvează progresul: cele 3 jocuri generale, jocurile pe clase (c1-…, c2-…, c3-…, c4-…)
+ * jocurile arcade (arc-…), cursul de engleză (en-<unitate>-<activitate>, cu „clasa” 0) și lecțiile cu materiale (lectie-…). Înainte erau acceptate doar primele 3, iar restul primeau 400.
+ */
+const JOC_VALID = /^(scara|numaratoare|fractii|c[1-5]-[a-z0-9]{2,20}|arc-[a-z]{2,20}|en-[a-z]{2,20}-[a-z]{2,20}|lectie-[a-z0-9-]{1,60})$/;
 
 /** Progresul elevului din baza de date: cele mai bune stele pe joc×clasă și punctele. */
 export async function GET() {
@@ -12,7 +16,7 @@ export async function GET() {
   if (!s) return NextResponse.json({ conectat: false });
   const [u, incercari] = await Promise.all([
     db.utilizator.findUnique({ where: { id: s.id }, select: { puncteLogica: true, puncteViteza: true, recompense: { select: { recompensaId: true } } } }),
-    db.incercare.groupBy({ by: ["mecanica", "lectieId"], where: { elevId: s.id }, _max: { stele: true } }),
+    db.incercare.groupBy({ by: ["mecanica", "lectieId"], where: { elevId: s.id, temaId: null }, _max: { stele: true } }), // doar jocul liber (temele au rapoartele lor)
   ]);
   const stele: Record<string, number> = {};
   for (const i of incercari) stele[`${i.mecanica}-${i.lectieId}`] = i._max.stele ?? 0;
@@ -34,7 +38,8 @@ export async function POST(req: NextRequest) {
   const joc = String(b?.joc ?? "");
   const clasa = Number(b?.clasa);
   const nr = (x: unknown, max: number) => Math.max(0, Math.min(max, Math.round(Number(x) || 0)));
-  if (!JOCURI.includes(joc) || ![1, 2, 3, 4, 5].includes(clasa)) return NextResponse.json({ eroare: "date invalide" }, { status: 400 });
+  // engleza (en-…) e pentru preșcolari: „clasa” 0
+  if (!JOC_VALID.test(joc) || !(joc.startsWith("en-") ? clasa === 0 : [1, 2, 3, 4, 5].includes(clasa))) return NextResponse.json({ eroare: "date invalide" }, { status: 400 });
 
   const logica = nr(b.logica, 50);
   const viteza = nr(b.viteza, 50);

@@ -3,8 +3,25 @@ import type { Prisma, Tema } from "@prisma/client";
 import { db } from "./db";
 import type { Sesiune } from "./sesiune-token";
 import { curata } from "@/motor/calcul/config";
+import { cfgIncercare, curataC3 } from "@/motor/clasa3/config";
+import { genereazaC3 } from "@/motor/clasa3/generator";
+import { cfgIncercareC4, curataC4 } from "@/motor/clasa4/config";
+import { genereazaC4 } from "@/motor/clasa4/generator";
+import { cfgIncercareC5, curataC5 } from "@/motor/clasa5/config";
+import { genereazaC5 } from "@/motor/clasa5/generator";
+import { cfgIncercareArcade, curataArcade } from "@/motor/arcade/config";
+import { intrebariArcade } from "@/motor/arcade/intrebari";
 import { genereazaCalcul, hash } from "@/motor/calcul/generator";
 import type { ConfigCalcul, ExCalcul } from "@/motor/calcul/tipuri";
+import { curataC1 } from "@/motor/clasa1/config";
+import { cfgIncercareC2, curataC2 } from "@/motor/clasa2/config";
+import { genereazaC2 } from "@/motor/clasa2/generator";
+import type { NivelC2 } from "@/motor/clasa2/tipuri";
+import { genereazaClasa1 } from "@/motor/clasa1/sesiune";
+import type { ConfigClasa1, ExercitiuC1 } from "@/motor/clasa1/tipuri";
+
+/** Mecanicile temelor online: fișa de calcul și jocurile clasei I. */
+export const MECANICI_TEME = ["calcul", "clasa1"] as const;
 
 /** hash simplu al unui text (id de elev) → întreg */
 function hashText(s: string): number {
@@ -20,9 +37,81 @@ export function exercitiiTema(tema: Pick<Tema, "config" | "seed">, elevId: strin
   return { cfg: c, exercitii: genereazaCalcul(c).exercitii };
 }
 
+/** Exercițiile unei teme cu jocurile clasei I (aceleași pentru toți sau, cu seed null, diferite pentru fiecare elev). */
+export function exercitiiTemaClasa1(tema: Pick<Tema, "config" | "seed">, elevId: string): { cfg: ConfigClasa1; exercitii: ExercitiuC1[] } {
+  const cfg = curataC1((tema.config ?? {}) as Record<string, unknown>);
+  const c = tema.seed === null ? { ...cfg, seed: hash(cfg.seed, hashText(elevId)) % 2 ** 31 || 1 } : cfg;
+  return { cfg: c, exercitii: genereazaClasa1(c).exercitii };
+}
+
 /** Temele pe care le vede un elev: ale claselor în care e înscris și cele primite personal. */
 export function filtruTemeElev(elevId: string): Prisma.TemaWhereInput {
-  return { mecanica: "calcul", OR: [{ elevId }, { elevId: null, clasa: { elevi: { some: { elevId } } } }] };
+  return { OR: [{ mecanica: { in: [...MECANICI_TEME] } }, { mecanica: { startsWith: "c3:" } }, { mecanica: { startsWith: "c2:" } }, { mecanica: { startsWith: "c4:" } }, { mecanica: { startsWith: "c5:" } }, { mecanica: { startsWith: "arc:" } }], AND: { OR: [{ elevId }, { elevId: null, clasa: { elevi: { some: { elevId } } } }] } };
+}
+
+/**
+ * Exercițiile unui joc de clasa a III-a dat ca temă: aceleași pentru toți (sau, cu seed null, diferite pentru fiecare elev).
+ * La „Mai încerc o dată”, încercarea n folosește alt seed, ca elevul să nu învețe răspunsurile pe de rost.
+ */
+export function itemiTemaC3(tema: Pick<Tema, "config" | "seed">, elevId: string, incercare = 0) {
+  const c = cfgIncercare(cfgTemaC3(tema, elevId), incercare);
+  return { cfg: c, itemi: genereazaC3(c).itemi };
+}
+
+/** Configurația de bază a temei pentru un elev (încercarea 0). */
+export function cfgTemaC3(tema: Pick<Tema, "config" | "seed">, elevId: string) {
+  const cfg = curataC3((tema.config ?? {}) as Record<string, unknown>);
+  return tema.seed === null ? { ...cfg, seed: hash(cfg.seed, hashText(elevId)) % 2 ** 31, inlocuiri: {} } : cfg;
+}
+
+/** Configurația de bază a unui joc de clasa a IV-a pentru un elev (încercarea 0). */
+export function cfgTemaC4(tema: Pick<Tema, "config" | "seed">, elevId: string) {
+  const cfg = curataC4((tema.config ?? {}) as Record<string, unknown>);
+  return tema.seed === null ? { ...cfg, seed: hash(cfg.seed, hashText(elevId)) % 2 ** 31, inlocuiri: {} } : cfg;
+}
+
+/** Exercițiile jocului de clasa a IV-a pentru încercarea n. */
+export function itemiTemaC4(tema: Pick<Tema, "config" | "seed">, elevId: string, incercare = 0) {
+  const c = cfgIncercareC4(cfgTemaC4(tema, elevId), incercare);
+  return { cfg: c, itemi: genereazaC4(c).itemi };
+}
+
+/** Configurația de bază a unui joc de clasa a V-a pentru un elev (încercarea 0). */
+export function cfgTemaC5(tema: Pick<Tema, "config" | "seed">, elevId: string) {
+  const cfg = curataC5((tema.config ?? {}) as Record<string, unknown>);
+  return tema.seed === null ? { ...cfg, seed: hash(cfg.seed, hashText(elevId)) % 2 ** 31, inlocuiri: {} } : cfg;
+}
+
+/** Exercițiile jocului de clasa a V-a pentru încercarea n. */
+export function itemiTemaC5(tema: Pick<Tema, "config" | "seed">, elevId: string, incercare = 0) {
+  const c = cfgIncercareC5(cfgTemaC5(tema, elevId), incercare);
+  return { cfg: c, itemi: genereazaC5(c).itemi };
+}
+
+/** Configurația de bază a unui joc arcade dat ca temă (cu seed null: alte întrebări pentru fiecare elev). */
+export function cfgTemaArcade(tema: Pick<Tema, "config" | "seed">, elevId: string) {
+  const cfg = curataArcade((tema.config ?? {}) as Record<string, unknown>);
+  return tema.seed === null ? { ...cfg, seed: hash(cfg.seed, hashText(elevId)) % 2 ** 31 } : cfg;
+}
+
+/** Întrebările jocului arcade pentru încercarea n (aceleași pe client și pe server). */
+export function intrebariTemaArcade(tema: Pick<Tema, "config" | "seed">, elevId: string, incercare = 0) {
+  const c = cfgIncercareArcade(cfgTemaArcade(tema, elevId), incercare);
+  return { cfg: c, intrebari: intrebariArcade(c.clasa, c.seed, c.n, c.dif) };
+}
+
+/** Configurația de bază a unui joc de clasa a II-a pentru un elev (încercarea 0). */
+export function cfgTemaC2(tema: Pick<Tema, "config" | "seed">, elevId: string) {
+  const cfg = curataC2((tema.config ?? {}) as Record<string, unknown>);
+  return tema.seed === null ? { ...cfg, seed: hash(cfg.seed, hashText(elevId)) % 2 ** 31, inlocuiri: {} } : cfg;
+}
+
+/** Exercițiile jocului de clasa a II-a, pentru încercarea și nivelul jucat (nivelul fixat de profesor are prioritate). */
+export function itemiTemaC2(tema: Pick<Tema, "config" | "seed">, elevId: string, incercare: number, nivel: NivelC2) {
+  const baza = cfgTemaC2(tema, elevId);
+  const c = cfgIncercareC2(baza, incercare);
+  const niv = baza.nivel === "alege" ? nivel : baza.nivel;
+  return { cfg: c, nivel: niv, itemi: genereazaC2(c, niv).itemi };
 }
 
 export async function temaPentruElev(cod: string, elevId: string) {

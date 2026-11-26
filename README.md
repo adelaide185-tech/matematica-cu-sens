@@ -16,6 +16,9 @@ Aplicația pornește la http://localhost:3000.
 
 - `/profesor`: generatorul de fișe
 - `/elev`: jocurile (Scara, Numărătoarea magică, Pizza fracțiilor)
+- `/elev/atelier`: Atelierul cu materiale (blocuri baza 10, rekenrek, cadrul de 10, axa numerelor, tabla sutelor, modelul în bară), cu link de partajare
+- `/elev/lectii`: lecții ghidate pe materiale (clasa a II-a)
+- `/profesor/lectii`: lecțiile cu notele pentru profesor și modul „Proiectează la clasă”
 - `/fisa?...`: pagina A4 de printare
 - `/api/pdf?...`: descărcare PDF (are nevoie de Playwright + Chromium pe server)
 
@@ -52,6 +55,8 @@ Testele verifică fiecare generator, pentru fiecare clasă și fiecare nivel, pe
 | `src/curriculum/` | mapa curriculară: lecțiile Eduten (cl. I, III, IV), curriculumul „Matematică cu Sens” (cl. II), programa (cl. V) |
 | `src/componente/svg/` | desenele SVG comune fișelor și jocurilor: numărătoare, fracții, ceas, axa numerelor |
 | `src/componente/FisaPrint.tsx` | fișa A4 (antet, itemi, spațiu de lucru, rezolvări, barem) |
+| `src/manipulative/` | materialele virtuale: logica pură (`logica.ts`, testată), componentele interactive, starea + linkul de partajare (`stare.ts`) |
+| `src/lectii/` | lecțiile ghidate (pași, verificări, indicii, rezolvări) și notele pentru profesor |
 | `src/jocuri/` | progres, dificultate adaptivă, recompense, componente comune jocurilor |
 | `src/app/` | paginile Next.js |
 | `prisma/schema.prisma` | schema bazei de date (conturi, școli, licențe, teme, progres); încă neconectată |
@@ -64,6 +69,7 @@ Gata și testat:
 - fișe pe 4 niveluri cu barem și descriptori
 - PDF
 - 3 jocuri cu stele, trofee și dificultate adaptivă
+- Atelierul cu 6 materiale virtuale și 9 lecții ghidate pentru clasa a II-a (inspirate de Brainingcamp)
 
 Gata (etapa 2):
 - conturi cu roluri (administrator, profesor, elev)
@@ -88,6 +94,64 @@ Generatorul de calcul (`/profesor/calcul`, detalii în `docs/04_GENERATOR_CALCUL
 - PDF (fișă; fișă + barem), Word (.docx), CSV
 - teme și teste online pentru o grupă sau un elev, cu cronometru, verificare automată și rezultate pentru profesor
 - verificare matematică: teste automate + SymPy (`npm run valideaza:sympy`)
+
+Clasa a III-a: teme și jocuri (`/profesor/clasa3`, detalii în `docs/05_CLASA3_JOCURI.md`):
+- 8 capitole din programă, cu opțiuni; 10–100 de exerciții; fișă PDF cu barem
+- 5 mini-jocuri: Cursa contra cronometrului, Perechi, Balanța, Detectivul, Constructorul
+- trimise ca joc online unei grupe sau unui elev; rezultate cu medalie, acuratețe, timp mediu și greșeli, actualizate automat
+
+Clasa I · jocuri și fișe pe capitole (`/profesor/clasa1`):
+- 9 capitole, selectabile individual sau combinat:
+  - numerele 0–100;
+  - adunarea și scăderea 0–20 și 0–100, cu opțiunea „doar fără trecere / cu trecere / amestecat”;
+  - termenul necunoscut (□);
+  - geometrie și orientare spațială;
+  - timpul, banii, lungimea;
+  - probleme cu una sau două operații.
+- 10, 15, 20, 25, 50 sau 100 de exerciții unice; același cod dă aceleași exerciții pe fișă, în barem și în joc
+- 5 mini-jocuri pentru elev (`/elev/clasa1`, `src/jocuri/clasa1/`):
+  - Numără și grupează;
+  - Cursa prietenoasă (cronometru opțional, oprit implicit);
+  - Potrivește perechile / Memory;
+  - Balanța numerelor;
+  - Căsuța magică.
+- interfață pentru copii: butoane mari, tastatură numerică pe ecran, citirea cerinței cu voce (🔊)
+- PDF A4 cu font mare, pe 2–3 coloane; „Fișă + Barem” cu răspunsurile pe pagină separată
+- atribuire ca joc interactiv unei grupe sau unui elev; fiecare răspuns se verifică pe server
+- raportul profesorului:
+  - medalie (🥉 ≥ 50%, 🥈 ≥ 75%, 🥇 ≥ 90%, 💎 100%);
+  - acuratețe din prima;
+  - timp total și pe exercițiu;
+  - rezultate pe capitole;
+  - unde a greșit fiecare elev
+- motorul (`src/motor/clasa1/`) e testat în `clasa1.test.ts`:
+  - toate numerele sunt în concentrul ales, fără negative;
+  - regula „fără trecere” e respectată (unități ≤ 9 la adunare, fără împrumut la scădere);
+  - fără exerciții duplicate în joc sau pe fișă;
+  - reproductibil din seed
+
+Clasa a II-a: mini-jocuri (`/profesor/clasa2`, detalii în `docs/06_CLASA2_JOCURI.md`):
+- conținut pe noțiunile din antrenament, 3 niveluri, greșeli tipice etichetate, numere cu litere și ora spusă românește
+- Perechi rapide, Bule care cad, Scara, Completează căsuțele, Balanța (și „echilibrează”), Ordonează, Memorie, Ceasul (citește ora / mută acele), Magazinul (plătește exact, câți bani sunt, rest), Provocarea în imagini, Integrama numerelor, Ținte, Mix automat și puzzle-ul de recompensă; semafor pe elevi, raport pentru părinți, diplomă, CSV; fișă PDF cu barem; trimitere ca joc; raport cu greșeli tipice
+
+Clasa a IV-a, semestrul al II-lea (`/profesor/clasa4`, detalii în `docs/07_CLASA4_JOCURI.md`):
+- cele 12 capitole din cuprins, fiecare pe Nivel 1 / Nivel 2: geometrie, corpuri, metoda figurativă, încercări, estimare, logică și probabilități, tabele, etaloane, capacitate, lungime, masă, timp
+- desene SVG (drepte, figuri, corpuri, tabele, bile, segmente), fișă PDF cu barem și fișă „Exerciții rezolvate” pas cu pas
+- aceleași 5 jocuri ca la clasa a III-a, trimise ca temă, cu rezolvarea arătată după greșeală și rapoarte la profesor
+- verificare independentă cu SymPy (`scripts/valideaza_clasa4.py`, parte din `npm run valideaza:sympy`)
+
+Clasa a V-a (`/profesor/clasa5`, detalii în `docs/09_CLASA5_JOCURI.md`):
+- 10 capitole pe Nivel 1 / Nivel 2: puteri, ordinea operațiilor, factor comun, divizibilitate, numere prime, metode de rezolvare, fracții ordinare, fracții zecimale, segmente și unghiuri, arii și volume
+- fișă PDF cu barem și exerciții rezolvate; aceleași 5 jocuri; teme verificate pe server; validare SymPy (`scripts/valideaza_clasa5.py`)
+
+Jocuri arcade pentru clasele I–V (`/elev/arcade`, detalii în `docs/10_JOCURI_ARCADE.md`):
+- Baloanele, Cursa cu porți și Racheta: 30 de puncte pe întrebare, 3 inimioare care scad punctajul fără să oprească jocul, rezolvarea după a doua greșeală, 3 viteze, pauză, mouse + atingere + tastatură, progres salvat în cont
+- profesorul (`/profesor/arcade`) vede întrebările, previzualizează și trimite jocul ca temă sau test; serverul recalculează punctajul din alegerile elevului; rezultatele apar în rapoartele obișnuite
+
+Engleză 4–6 ani (`/engleza`, din meniul „Cursuri”, detalii în `docs/11_ENGLEZA_4_6.md`):
+- 9 unități (Colours, Numbers, Animals, Family, Body, Food, Toys, Clothes, Weather), conținut original, totul pe ascultare (copiii nu citesc încă)
+- Cartonașe, Ascultă și atinge, Perechi; dificultatea după vârstă (4, 5 sau 6 ani); stele salvate și în cont
+- generator de fișe pentru educatoare (`/profesor/engleza`): 6 tipuri de exerciții cu imagini, PDF cu „fișa educatoarei” (ce se citește + răspunsuri)
 
 Urmează:
 - rapoarte de progres pe noțiuni pentru profesor

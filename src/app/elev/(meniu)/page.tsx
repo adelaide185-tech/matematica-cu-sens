@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { citesteProgres, salveazaProgres, sincronizeazaProgres, TROFEE, type Progres } from "@/jocuri/progres";
+import { Mascota } from "@/componente/Mascota";
 
 const JOCURI = [
   { id: "scara", nume: "Scara", icon: "🪜", descriere: "Urcă treaptă cu treaptă rezolvând calcule.", clase: [1, 2, 3, 4], culoare: "#2f6fd1" },
@@ -40,7 +41,10 @@ export default function ZonaElev() {
       </header>
 
       <section className="mx-auto max-w-5xl">
-        <h1 className="text-center text-3xl font-bold text-mov sm:text-4xl">Hai să ne jucăm cu matematica!</h1>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Mascota stare="salut" marime={96} />
+          <h1 className="text-center text-3xl font-bold text-mov sm:text-4xl">Hai să ne jucăm cu matematica!</h1>
+        </div>
         <div className="mt-5 flex flex-wrap justify-center gap-2">
           {[1, 2, 3, 4, 5].map((c) => (
             <button key={c} onClick={() => alegeClasa(c)}
@@ -60,6 +64,67 @@ export default function ZonaElev() {
           <span className="rounded-2xl bg-galben px-5 py-3 text-lg font-bold text-mov-inchis">Începe ▶</span>
         </Link>
 
+        {clasa === 2 && (
+          <Link href="/elev/clasa2"
+            className="mt-4 flex flex-wrap items-center gap-5 rounded-3xl bg-galben p-5 text-mov-inchis shadow-md transition hover:-translate-y-1 hover:shadow-xl">
+            <span className="text-5xl" aria-hidden>🎮</span>
+            <span className="flex-1">
+              <span className="block text-2xl font-bold">Jocuri de clasa a II-a</span>
+              <span className="block">12 jocuri: Perechi, Bule, Scara, Căsuțe, Balanța, Ceasul, Magazinul, Integrama… și un puzzle de câștigat!</span>
+            </span>
+          </Link>
+        )}
+        {clasa === 3 && (
+          <Link href="/elev/clasa3"
+            className="mt-4 flex flex-wrap items-center gap-5 rounded-3xl bg-galben p-5 text-mov-inchis shadow-md transition hover:-translate-y-1 hover:shadow-xl">
+            <span className="text-5xl" aria-hidden>🎮</span>
+            <span className="flex-1">
+              <span className="block text-2xl font-bold">Jocuri de clasa a III-a</span>
+              <span className="block">Cursa contra cronometrului, Perechi, Balanța, Detectivul și Constructorul.</span>
+            </span>
+          </Link>
+        )}
+        {clasa === 4 && (
+          <Link href="/elev/clasa4"
+            className="mt-4 flex flex-wrap items-center gap-5 rounded-3xl bg-galben p-5 text-mov-inchis shadow-md transition hover:-translate-y-1 hover:shadow-xl">
+            <span className="text-5xl" aria-hidden>📐</span>
+            <span className="flex-1">
+              <span className="block text-2xl font-bold">Jocuri de clasa a IV-a</span>
+              <span className="block">Unități de măsură, geometrie, probleme, logică și tabele: Cursa, Perechi, Balanța, Detectivul și Constructorul.</span>
+            </span>
+          </Link>
+        )}
+        {clasa === 5 && (
+          <Link href="/elev/clasa5"
+            className="mt-4 flex flex-wrap items-center gap-5 rounded-3xl bg-galben p-5 text-mov-inchis shadow-md transition hover:-translate-y-1 hover:shadow-xl">
+            <span className="text-5xl" aria-hidden>🚀</span>
+            <span className="flex-1">
+              <span className="block text-2xl font-bold">Jocuri de clasa a V-a</span>
+              <span className="block">Puteri, divizibilitate, fracții, zecimale, geometrie: Cursa, Perechi, Balanța, Detectivul și Constructorul.</span>
+            </span>
+          </Link>
+        )}
+        {clasa === 1 && (
+          <Link href="/elev/clasa1"
+            className="mt-4 flex flex-wrap items-center gap-5 rounded-3xl bg-galben p-6 shadow-lg transition hover:-translate-y-1 hover:shadow-xl">
+            <span className="text-6xl" aria-hidden>🚀</span>
+            <span className="flex-1">
+              <span className="block text-2xl font-extrabold text-mov-inchis">Jocurile clasei I</span>
+              <span className="block text-mov-inchis/90">Numără și grupează, cursa cu racheta, perechi, balanța, căsuța magică.</span>
+            </span>
+            <span className="rounded-2xl bg-mov px-5 py-3 text-lg font-bold text-white">Joacă ▶</span>
+          </Link>
+        )}
+
+        <Link href={`/elev/arcade?clasa=${clasa}`}
+          className="mt-4 flex flex-wrap items-center gap-5 rounded-3xl p-5 text-white shadow-md transition hover:-translate-y-1 hover:shadow-xl" style={{ background: "linear-gradient(120deg, #e0483e, #6a59a7)" }}>
+          <span className="text-5xl" aria-hidden>🕹️</span>
+          <span className="flex-1">
+            <span className="block text-2xl font-bold">Jocuri arcade</span>
+            <span className="block text-white/90">Baloanele, Cursa cu porți și Racheta: răspunsuri rapide, 3 viteze, medalii.</span>
+          </span>
+        </Link>
+
         <Link href="/elev/teme"
           className="mt-4 flex flex-wrap items-center gap-5 rounded-3xl bg-hartie p-5 shadow-md transition hover:-translate-y-1 hover:shadow-xl">
           <span className="text-5xl" aria-hidden>✏️</span>
@@ -69,7 +134,24 @@ export default function ZonaElev() {
           </span>
         </Link>
 
-        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-5 grid gap-5 sm:grid-cols-2">
+          <Link href="/elev/lectii" className="flex items-center gap-4 rounded-3xl bg-mov p-6 text-white shadow-md transition hover:-translate-y-1 hover:shadow-xl">
+            <span className="text-6xl" aria-hidden>🧱</span>
+            <span>
+              <span className="block text-2xl font-bold">Lecții cu materiale</span>
+              <span className="block text-white/85">Blocuri, axa numerelor, modelul în bară și altele, pas cu pas.</span>
+            </span>
+          </Link>
+          <Link href="/elev/atelier" className="flex items-center gap-4 rounded-3xl bg-white p-6 shadow-md ring-2 ring-mov/20 transition hover:-translate-y-1 hover:shadow-xl">
+            <span className="text-6xl" aria-hidden>🧰</span>
+            <span>
+              <span className="block text-2xl font-bold text-mov">Atelierul</span>
+              <span className="block text-gray-600">Lucrează liber cu materialele: construiește, mută, descoperă.</span>
+            </span>
+          </Link>
+        </div>
+
+        <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {JOCURI.map((j) => {
             const disponibil = j.clase.includes(clasa);
             const stele = pr?.stele[`${j.id}-${clasa}`] ?? 0;

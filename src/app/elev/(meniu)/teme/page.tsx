@@ -44,7 +44,7 @@ export default async function TemeleMele() {
           const expirat = t.termen && t.termen < new Date();
           return (
             <Link key={t.id} href={`/elev/tema/${t.cod}`} className="flex items-center gap-4 rounded-3xl bg-hartie p-5 shadow transition hover:-translate-y-0.5 hover:shadow-lg">
-              <span className="text-4xl" aria-hidden>{t.test ? "📝" : "✏️"}</span>
+              <span className="text-4xl" aria-hidden>{t.mecanica === "clasa1" ? "🚀" : t.test ? "📝" : "✏️"}</span>
               <span className="flex-1">
                 <span className="block text-xl font-bold text-mov">{t.titlu}</span>
                 <span className="block text-sm text-gray-600">

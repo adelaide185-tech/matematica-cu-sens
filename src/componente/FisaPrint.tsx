@@ -86,7 +86,7 @@ function ItemFisa({ item, nr, rezolvari, arataPunctaj }: { item: Item; nr: numbe
         ))}
       </div>
       {!rezolvari && item.spatiuLucru ? <div className="fisa-lucru" style={{ height: `${item.spatiuLucru * 9}mm` }} /> : null}
-      {rezolvari && (
+      {rezolvari && (item.rezolvare.length > 0 || (arataPunctaj && multe)) && (
         <div className="fisa-rezolvare">
           {item.rezolvare.map((r, k) => <div key={k}>{r}</div>)}
           {arataPunctaj && multe && <div className="fisa-barem-item">Barem: {item.cerinte.length} × {Number.isInteger(per) ? per : per.toFixed(1)} p</div>}

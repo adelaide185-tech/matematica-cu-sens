@@ -9,6 +9,13 @@
   --color-verde: #2e9e5b;
   --color-albastru: #2f6fd1;
   --color-portocaliu: #e07a1f;
+  /* ── Paleta Fabricii de Inteligență (din ilustrația cu mascota) ── */
+  --color-violet: #5b3fb8;
+  --color-violet-inchis: #3d2689;
+  --color-lavanda: #f2c5f9;
+  --color-lavanda-deschis: #fbf0fd;
+  --color-cyan: #8be6f2;
+  --color-cyan-inchis: #1fa9bd;
   --font-sans: var(--font-quicksand), ui-sans-serif, system-ui, sans-serif;
 
   /* ── Zona elev (jocuri): tabletă și tablă interactivă ── */
@@ -130,6 +137,20 @@ body {
 .fisa-rezultat { font-size: 13pt; font-weight: 700; text-align: right; }
 .fisa-subsol { margin-top: 8mm; font-size: 8.5pt; color: #888; text-align: center; }
 
+/* ───── Fișa clasei I: font mare, căsuțe mari, rânduri aerisite (copii de 7–8 ani) ───── */
+.fisa-c1 .fisa { font-size: 14pt; line-height: 1.55; }
+.fisa-c1 .fisa-enunt { font-size: 14.5pt; margin-bottom: 3mm; }
+.fisa-c1 .fisa-item { margin-bottom: 6mm; }
+.fisa-c1 .fisa-cerinte { gap: 5mm 8mm; }
+.fisa-c1 .casuta { width: 14mm; height: 10mm; border-width: 1.6px; border-radius: 2mm; }
+.fisa-c1 .linie { min-width: 26mm; height: 1.3em; }
+.fisa-c1 .fisa-optiuni { font-size: 13.5pt; gap: 2mm 6mm; }
+.fisa-c1 .fisa-mecanica { max-width: 82mm; }
+.fisa-c1 .fisa-mecanica svg { max-height: 38mm; }
+.fisa-c1 .fisa-lucru { height: 22mm !important; }
+.fisa-pagina-noua { break-before: page; page-break-before: always; }
+@media screen { .fisa-pagina-noua { margin-top: 8mm; } }
+
 @page { size: A4; margin: 0; }
 @media print {
   body { background: #fff; }
@@ -192,3 +213,139 @@ body {
   .fc-itemi { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
   .fc-raspunsuri { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+
+/* fișa de clasa a III-a (aceleași reguli ca fișa de calcul, plus desene și texte lungi) */
+.fc-item-c3 { align-items: flex-start; }
+.fc-wrap { white-space: normal; line-height: 1.35; }
+.fc-cu-desen { display: flex; flex-direction: column; gap: 1mm; white-space: normal; }
+.fc-caroiaj { display: block; margin-top: 1.5mm; }
+.fc-instructiune { margin: 2mm 0 0; font-size: 10.5pt; font-style: italic; color: #4a3d80; }
+.fc-raspunsuri-c3 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.fc-raspunsuri-c3 li { white-space: normal; }
+.fc-variante { display: inline-flex; flex-wrap: wrap; gap: 1mm 4mm; margin-left: 2mm; font-size: 10pt; }
+.desen-tabel { font-size: 10pt; }
+.fc-rez-lista { list-style: none; padding: 0; margin: 4mm 0 0; display: grid; gap: 4mm; }
+.fc-rez { break-inside: avoid; border: 1px solid #d8d3ec; border-radius: 3mm; padding: 3mm 4mm; }
+.fc-rez-enunt { font-weight: 600; position: relative; padding-right: 6mm; }
+.fc-rez-desen { margin: 2mm 0; }
+.fc-rez-pasi { font-size: 10.5pt; margin-top: 1.5mm; }
+.fc-rez-pasi ol { margin: 1mm 0 0 5mm; list-style: decimal; }
+.fc-rez-raspuns { margin-top: 1mm; color: #2e7d32; }
+
+/* mini-jocurile clasei a II-a */
+@keyframes scutura { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+@keyframes cade { from { top: -7rem; } to { top: 100%; } }
+.bula { top: -7rem; animation-name: cade; animation-timing-function: linear; animation-iteration-count: infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .bula { animation: none; top: 30%; }
+  .bula:nth-child(even) { top: 60%; }
+}
+.fc-c2 { font-size: 15pt; }
+.fc-c2.fc-col3 { font-size: 14pt; }
+@keyframes treceTinta { from { left: 100%; } to { left: -8rem; } }
+.tinta { left: 100%; animation-name: treceTinta; animation-timing-function: linear; animation-iteration-count: infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .tinta { animation: none; position: relative !important; left: auto; top: 2.5rem; margin: 0 0.5rem; display: inline-flex; }
+}
+
+/* diploma: A4 orizontal */
+@page diploma { size: A4 landscape; margin: 0; }
+.diploma { width: 297mm; height: 210mm; margin: 0 auto; padding: 10mm; background: #fffdf5; box-shadow: 0 4px 24px rgb(0 0 0 / 0.12); }
+.diploma-chenar { height: 100%; border: 6mm double #6a59a7; border-radius: 6mm; padding: 10mm; text-align: center; color: #2a2150; background: radial-gradient(circle at 50% 30%, #fff 0, #fff6d6 100%); }
+.diploma-titlu { margin-top: 6mm; font-size: 46pt; font-weight: 900; letter-spacing: 0.2em; color: #6a59a7; }
+.diploma-nume { margin: 4mm 0; font-size: 34pt; font-weight: 800; color: #4a3d80; border-bottom: 1px solid #c9b6f2; display: inline-block; padding: 0 12mm; }
+.diploma-medalie { margin: 3mm 0; font-size: 26pt; font-weight: 800; color: #b5541b; }
+@media print { .diploma { page: diploma; box-shadow: none; margin: 0; } }
+
+/* jocurile arcade (Baloanele, Cursa cu porți, Racheta) */
+@keyframes urcaBalon { from { top: 100%; } to { top: -45%; } }
+@keyframes legana { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+@keyframes coboaraPoarta { from { top: -22%; } to { top: 68%; } }
+@keyframes coboaraMeteorit { from { top: -28%; } to { top: 70%; } }
+@keyframes soseaCurge { from { background-position-y: 0; } to { background-position-y: 80px; } }
+@keyframes salt { 0% { transform: scale(0.6); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+@keyframes laser { from { opacity: 1; transform: translateX(-50%) scaleY(0.2); transform-origin: bottom; } to { opacity: 0.2; transform: translateX(-50%) scaleY(1); } }
+.arcade-urca { top: 100%; transform: translateX(-50%); animation-name: urcaBalon; animation-timing-function: linear; animation-fill-mode: forwards; }
+.arcade-balon { animation: legana 2.4s ease-in-out infinite; }
+.arcade-coboara { top: -22%; animation-name: coboaraPoarta; animation-timing-function: linear; animation-fill-mode: forwards; }
+.arcade-meteorit { top: -28%; animation-name: coboaraMeteorit; animation-timing-function: linear; animation-fill-mode: forwards; }
+.arcade-sosea { background-image: repeating-linear-gradient(to bottom, transparent 0 40px, rgb(255 255 255 / 0.12) 40px 80px); animation: soseaCurge 0.6s linear infinite; }
+/* fără mișcare: variantele stau pe loc, fără timp (jocul rămâne jucabil) */
+@media (prefers-reduced-motion: reduce) {
+  .arcade-urca { animation: none; top: 30%; }
+  .arcade-balon, .arcade-sosea { animation: none; }
+  .arcade-coboara { animation: none; top: 35%; }
+  .arcade-meteorit { animation: none; top: 30%; }
+}
+
+/* ───── Fișele de engleză 4–6 ani ───── */
+.fe .fc-titlu { font-size: 20pt; }
+.fe-fata { font-size: 14pt; letter-spacing: 2mm; }
+.fe-sectiune { position: relative; break-inside: avoid; margin: 0 0 6mm; padding: 3mm 4mm 4mm; border: 1.5px solid #d8d3ec; border-radius: 5mm; }
+.fe-cerinta { display: flex; align-items: center; gap: 3mm; margin: 0 0 3mm; font-size: 13pt; font-weight: 500; color: #2b2540; }
+.fe-nr { display: inline-grid; place-items: center; width: 8mm; height: 8mm; border-radius: 50%; background: #6a59a7; color: #fff; font-weight: 800; font-size: 12pt; flex: none; }
+.fe-picto { font-size: 17pt; }
+.fe-ro { color: #777; font-size: 11pt; font-weight: 400; }
+.fe-poza { line-height: 1; display: inline-block; }
+.fe-pata { display: inline-grid; place-items: center; border-radius: 50%; border: 1.2px solid #555; font-size: 9pt; }
+.fe-randuri { list-style: none; padding: 0; margin: 0; display: grid; gap: 2.5mm; }
+.fe-rand { display: flex; align-items: center; gap: 4mm; }
+.fe-nrmic { font-weight: 800; color: #6a59a7; min-width: 5mm; font-size: 12pt; }
+.fe-celula { flex: 1; display: grid; place-items: center; min-height: 20mm; border: 1px dashed #ccc; border-radius: 4mm; }
+.fe-umbre { display: grid; grid-template-columns: 1fr 1fr; gap: 30mm; padding: 0 8mm; }
+.fe-col { display: grid; gap: 3mm; }
+.fe-umbra-rand { display: flex; align-items: center; justify-content: space-between; gap: 4mm; min-height: 18mm; }
+.fe-col:last-child .fe-umbra-rand { justify-content: flex-start; }
+.fe-punct { width: 3.5mm; height: 3.5mm; border-radius: 50%; background: #333; flex: none; }
+.fe-grila3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; }
+.fe-grila2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4mm; }
+.fe-colorat { display: grid; place-items: center; gap: 2mm; min-height: 38mm; border: 1px dashed #ccc; border-radius: 4mm; padding: 2mm; }
+.fe-indiciu-culoare { display: flex; align-items: center; gap: 2mm; font-size: 12pt; }
+.fe-numara { display: flex; align-items: center; justify-content: space-between; gap: 3mm; border: 1px dashed #ccc; border-radius: 4mm; padding: 2mm 3mm; min-height: 24mm; }
+.fe-grup { display: inline-grid; gap: 1mm; font-size: 8.5mm; line-height: 1; }
+.fe-optiuni { display: flex; gap: 2.5mm; }
+.fe-cifra { display: inline-grid; place-items: center; width: 10mm; height: 10mm; border: 1.2px solid #999; border-radius: 2mm; font-size: 15pt; font-weight: 800; }
+.fe-traseaza { display: grid; gap: 3mm; }
+.fe-trasare { display: flex; align-items: center; gap: 4mm; }
+.fe-litere { height: 17mm; flex: 1; max-width: 150mm; }
+.fe-educatoare .fe-script { break-inside: avoid; margin-bottom: 4mm; }
+.fe-educatoare h2 { display: flex; align-items: center; gap: 2mm; font-size: 12pt; margin: 0 0 1.5mm; }
+.fe-educatoare ol { margin: 0 0 0 10mm; font-size: 11pt; list-style: decimal; }
+.fe-spune { font-style: italic; }
+.fe-raspuns { color: #2e7d32; margin-left: 2mm; }
+.fe-sectiune .fc-regen { top: 3mm; right: 3mm; transform: none; }
+.fe-sectiune:hover .fc-regen { opacity: 1; }
+.fe-educatoare { break-before: page; }
+
+/* ───── Sclipici, mascota ───── */
+@keyframes mascotaPlutire { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes mascotaSalt { 0%, 100% { transform: translateY(0) scale(1); } 30% { transform: translateY(-18px) scale(1.04, 0.97); } 55% { transform: translateY(0) scale(1.05, 0.95); } 70% { transform: translateY(-6px); } }
+@keyframes mascotaFlutura { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-18deg); } 75% { transform: rotate(14deg); } }
+@keyframes mascotaRaze { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@keyframes mascotaClipire { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+.mascota-plutire { animation: mascotaPlutire 3s ease-in-out infinite; }
+.mascota-salt { animation: mascotaSalt 0.9s ease-out 2; }
+.mascota-flutura { animation: mascotaFlutura 1.1s ease-in-out infinite; transform-box: view-box; }
+.mascota-raze { animation: mascotaRaze 2.2s ease-in-out infinite; }
+.mascota-clipire { animation: mascotaClipire 4s infinite; transform-box: fill-box; transform-origin: center; }
+.mascota-bula::after { content: ""; position: absolute; left: -10px; bottom: 14px; border: 8px solid transparent; border-right-color: #fff; }
+@media (prefers-reduced-motion: reduce) {
+  .mascota-plutire, .mascota-salt, .mascota-flutura, .mascota-raze, .mascota-clipire { animation: none; }
+}
+
+/* fundalul „Fabrica de Inteligență”: lavandă → cyan, ca în ilustrația cu mascota */
+.fundal-fabrica { background: radial-gradient(circle at 12% 8%, #f7d6fb 0, transparent 38%), radial-gradient(circle at 90% 20%, #c9f3f9 0, transparent 40%), linear-gradient(160deg, #fbf0fd 0%, #f1ecff 50%, #e8f9fc 100%); }
+.card-curs-mate { background: linear-gradient(135deg, #6b4fc4, #3d2689); }
+.card-curs-engleza { background: linear-gradient(135deg, #1fa9bd, #5b3fb8); }
+.portret-mascota { box-shadow: 0 0 0 6px #fff, 0 0 40px 6px rgb(139 230 242 / 0.55), 0 12px 30px rgb(61 38 137 / 0.35); }
+
+/* jocurile vii de engleză */
+@keyframes balonPlutire { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-16px) rotate(2deg); } }
+@keyframes balonSpart { 0% { transform: scale(0.6); opacity: 1; } 70% { transform: scale(1.3); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+@keyframes cartitaLovita { 0% { transform: scale(1, 1); } 30% { transform: scale(1.2, 0.7); } 60% { transform: scale(0.95, 1.08); } 100% { transform: scale(1, 1); } }
+@keyframes cutieDeschisa { 0% { transform: scale(0.3) rotate(-8deg); opacity: 0; } 70% { transform: scale(1.08) rotate(2deg); opacity: 1; } 100% { transform: scale(1) rotate(0); } }
+.balon-plutire { animation: balonPlutire 3s ease-in-out infinite; }
+.balon-spart { animation: balonSpart 0.6s ease-out forwards; }
+.cartita-lovita { animation: cartitaLovita 0.45s ease-out; transform-origin: bottom center; }
+.cutie-deschisa { animation: cutieDeschisa 0.45s ease-out; }
+@media (prefers-reduced-motion: reduce) { .balon-plutire, .cartita-lovita, .cutie-deschisa { animation: none; } }
