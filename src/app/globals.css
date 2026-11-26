@@ -270,3 +270,42 @@ body {
   .arcade-coboara { animation: none; top: 35%; }
   .arcade-meteorit { animation: none; top: 30%; }
 }
+
+/* ───── Fișele de engleză 4–6 ani ───── */
+.fe .fc-titlu { font-size: 20pt; }
+.fe-fata { font-size: 14pt; letter-spacing: 2mm; }
+.fe-sectiune { position: relative; break-inside: avoid; margin: 0 0 6mm; padding: 3mm 4mm 4mm; border: 1.5px solid #d8d3ec; border-radius: 5mm; }
+.fe-cerinta { display: flex; align-items: center; gap: 3mm; margin: 0 0 3mm; font-size: 13pt; font-weight: 500; color: #2b2540; }
+.fe-nr { display: inline-grid; place-items: center; width: 8mm; height: 8mm; border-radius: 50%; background: #6a59a7; color: #fff; font-weight: 800; font-size: 12pt; flex: none; }
+.fe-picto { font-size: 17pt; }
+.fe-ro { color: #777; font-size: 11pt; font-weight: 400; }
+.fe-poza { line-height: 1; display: inline-block; }
+.fe-pata { display: inline-grid; place-items: center; border-radius: 50%; border: 1.2px solid #555; font-size: 9pt; }
+.fe-randuri { list-style: none; padding: 0; margin: 0; display: grid; gap: 2.5mm; }
+.fe-rand { display: flex; align-items: center; gap: 4mm; }
+.fe-nrmic { font-weight: 800; color: #6a59a7; min-width: 5mm; font-size: 12pt; }
+.fe-celula { flex: 1; display: grid; place-items: center; min-height: 20mm; border: 1px dashed #ccc; border-radius: 4mm; }
+.fe-umbre { display: grid; grid-template-columns: 1fr 1fr; gap: 30mm; padding: 0 8mm; }
+.fe-col { display: grid; gap: 3mm; }
+.fe-umbra-rand { display: flex; align-items: center; justify-content: space-between; gap: 4mm; min-height: 18mm; }
+.fe-col:last-child .fe-umbra-rand { justify-content: flex-start; }
+.fe-punct { width: 3.5mm; height: 3.5mm; border-radius: 50%; background: #333; flex: none; }
+.fe-grila3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; }
+.fe-grila2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4mm; }
+.fe-colorat { display: grid; place-items: center; gap: 2mm; min-height: 38mm; border: 1px dashed #ccc; border-radius: 4mm; padding: 2mm; }
+.fe-indiciu-culoare { display: flex; align-items: center; gap: 2mm; font-size: 12pt; }
+.fe-numara { display: flex; align-items: center; justify-content: space-between; gap: 3mm; border: 1px dashed #ccc; border-radius: 4mm; padding: 2mm 3mm; min-height: 24mm; }
+.fe-grup { display: inline-grid; gap: 1mm; font-size: 8.5mm; line-height: 1; }
+.fe-optiuni { display: flex; gap: 2.5mm; }
+.fe-cifra { display: inline-grid; place-items: center; width: 10mm; height: 10mm; border: 1.2px solid #999; border-radius: 2mm; font-size: 15pt; font-weight: 800; }
+.fe-traseaza { display: grid; gap: 3mm; }
+.fe-trasare { display: flex; align-items: center; gap: 4mm; }
+.fe-litere { height: 17mm; flex: 1; max-width: 150mm; }
+.fe-educatoare .fe-script { break-inside: avoid; margin-bottom: 4mm; }
+.fe-educatoare h2 { display: flex; align-items: center; gap: 2mm; font-size: 12pt; margin: 0 0 1.5mm; }
+.fe-educatoare ol { margin: 0 0 0 10mm; font-size: 11pt; list-style: decimal; }
+.fe-spune { font-style: italic; }
+.fe-raspuns { color: #2e7d32; margin-left: 2mm; }
+.fe-sectiune .fc-regen { top: 3mm; right: 3mm; transform: none; }
+.fe-sectiune:hover .fc-regen { opacity: 1; }
+.fe-educatoare { break-before: page; }

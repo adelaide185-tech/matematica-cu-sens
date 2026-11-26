@@ -65,3 +65,41 @@ Pe pagina cursului, fiecare unitate arată cele 6 stele posibile (3 de la „Asc
   - Perechi și Cartonașe;
   - stelele afișate pe pagina cursului și salvate în contul elevului;
   - 0 erori în consolă.
+
+## Fișe de lucru pentru educatoare (`/profesor/engleza`)
+
+Generatorul se deschide din panoul profesorului („Fișe English 4–6 ani”) sau de pe pagina cursului („🖨️ Pentru educatoare: fișe de lucru”). Educatoarea alege:
+- vârsta copiilor;
+- temele (din cele 9 unități);
+- tipurile de exerciții;
+- antetul (titlu, grădinița sau grupa, numele educatoarei, data);
+- dacă printează color sau alb-negru.
+
+Fișa folosește doar imagini, fără text de citit pentru copii. Fiecare cerință are o pictogramă și textul ei în engleză și în română, pentru adult.
+
+| Exercițiu | Ce face copilul |
+|---|---|
+| 👂⭕ Listen and circle | încercuiește imaginea spusă de educatoare (2, 3 sau 4 imagini pe rând, după vârstă) |
+| 🌑 Match the picture and its shadow | unește imaginea cu silueta ei |
+| 🖍️ Listen and colour | colorează imaginea (gri deschis) cu culoarea spusă („Colour the cat brown.”) |
+| 🔢⭕ Count and circle | numără obiectele și încercuiește numărul (1–5 / 1–7 / 1–10, după vârstă) |
+| ❌ Cross out the odd one | taie imaginea din altă temă (trei din aceeași temă și una din alta) |
+| ✏️ Trace the word | scrie peste literele punctate (recomandat la 6 ani) |
+
+**Fișa educatoarei** are o pagină separată pentru fiecare fișă, cu:
+- textul de citit cu voce tare la fiecare exercițiu („Where's the duck?”, „Colour the cat brown.”);
+- răspunsurile.
+
+**Descărcare și printare:**
+- PDF-ul are două variante: fișa copiilor sau fișa copiilor plus fișa educatoarei, pe `/api/pdf-engleza`. Doar profesorii pot descărca PDF-ul.
+- Pagina de printare este `/fisa/engleza`.
+
+**Alte controale:** „🎲 Alte exerciții” face o fișă nouă, iar ↻ pe un exercițiu îi schimbă doar imaginile acestuia.
+
+**Teste:** `src/engleza/fise.test.ts` verifică toate vârstele, toate temele și toate tipurile:
+- la „Listen and circle”, imagini diferite pe un rând, cu imaginea cerută o singură dată;
+- la umbre, aceleași imagini ca în stânga, amestecate;
+- la intrus, o singură imagine din altă temă;
+- la numărat, numerele în limitele vârstei;
+- aceleași exerciții pentru același cod;
+- ↻ schimbă doar exercițiul ales.

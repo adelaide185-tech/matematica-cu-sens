@@ -32,7 +32,10 @@ export function HubEngleza() {
       <section className="mx-auto max-w-5xl text-center">
         <h1 className="text-4xl font-extrabold text-mov sm:text-5xl">🇬🇧 English <span className="text-gray-500">· 4–6 ani</span></h1>
         <p className="mx-auto mt-2 max-w-2xl text-lg text-gray-600">Copiii ascultă cuvintele în engleză și ating imaginile. Nu trebuie să știe să citească. Un adult pornește jocul și dă volumul mai tare. 🔊</p>
-        <button type="button" onClick={() => spune("Hello! Let's play!")} className="mt-3 rounded-full bg-white px-5 py-2 font-bold text-mov shadow">🔊 Testează sunetul</button>
+        <div className="mt-3 flex flex-wrap justify-center gap-2">
+          <button type="button" onClick={() => spune("Hello! Let's play!")} className="rounded-full bg-white px-5 py-2 font-bold text-mov shadow">🔊 Testează sunetul</button>
+          <Link href="/profesor/engleza" className="rounded-full bg-mov-deschis px-5 py-2 font-bold text-mov shadow">🖨️ Pentru educatoare: fișe de lucru</Link>
+        </div>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-lg font-bold text-mov">Vârsta copilului:
           {([4, 5, 6] as Varsta[]).map((v) => (
             <button key={v} type="button" onClick={() => alege(v)} aria-pressed={varsta === v}

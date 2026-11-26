@@ -57,6 +57,10 @@ export default function PanouProfesor() {
           <span className="text-2xl" aria-hidden>🕹️</span>
           <span><b>Jocuri arcade (clasele I–V)</b> — Baloanele, Cursa cu porți, Racheta: previzualizare și trimitere ca temă</span>
         </Link>
+        <Link href="/profesor/engleza" className="mt-2 flex items-center gap-3 rounded-2xl bg-mov-deschis p-3 text-sm hover:brightness-95">
+          <span className="text-2xl" aria-hidden>🇬🇧</span>
+          <span><b className="text-mov">Fișe English 4–6 ani</b> — ascultă și încercuiește, umbre, colorează, numără, intrusul, scrie peste litere; cu fișa educatoarei</span>
+        </Link>
         <Link href="/profesor/clasa2" className={`mt-2 flex items-center gap-3 rounded-2xl p-3 text-sm hover:brightness-95 ${p.clasa === 2 ? "bg-mov text-white" : "bg-mov-deschis"}`}>
           <span className="text-2xl" aria-hidden>🎮</span>
           <span><b className={p.clasa === 2 ? "" : "text-mov"}>Clasa a II-a: jocuri și fișe</b> — noțiuni la alegere, 3 niveluri, 12 mini-jocuri, Mix automat, rapoarte pentru părinți</span>

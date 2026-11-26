@@ -151,6 +151,7 @@ Jocuri arcade pentru clasele I–V (`/elev/arcade`, detalii în `docs/10_JOCURI_
 Engleză 4–6 ani (`/engleza`, din meniul „Cursuri”, detalii în `docs/11_ENGLEZA_4_6.md`):
 - 9 unități (Colours, Numbers, Animals, Family, Body, Food, Toys, Clothes, Weather), conținut original, totul pe ascultare (copiii nu citesc încă)
 - Cartonașe, Ascultă și atinge, Perechi; dificultatea după vârstă (4, 5 sau 6 ani); stele salvate și în cont
+- generator de fișe pentru educatoare (`/profesor/engleza`): 6 tipuri de exerciții cu imagini, PDF cu „fișa educatoarei” (ce se citește + răspunsuri)
 
 Urmează:
 - rapoarte de progres pe noțiuni pentru profesor
