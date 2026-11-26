@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { CURSURI, MeniuCursuri, linkCurs } from "@/componente/MeniuCursuri";
+import { Mascota } from "@/componente/Mascota";
 
 export default function Acasa() {
   return (
@@ -9,6 +10,8 @@ export default function Acasa() {
         <MeniuCursuri />
       </header>
       <Image src="/brand/logo-orizontal.jpg" alt="Fabrica de Inteligență" width={420} height={142} priority className="h-auto w-[300px] sm:w-[420px]" />
+      <Link href="/mascota" className="mt-2" aria-label="Fă cunoștință cu Sclipici, mascota noastră"><Mascota stare="salut" marime={120} spune="Bună! Eu sunt Sclipici!" /></Link>
+
       <section className="mt-6 w-full max-w-3xl" aria-labelledby="cursuri">
         <h2 id="cursuri" className="text-center text-2xl font-bold text-mov">Cursuri</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">

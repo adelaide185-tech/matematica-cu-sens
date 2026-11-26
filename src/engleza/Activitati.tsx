@@ -7,6 +7,7 @@ import { inregistreaza } from "@/jocuri/progres";
 import { cuCuvant, type Cuvant, type Unitate, type Varsta } from "./continut";
 import { cartiPerechi, rundeAsculta, steleAsculta, stelePerechi } from "./runde";
 import { LAUDE, spune } from "./voce";
+import { Mascota } from "@/componente/Mascota";
 
 /** Imaginea unui cuvânt: emoji mare; la culori o pată de culoare; la numere, atâtea stele. */
 export function Imagine({ c, marime = 1 }: { c: Cuvant; marime?: number }) {
@@ -48,6 +49,7 @@ export function Cartonase({ u, inapoi }: { u: Unitate; inapoi: string }) {
   return (
     <main className="mx-auto flex min-h-screen max-w-4xl flex-col px-4 pb-6">
       <Antet u={u} titlu="Cartonașe" inapoi={inapoi} pas={i + 1} total={u.cuvinte.length} />
+      <div className="flex justify-center"><Mascota marime={80} stare={terminat ? "bucuros" : "salut"} spune={terminat ? "Well done!" : "Say it with me!"} /></div>
       <button type="button" onClick={asculta} aria-label={`Ascultă: ${c.en}`}
         className="mx-auto mt-2 flex min-h-[55vh] w-full flex-col items-center justify-center gap-4 rounded-[2.5rem] bg-white p-6 shadow-lg ring-8 transition active:scale-[0.98]" style={{ ["--tw-ring-color" as string]: `${u.culoare}33` }}>
         <Imagine c={c} marime={1.8} />
@@ -107,6 +109,7 @@ export function Asculta({ u, varsta, seed, inapoi, onReia }: { u: Unitate; varst
     <main className="mx-auto flex min-h-screen max-w-5xl flex-col px-4 pb-6">
       <Antet u={u} titlu="Ascultă și atinge" inapoi={inapoi} pas={r + 1} total={runde.length} />
       <div className="flex items-center justify-center gap-3">
+        <Mascota marime={90} stare={stare ? (stare.ok ? "bucuros" : "incurajare") : "ganditor"} key={stare ? `${r}-${stare.ok}-${stare.en}` : `g${r}`} />
         <button type="button" onClick={() => spune(cerinta)} className="flex items-center gap-3 rounded-full bg-mov px-6 py-3 text-2xl font-extrabold text-white shadow-lg active:scale-95" aria-label={`Ascultă din nou: ${cerinta}`}>
           🔊 <span className="text-lg font-bold text-white/90">{cerinta}</span>
         </button>
@@ -163,6 +166,7 @@ export function Perechi({ u, varsta, seed, inapoi, onReia }: { u: Unitate; varst
   return (
     <main className="mx-auto flex min-h-screen max-w-4xl flex-col px-4 pb-6">
       <Antet u={u} titlu="Perechi" inapoi={inapoi} pas={gasite.length} total={perechi} />
+      <div className="flex justify-center"><Mascota key={gasite.length} marime={80} stare={gasite.length ? "bucuros" : "salut"} spune={gasite.length ? `${LAUDE[gasite.length % LAUDE.length]}` : "Find the pairs!"} /></div>
       <div className={`mt-2 grid flex-1 content-center gap-3 ${carti.length <= 6 ? "grid-cols-3" : "grid-cols-4"}`}>
         {carti.map((k) => {
           const vizibil = deschise.includes(k.cheie) || gasite.includes(k.c.en);
@@ -185,7 +189,7 @@ function FinalEn({ u, stele, inapoi, onReia }: { u: Unitate; stele: number; inap
   return (
     <main className="mx-auto flex min-h-screen max-w-xl flex-col items-center justify-center px-4 text-center">
       <div className="rounded-[2.5rem] bg-white p-8 shadow-xl">
-        <div className="text-7xl" aria-hidden>{u.icon}</div>
+        <Mascota stare="bucuros" marime={150} />
         <p className="mt-2 text-4xl font-extrabold text-mov">Well done!</p>
         <p className="text-lg text-gray-600">Bravo!</p>
         <div className="mt-3 text-6xl" aria-label={`${stele} stele`}>{[1, 2, 3].map((s) => <span key={s} className={s <= stele ? "" : "opacity-20 grayscale"}>⭐</span>)}</div>

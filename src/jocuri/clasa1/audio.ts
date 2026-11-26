@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { spuneText } from "@/lib/voce";
 
 /** Disponibilitatea citirii, aflată după montare (pe server nu există; altfel randarea ar diferi). */
 export function usePoateCiti(): boolean {
@@ -32,13 +33,8 @@ function pentruVoce(t: string): string {
 export function citeste(text: string) {
   if (!poateCiti() || !text) return;
   try {
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(pentruVoce(text));
-    u.lang = "ro-RO";
-    u.rate = 0.9;
-    const voce = window.speechSynthesis.getVoices().find((v) => v.lang.toLowerCase().startsWith("ro"));
-    if (voce) u.voice = voce;
-    window.speechSynthesis.speak(u);
+    // vocea jucăușă comună (mai rară, ton mai înalt; reglabilă de adult)
+    spuneText(pentruVoce(text), "ro");
   } catch {}
 }
 

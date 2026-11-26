@@ -9,6 +9,8 @@ import { ACTIVITATI_EN, UNITATI, type ActivitateEn, type Varsta } from "./contin
 import { citesteVarsta, salveazaVarsta } from "./Varsta";
 import { Imagine } from "./Activitati";
 import { spune } from "./voce";
+import { Mascota } from "@/componente/Mascota";
+import { SetariVoceAdult } from "@/componente/SetariVoce";
 
 const ACT = Object.keys(ACTIVITATI_EN) as ActivitateEn[];
 const steleUnitate = (s: Record<string, number>, u: string) => ACT.filter((a) => a !== "cartonase").reduce((t, a) => t + (s[`en-${u}-${a}-0`] ?? 0), 0);
@@ -30,10 +32,14 @@ export function HubEngleza() {
         <MeniuCursuri />
       </header>
       <section className="mx-auto max-w-5xl text-center">
-        <h1 className="text-4xl font-extrabold text-mov sm:text-5xl">🇬🇧 English <span className="text-gray-500">· 4–6 ani</span></h1>
+        <div className="flex flex-wrap items-center justify-center gap-4">
+          <button type="button" onClick={() => spune("Hi! I'm Sclipici! Let's play!")} aria-label="Sclipici te salută"><Mascota stare="salut" marime={130} spune="Hi! I'm Sclipici!" /></button>
+          <h1 className="text-4xl font-extrabold text-mov sm:text-5xl">🇬🇧 English <span className="text-gray-500">· 4–6 ani</span></h1>
+        </div>
         <p className="mx-auto mt-2 max-w-2xl text-lg text-gray-600">Copiii ascultă cuvintele în engleză și ating imaginile. Nu trebuie să știe să citească. Un adult pornește jocul și dă volumul mai tare. 🔊</p>
-        <div className="mt-3 flex flex-wrap justify-center gap-2">
+        <div className="mt-3 flex flex-wrap items-start justify-center gap-2">
           <button type="button" onClick={() => spune("Hello! Let's play!")} className="rounded-full bg-white px-5 py-2 font-bold text-mov shadow">🔊 Testează sunetul</button>
+          <SetariVoceAdult limba="en" />
           <Link href="/profesor/engleza" className="rounded-full bg-mov-deschis px-5 py-2 font-bold text-mov shadow">🖨️ Pentru educatoare: fișe de lucru</Link>
         </div>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-lg font-bold text-mov">Vârsta copilului:

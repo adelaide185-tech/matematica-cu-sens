@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { spuneText } from "@/lib/voce";
 import Link from "next/link";
 import { Tastatura } from "@/jocuri/componente";
 import { useCelebrare } from "@/jocuri/miscare";
@@ -11,6 +12,7 @@ import { ScaraMedalii } from "@/componente/ScaraMedalii";
 import { JOCURI_C3, SECUNDE_VITEZA, type ConfigC3, type ItemC3 as ItemC3Strict } from "@/motor/clasa3/tipuri";
 import type { Desen } from "@/motor/clasa4/tipuri";
 import { DesenC4 } from "@/jocuri/c4/DesenC4";
+import { Mascota } from "@/componente/Mascota";
 import { Rng } from "@/motor/rng";
 import { FataC3, FiguraC3, TextMate } from "./Vizuale";
 
@@ -32,12 +34,8 @@ export function timpItem(cfg: CfgJoc, it: ItemC3, combo: number): number {
 }
 
 function vorbeste(text: string) {
-  try {
-    const u = new SpeechSynthesisUtterance(text.replace(/□/g, "căsuța").replace(/(\d+)\/(\d+)/g, "$1 supra $2").replace(/×/g, " ori ").replace(/ : /g, " împărțit la ").replace(/−/g, " minus "));
-    u.lang = "ro-RO";
-    speechSynthesis.cancel();
-    speechSynthesis.speak(u);
-  } catch {}
+  // vocea jucăușă comună (mai rară, ton mai înalt; reglabilă de adult)
+  spuneText(text.replace(/□/g, "căsuța").replace(/(\d+)\/(\d+)/g, "$1 supra $2").replace(/×/g, " ori ").replace(/ : /g, " împărțit la ").replace(/−/g, " minus "), "ro");
 }
 
 /**
@@ -429,7 +427,7 @@ function Final({ cfg, puncte, rez, itemi, terminat, mesaj, inapoi, onReia }: {
   return (
     <main className="mx-auto max-w-3xl px-4 py-8 text-center">
       <div className="rounded-3xl bg-white p-6 shadow-lg">
-        <div className="text-7xl" aria-hidden>{m ? MEDALII[m].icon : "💪"}</div>
+        <div className="flex items-end justify-center gap-2"><Mascota stare={puncte.stele >= 2 ? "bucuros" : "incurajare"} marime={110} /><span className="text-7xl" aria-hidden>{m ? MEDALII[m].icon : "💪"}</span></div>
         <h1 className="mt-2 text-3xl font-extrabold text-mov">{m ? `Medalia de ${MEDALII[m].nume}!` : terminat ? "Bravo că ai terminat!" : "Ai rămas fără vieți"}</h1>
         <div className="mt-1 text-4xl">{[1, 2, 3].map((s) => <span key={s} className={s <= puncte.stele ? "" : "opacity-20 grayscale"}>⭐</span>)}</div>
         <ScaraMedalii puncte={puncte} />

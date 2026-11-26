@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { spuneText } from "@/lib/voce";
 import Link from "next/link";
 import { Tastatura } from "@/jocuri/componente";
 import { useCelebrare } from "@/jocuri/miscare";
@@ -39,12 +40,8 @@ function sunetGresit() {
 }
 
 function vorbeste(text: string) {
-  try {
-    const u = new SpeechSynthesisUtterance(text.replace(/□/g, "căsuța").replace(/…/g, "cât").replace(/×/g, " ori ").replace(/ : /g, " împărțit la ").replace(/−/g, " minus ").replace(/1\/2/g, "o doime").replace(/1\/4/g, "o pătrime").replace(/1\/3/g, "o treime"));
-    u.lang = "ro-RO";
-    speechSynthesis.cancel();
-    speechSynthesis.speak(u);
-  } catch {}
+  // vocea jucăușă comună (mai rară, ton mai înalt; reglabilă de adult)
+  spuneText(text.replace(/□/g, "căsuța").replace(/…/g, "cât").replace(/×/g, " ori ").replace(/ : /g, " împărțit la ").replace(/−/g, " minus ").replace(/1\/2/g, "o doime").replace(/1\/4/g, "o pătrime").replace(/1\/3/g, "o treime"), "ro");
 }
 
 function useMontat() {

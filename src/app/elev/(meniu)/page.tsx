@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { citesteProgres, salveazaProgres, sincronizeazaProgres, TROFEE, type Progres } from "@/jocuri/progres";
+import { Mascota } from "@/componente/Mascota";
 
 const JOCURI = [
   { id: "scara", nume: "Scara", icon: "🪜", descriere: "Urcă treaptă cu treaptă rezolvând calcule.", clase: [1, 2, 3, 4], culoare: "#2f6fd1" },
@@ -40,7 +41,10 @@ export default function ZonaElev() {
       </header>
 
       <section className="mx-auto max-w-5xl">
-        <h1 className="text-center text-3xl font-bold text-mov sm:text-4xl">Hai să ne jucăm cu matematica!</h1>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Mascota stare="salut" marime={96} />
+          <h1 className="text-center text-3xl font-bold text-mov sm:text-4xl">Hai să ne jucăm cu matematica!</h1>
+        </div>
         <div className="mt-5 flex flex-wrap justify-center gap-2">
           {[1, 2, 3, 4, 5].map((c) => (
             <button key={c} onClick={() => alegeClasa(c)}

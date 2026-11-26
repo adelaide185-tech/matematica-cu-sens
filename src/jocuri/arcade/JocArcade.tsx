@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { spuneText } from "@/lib/voce";
 import Link from "next/link";
 import { Rng } from "@/motor/rng";
 import type { IntrebareArcade } from "@/motor/arcade/intrebari";
@@ -9,6 +10,7 @@ import { useCelebrare } from "@/jocuri/miscare";
 import { sunetBland } from "@/antrenament/stare-client";
 import { TextMate } from "@/jocuri/c3/Vizuale";
 import { JOCURI_ARCADE, type JocArcadeId } from "@/motor/arcade/config";
+import { Mascota } from "@/componente/Mascota";
 
 export { JOCURI_ARCADE, type JocArcadeId } from "@/motor/arcade/config";
 type Faza = "joc" | "corect" | "gresit" | "arata";
@@ -16,12 +18,8 @@ type Faza = "joc" | "corect" | "gresit" | "arata";
 export interface FinalArcade { greseli: number[]; alegeri: (string | null)[][]; timpi: number[]; rezultat: ReturnType<typeof rezultatArcade> }
 
 function vorbeste(text: string) {
-  try {
-    const u = new SpeechSynthesisUtterance(text.replace(/□/g, "cât").replace(/○/g, "ce semn").replace(/(\d+)\/(\d+)/g, "$1 supra $2").replace(/×|·/g, " ori ").replace(/ : /g, " împărțit la ").replace(/−/g, " minus "));
-    u.lang = "ro-RO";
-    speechSynthesis.cancel();
-    speechSynthesis.speak(u);
-  } catch {}
+  // vocea jucăușă comună (mai rară, ton mai înalt; reglabilă de adult)
+  spuneText(text.replace(/□/g, "cât").replace(/○/g, "ce semn").replace(/(\d+)\/(\d+)/g, "$1 supra $2").replace(/×|·/g, " ori ").replace(/ : /g, " împărțit la ").replace(/−/g, " minus "), "ro");
 }
 
 /**
@@ -272,7 +270,7 @@ function FinalArcadeEcran({ joc, f, intrebari, inapoi, onReia }: { joc: JocArcad
   return (
     <main className="mx-auto max-w-3xl px-4 py-8 text-center">
       <div className="rounded-3xl bg-white p-6 shadow-lg">
-        <div className="text-7xl" aria-hidden>{r.medalie ? MED[r.medalie][0] : JOCURI_ARCADE[joc].icon}</div>
+        <div className="flex items-end justify-center gap-2"><Mascota stare={r.stele >= 2 ? "bucuros" : "incurajare"} marime={110} /><span className="text-7xl" aria-hidden>{r.medalie ? MED[r.medalie][0] : JOCURI_ARCADE[joc].icon}</span></div>
         <h1 className="mt-2 text-3xl font-extrabold text-mov">{r.medalie ? `Medalia de ${MED[r.medalie][1]}!` : "Bravo că ai terminat!"}</h1>
         <div className="mt-1 text-4xl">{[1, 2, 3].map((s) => <span key={s} className={s <= r.stele ? "" : "opacity-20 grayscale"}>⭐</span>)}</div>
         <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
