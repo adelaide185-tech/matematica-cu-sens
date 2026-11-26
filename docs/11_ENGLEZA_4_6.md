@@ -35,26 +35,34 @@ Textul englezesc și traducerea apar mici, pentru părinte sau educatoare.
 
 Fiecare unitate are 6–10 cuvinte, o propoziție model („It's a cat.”) și o cerință („Where's the cat?”).
 
-## Activitățile (`src/engleza/Activitati.tsx`)
+## Activitățile (9 în fiecare unitate)
 
-- **🃏 Cartonașe**: imaginea mare și cuvântul, care se aude la fiecare atingere. Butonul „💬 Cu propoziție” trece de la cuvânt la propoziția model. Sunt potrivite și pentru proiector, în clasă.
-- **👂 Ascultă și atinge**:
-  - copilul aude cerința și atinge imaginea;
-  - la o greșeală, aude ce a atins („That's a dog. Try again!”);
-  - după două greșeli, imaginea corectă pulsează, ca ajutor;
-  - pe ecran, cerința apare pe butonul 🔊, care o repetă.
-- **🧠 Perechi**: cartonașe întoarse; la fiecare întoarcere se aude cuvântul.
+Activitățile sunt făcute după modelul jocurilor Wordwall pe care le folosește aplicația „Axe English” (am analizat-o fără s-o rulăm). Conținutul și desenele sunt originale. La fiecare activitate, Sclipici reacționează la ce face copilul, iar acțiunile au sunete scurte.
 
-**Stelele:**
-- Copilul primește mereu cel puțin o stea, pentru că la vârsta asta contează efortul.
-- La „Ascultă și atinge”, 3 stele înseamnă cel mult o greșeală.
-- La „Perechi”, 3 stele înseamnă cel mult două mutări pe pereche.
+**📖 Învăț cuvintele** (fără greșeli; la final, 3 stele și „✓ făcut”):
+- **🃏 Cartonașe**: imaginea mare și cuvântul, cu propoziția model.
+- **🎁 Deschide cutia**: cutii-cadou numerotate. Fiecare se deschide cu o surpriză: imaginea, cuvântul și propoziția, plus „Say it!”.
+- **🎡 Roata**: copilul învârte roata cu imagini. Unde se oprește, aude „What's this? … It's a cat! Say: cat!” și apasă „✅ Am spus!”.
 
-Pe pagina cursului, fiecare unitate arată cele 6 stele posibile (3 de la „Ascultă și atinge”, 3 de la „Perechi”). Progresul se salvează în cont sub numele `en-<unitate>-<activitate>`, cu „clasa” 0.
+**🎮 Mă joc** (cu stele; 3 stele înseamnă cel mult o greșeală):
+- **👂 Ascultă și atinge**: copilul aude cerința și atinge imaginea potrivită.
+- **🔨 Lovește cârtița**: cârtițele ies din găuri cu imagini, iar copilul o lovește pe cea spusă. La 4 ani sunt 4 găuri, la 5–6 ani 6 găuri.
+- **🎈 Sparge baloanele**: baloane colorate care plutesc. Copilul îl sparge pe cel spus („Pop the cat!”).
+- **🧠 Perechi**: cartonașe întoarse, iar fiecare se aude când e întors.
+- **🗂️ Sortează**: imagini din două unități („Animals or Food?”). Copilul le pune în coșul potrivit, atingând imaginea și apoi coșul, sau trăgând-o cu degetul.
+- **🧩 Construiește propoziția**, după modelul jocului „Phrase Maker”:
+  - copilul aude propoziția unității („I can see a cat.”) și pune piesele în ordine;
+  - fiecare piesă are o pictogramă (🙋 I, 👀 see…) sau imaginea cuvântului;
+  - printre piese se află și o imagine-capcană;
+  - la 4 ani sunt 2 piese, la 5 ani cel mult 4, la 6 ani fiecare cuvânt e o piesă.
+
+**Stele:** după 2 greșeli, imaginea corectă pulsează, ca ajutor. Pe pagina cursului, fiecare unitate are o bară de progres cu stelele câștigate, cel mult 18 (6 jocuri × 3).
+
+Codul jocurilor e în `src/engleza/JocuriVii.tsx`, logica în `src/engleza/runde.ts`, iar sunetele în `src/engleza/sunete.ts` (generate în browser, fără fișiere).
 
 ## Verificare
 
-- `npx vitest run src/engleza`:
+- `npx vitest run src/engleza` (inclusiv `jocuri-vii.test.ts`):
   - cuvinte și imagini distincte în fiecare unitate;
   - rundele potrivite pentru fiecare vârstă;
   - aceleași runde pentru același seed.

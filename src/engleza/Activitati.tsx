@@ -26,7 +26,7 @@ export function Imagine({ c, marime = 1 }: { c: Cuvant; marime?: number }) {
   return <span className="leading-none" style={{ fontSize: `${5 * marime}rem` }} aria-hidden>{c.emoji}</span>;
 }
 
-function Antet({ u, titlu, inapoi, pas, total }: { u: Unitate; titlu: string; inapoi: string; pas?: number; total?: number }) {
+export function Antet({ u, titlu, inapoi, pas, total }: { u: Unitate; titlu: string; inapoi: string; pas?: number; total?: number }) {
   return (
     <header className="flex items-center gap-3 py-3">
       <Link href={inapoi} className="rounded-2xl bg-white px-4 py-2 text-2xl font-bold text-mov shadow" aria-label="Înapoi">←</Link>
@@ -183,7 +183,7 @@ export function Perechi({ u, varsta, seed, inapoi, onReia }: { u: Unitate; varst
   );
 }
 
-function FinalEn({ u, stele, inapoi, onReia }: { u: Unitate; stele: number; inapoi: string; onReia: () => void }) {
+export function FinalEn({ u, stele, inapoi, onReia }: { u: Unitate; stele: number; inapoi: string; onReia: () => void }) {
   useCelebrare(true, stele === 3 ? "mare" : "mica");
   useEffect(() => { spune(stele === 3 ? "Fantastic! Well done!" : "Well done!"); }, [stele]);
   return (

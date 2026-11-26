@@ -38,13 +38,13 @@ export const UNITATI: Unitate[] = [
     ],
   },
   {
-    id: "numbers", titlu: "Numbers 1–10", titluRo: "Numerele 1–10", icon: "🔢", culoare: "#2f6fd1", cerinta: "Touch {w}!", fraza: "{w}!",
+    id: "numbers", titlu: "Numbers 1–10", titluRo: "Numerele 1–10", icon: "🔢", culoare: "#2f6fd1", cerinta: "Touch {w}!", fraza: "I can count to {w}.",
     cuvinte: ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"].map((en, i) => ({
       en, ro: ["unu", "doi", "trei", "patru", "cinci", "șase", "șapte", "opt", "nouă", "zece"][i], emoji: "⭐", numar: i + 1,
     })),
   },
   {
-    id: "animals", titlu: "Animals", titluRo: "Animalele", icon: "🐾", culoare: "#2e9e5b", cerinta: "Where's the {w}?", fraza: "It's a {w}.",
+    id: "animals", titlu: "Animals", titluRo: "Animalele", icon: "🐾", culoare: "#2e9e5b", cerinta: "Where's the {w}?", fraza: "I can see a {w}.",
     cuvinte: [
       { en: "cat", ro: "pisică", emoji: "🐱" }, { en: "dog", ro: "câine", emoji: "🐶" }, { en: "bird", ro: "pasăre", emoji: "🐦" },
       { en: "fish", ro: "pește", emoji: "🐟" }, { en: "rabbit", ro: "iepure", emoji: "🐰" }, { en: "duck", ro: "rață", emoji: "🦆" },
@@ -61,7 +61,7 @@ export const UNITATI: Unitate[] = [
     ],
   },
   {
-    id: "body", titlu: "My body", titluRo: "Corpul meu", icon: "🙋", culoare: "#6a59a7", cerinta: "Touch the {w}!", fraza: "This is my {w}.",
+    id: "body", titlu: "My body", titluRo: "Corpul meu", icon: "🙋", culoare: "#6a59a7", cerinta: "Touch the {w}!", fraza: "Touch your {w}.",
     cuvinte: [
       { en: "eyes", ro: "ochii", emoji: "👀" }, { en: "ear", ro: "urechea", emoji: "👂" }, { en: "nose", ro: "nasul", emoji: "👃" },
       { en: "mouth", ro: "gura", emoji: "👄" }, { en: "hand", ro: "mâna", emoji: "✋" }, { en: "foot", ro: "piciorul (laba)", emoji: "🦶" },
@@ -69,7 +69,7 @@ export const UNITATI: Unitate[] = [
     ],
   },
   {
-    id: "food", titlu: "Food", titluRo: "Mâncarea", icon: "🍎", culoare: "#c62828", cerinta: "Where's the {w}?", fraza: "I like {w}!",
+    id: "food", titlu: "Food", titluRo: "Mâncarea", icon: "🍎", culoare: "#c62828", cerinta: "Where's the {w}?", fraza: "I want the {w}, please.",
     cuvinte: [
       { en: "apple", ro: "măr", emoji: "🍎" }, { en: "banana", ro: "banană", emoji: "🍌" }, { en: "milk", ro: "lapte", emoji: "🥛" },
       { en: "bread", ro: "pâine", emoji: "🍞" }, { en: "cake", ro: "tort", emoji: "🍰" }, { en: "egg", ro: "ou", emoji: "🥚" },
@@ -86,7 +86,7 @@ export const UNITATI: Unitate[] = [
     ],
   },
   {
-    id: "clothes", titlu: "Clothes", titluRo: "Hainele", icon: "👕", culoare: "#d81b60", cerinta: "Where's the {w}?", fraza: "I've got a {w}.",
+    id: "clothes", titlu: "Clothes", titluRo: "Hainele", icon: "👕", culoare: "#d81b60", cerinta: "Where's the {w}?", fraza: "Put on your {w}.",
     cuvinte: [
       { en: "hat", ro: "pălărie", emoji: "👒" }, { en: "coat", ro: "haină", emoji: "🧥" }, { en: "dress", ro: "rochie", emoji: "👗" },
       { en: "T-shirt", ro: "tricou", emoji: "👕" }, { en: "shoes", ro: "pantofi", emoji: "👟" }, { en: "socks", ro: "șosete", emoji: "🧦" },
@@ -112,11 +112,26 @@ export const RUNDE_VARSTA: Record<Varsta, number> = { 4: 6, 5: 8, 6: 10 };
 /** perechi la Memory */
 export const PERECHI_VARSTA: Record<Varsta, number> = { 4: 3, 5: 4, 6: 6 };
 
-export type ActivitateEn = "cartonase" | "asculta" | "perechi";
-export const ACTIVITATI_EN: Record<ActivitateEn, { nume: string; icon: string; descriere: string }> = {
-  cartonase: { nume: "Cartonașe", icon: "🃏", descriere: "Vezi imaginea, asculți cuvântul și îl spui și tu." },
-  asculta: { nume: "Ascultă și atinge", icon: "👂", descriere: "Asculți cuvântul și atingi imaginea potrivită." },
-  perechi: { nume: "Perechi", icon: "🧠", descriere: "Întoarce cartonașele și găsește imaginile la fel." },
+export type ActivitateEn = "cartonase" | "cutia" | "roata" | "asculta" | "cartita" | "baloane" | "perechi" | "sorteaza" | "propozitie";
+/** grupa: „invat” (descopăr și spun cuvintele) sau „joc” (jocuri cu stele) */
+export const ACTIVITATI_EN: Record<ActivitateEn, { nume: string; icon: string; descriere: string; grupa: "invat" | "joc"; culoare: string }> = {
+  cartonase: { nume: "Cartonașe", icon: "🃏", descriere: "Vezi imaginea, asculți cuvântul și îl spui și tu.", grupa: "invat", culoare: "#6a59a7" },
+  cutia: { nume: "Deschide cutia", icon: "🎁", descriere: "Fiecare cutie are o surpriză. Ce e înăuntru?", grupa: "invat", culoare: "#e0483e" },
+  roata: { nume: "Roata", icon: "🎡", descriere: "Învârte roata și spune cuvântul în engleză.", grupa: "invat", culoare: "#e07a1f" },
+  asculta: { nume: "Ascultă și atinge", icon: "👂", descriere: "Asculți cuvântul și atingi imaginea potrivită.", grupa: "joc", culoare: "#2f6fd1" },
+  cartita: { nume: "Lovește cârtița", icon: "🔨", descriere: "Lovește cârtița care ține imaginea spusă!", grupa: "joc", culoare: "#8d6e63" },
+  baloane: { nume: "Sparge baloanele", icon: "🎈", descriere: "Sparge balonul cu imaginea spusă!", grupa: "joc", culoare: "#ec407a" },
+  perechi: { nume: "Perechi", icon: "🧠", descriere: "Întoarce cartonașele și găsește imaginile la fel.", grupa: "joc", culoare: "#00897b" },
+  sorteaza: { nume: "Sortează", icon: "🗂️", descriere: "Pune fiecare imagine în coșul potrivit.", grupa: "joc", culoare: "#1fa9bd" },
+  propozitie: { nume: "Construiește propoziția", icon: "🧩", descriere: "Ascultă propoziția și pune piesele în ordine.", grupa: "joc", culoare: "#5b3fb8" },
+};
+/** activitățile cu stele câștigate (cele de „învăț” dau mereu 3 stele la final) */
+export const ACTIVITATI_CU_STELE: ActivitateEn[] = ["asculta", "cartita", "baloane", "perechi", "sorteaza", "propozitie"];
+
+/** pictogramele cuvintelor din propoziții (copiii nu citesc: fiecare piesă are o imagine) */
+export const ICON_CUVANT: Record<string, string> = {
+  "i": "🙋", "i've": "🙋", "it's": "👉", "this": "👉", "is": "🟰", "my": "🫶", "a": "☝️", "the": "👆", "like": "❤️", "want": "🤲", "please": "🙏",
+  "can": "💪", "see": "👀", "count": "🔢", "to": "➡️", "got": "🤲", "touch": "✋", "your": "🫵", "put": "🤲", "on": "⬆️",
 };
 
 /** textul cerinței cu cuvântul pus („Where's the cat?”) */

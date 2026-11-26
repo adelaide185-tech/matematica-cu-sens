@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ACTIVITATI_EN, unitate, type ActivitateEn, type Varsta } from "@/engleza/continut";
 import { Asculta, Cartonase, Perechi } from "@/engleza/Activitati";
+import { ConstruiestePropozitia, DeschideCutia, LovesteCartita, Roata, Sorteaza, SpargeBaloanele } from "@/engleza/JocuriVii";
 import { citesteVarsta } from "@/engleza/Varsta";
 import { seedNou } from "@/motor/rng";
 
@@ -21,6 +22,15 @@ export default function PaginaActivitate() {
   const a = activitate as ActivitateEn;
   const reia = () => setSeed(seedNou());
   if (a === "cartonase") return <Cartonase u={u} inapoi={inapoi} />;
-  if (a === "asculta") return <Asculta key={seed} u={u} varsta={varsta} seed={seed} inapoi={inapoi} onReia={reia} />;
-  return <Perechi key={seed} u={u} varsta={varsta} seed={seed} inapoi={inapoi} onReia={reia} />;
+  const p = { u, varsta, seed, inapoi, onReia: reia };
+  switch (a) {
+    case "asculta": return <Asculta key={seed} {...p} />;
+    case "perechi": return <Perechi key={seed} {...p} />;
+    case "cartita": return <LovesteCartita key={seed} {...p} />;
+    case "baloane": return <SpargeBaloanele key={seed} {...p} />;
+    case "cutia": return <DeschideCutia key={seed} {...p} />;
+    case "roata": return <Roata key={seed} {...p} />;
+    case "sorteaza": return <Sorteaza key={seed} {...p} />;
+    case "propozitie": return <ConstruiestePropozitia key={seed} {...p} />;
+  }
 }

@@ -5,15 +5,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { MeniuCursuri } from "@/componente/MeniuCursuri";
 import { citesteProgres, sincronizeazaProgres } from "@/jocuri/progres";
-import { ACTIVITATI_EN, UNITATI, type ActivitateEn, type Varsta } from "./continut";
+import { ACTIVITATI_CU_STELE, UNITATI, type Varsta } from "./continut";
 import { citesteVarsta, salveazaVarsta } from "./Varsta";
 import { Imagine } from "./Activitati";
 import { spune } from "./voce";
 import { Mascota } from "@/componente/Mascota";
 import { SetariVoceAdult } from "@/componente/SetariVoce";
 
-const ACT = Object.keys(ACTIVITATI_EN) as ActivitateEn[];
-const steleUnitate = (s: Record<string, number>, u: string) => ACT.filter((a) => a !== "cartonase").reduce((t, a) => t + (s[`en-${u}-${a}-0`] ?? 0), 0);
+const MAX_STELE = ACTIVITATI_CU_STELE.length * 3;
+const steleUnitate = (s: Record<string, number>, u: string) => ACTIVITATI_CU_STELE.reduce((t, a) => t + (s[`en-${u}-${a}-0`] ?? 0), 0);
 
 /** Cursul de engleză 4–6 ani: alegerea vârstei și a unității. */
 export function HubEngleza() {
@@ -64,7 +64,10 @@ export function HubEngleza() {
                 </span>
               </div>
               <div className="mt-3 flex flex-wrap gap-1">{u.cuvinte.slice(0, 5).map((c) => <span key={c.en} className="grid h-12 w-12 place-items-center overflow-hidden rounded-xl bg-gray-50"><Imagine c={c} marime={c.numar ? 0.25 : c.culoare ? 0.4 : 0.45} /></span>)}</div>
-              <div className="mt-3 text-xl" aria-label={`${s} stele din 6`}>{Array.from({ length: 6 }, (_, k) => <span key={k} className={k < s ? "" : "opacity-20 grayscale"}>⭐</span>)}</div>
+              <div className="mt-3 flex items-center gap-2" aria-label={`${s} stele din ${MAX_STELE}`}>
+                <span className="h-3 flex-1 overflow-hidden rounded-full bg-mov-deschis"><span className="block h-full rounded-full bg-galben" style={{ width: `${(100 * s) / MAX_STELE}%` }} /></span>
+                <span className="font-bold text-violet-inchis">⭐ {s}/{MAX_STELE}</span>
+              </div>
             </Link>
           );
         })}

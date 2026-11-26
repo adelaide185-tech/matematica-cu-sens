@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ACTIVITATI_EN, unitate, type ActivitateEn } from "@/engleza/continut";
+import { ACTIVITATI_CU_STELE, ACTIVITATI_EN, unitate, type ActivitateEn } from "@/engleza/continut";
 import { Imagine } from "@/engleza/Activitati";
 import { citesteProgres } from "@/jocuri/progres";
 import { spune } from "@/engleza/voce";
@@ -22,19 +22,26 @@ export default function PaginaUnitate() {
         <span className="text-5xl" aria-hidden>{u.icon}</span>
         <h1 className="text-3xl font-extrabold sm:text-4xl" style={{ color: u.culoare }}>{u.titlu} <span className="text-xl font-bold text-gray-500">· {u.titluRo}</span></h1>
       </header>
-      <div className="grid gap-4 sm:grid-cols-3">
-        {(Object.keys(ACTIVITATI_EN) as ActivitateEn[]).map((a) => {
-          const s = stele[`en-${u.id}-${a}-0`] ?? 0;
-          return (
-            <Link key={a} href={`/engleza/${u.id}/${a}`} className="flex flex-col items-center gap-1 rounded-[2rem] bg-white p-5 text-center shadow-md transition hover:-translate-y-1 hover:shadow-xl">
-              <span className="text-6xl" aria-hidden>{ACTIVITATI_EN[a].icon}</span>
-              <span className="text-2xl font-extrabold text-mov">{ACTIVITATI_EN[a].nume}</span>
-              <span className="text-sm text-gray-600">{ACTIVITATI_EN[a].descriere}</span>
-              <span className="mt-1 text-xl" aria-label={`${s} stele`}>{[1, 2, 3].map((k) => <span key={k} className={k <= s ? "" : "opacity-20 grayscale"}>⭐</span>)}</span>
-            </Link>
-          );
-        })}
-      </div>
+      {(["invat", "joc"] as const).map((g) => (
+        <section key={g} className="mt-4">
+          <h2 className="mb-2 text-xl font-extrabold text-violet-inchis">{g === "invat" ? "📖 Învăț cuvintele" : "🎮 Mă joc"}</h2>
+          <div className={`grid gap-4 ${g === "invat" ? "sm:grid-cols-3" : "grid-cols-2 sm:grid-cols-3"}`}>
+            {(Object.keys(ACTIVITATI_EN) as ActivitateEn[]).filter((a) => ACTIVITATI_EN[a].grupa === g).map((a) => {
+              const s = stele[`en-${u.id}-${a}-0`] ?? 0, info = ACTIVITATI_EN[a];
+              return (
+                <Link key={a} href={`/engleza/${u.id}/${a}`} className="flex flex-col items-center gap-1 rounded-[2rem] bg-white p-5 text-center shadow-md transition hover:-translate-y-1 hover:shadow-xl" style={{ borderBottom: `8px solid ${info.culoare}` }}>
+                  <span className="text-6xl" aria-hidden>{info.icon}</span>
+                  <span className="text-xl font-extrabold" style={{ color: info.culoare }}>{info.nume}</span>
+                  <span className="text-sm text-gray-600">{info.descriere}</span>
+                  {ACTIVITATI_CU_STELE.includes(a)
+                    ? <span className="mt-1 text-xl" aria-label={`${s} stele`}>{[1, 2, 3].map((k) => <span key={k} className={k <= s ? "" : "opacity-20 grayscale"}>⭐</span>)}</span>
+                    : <span className="mt-1 text-sm font-semibold text-green-700">{s ? "✓ făcut" : " "}</span>}
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      ))}
       <h2 className="mt-8 text-xl font-bold text-mov">Cuvintele unității <span className="text-sm font-normal text-gray-500">(atinge o imagine ca s-o auzi)</span></h2>
       <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-5">
         {u.cuvinte.map((c) => (
